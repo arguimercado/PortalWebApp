@@ -1,0 +1,60 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+
+@inherits ComponentViewModelBase<CostReportViewModel>
+@attribute [Authorize]
+
+<RadzenCard>
+   
+    <RadzenStack Style="margin-top:60px">
+        <RadzenDataGrid TItem="AssetSIVSummary"
+                        Data="Model.CostReport.Summary"
+                        AllowColumnResize=true
+                        AllowVirtualization=true
+                        AllowPaging=true
+                        AllowSorting=true
+                        ExpandMode="DataGridExpandMode.Single"
+                        PageSize="10"
+                        PageSizeOptions="new int[] { 10, 20, 30,50,100 }"
+                        ShowPagingSummary="true">
+
+            <Template Context="summary">
+                <RadzenDataGrid TItem="AssetSIVTransaction"
+                                Data="summary.Transactions"
+                                AllowColumnResize=true
+                                AllowVirtualization=true
+                                AllowPaging=true
+                                AllowSorting=true
+                                AllowFiltering=true
+                                PageSize="10"
+                                PageSizeOptions="new int[] { 10, 20, 30,50,100 }"
+                                ShowPagingSummary="true">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="AssetCode" Title="Asset Code" />
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="ItemCode" Title="Item Code" />
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="ItemDescription" Title="Description" />
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="DocType" Title="Source" />
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="SIVNo" Title="Doc. No" />
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="SIVDate" Title="Doc. Date" />
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="Qty" Title="Quantity" FormatString="{0:###,##0}" TextAlign="TextAlign.Right" />
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="Rate" Title="Rate" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="AssetSIVTransaction" Property="Amount" Title="Amount" FormatString="{0:###,##0.00}" TextAlign="TextAlign.Right">
+                            <FooterTemplate>
+                                <RadzenText TextStyle="TextStyle.Caption" Text="@summary.Transactions.Sum(c => c.Amount).ToString("###,##0.00")" />
+                            </FooterTemplate>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </Template>
+            <Columns>
+                <RadzenDataGridColumn TItem="AssetSIVSummary" Property="AssetCode" Title="Asset Code" />
+                <RadzenDataGridColumn TItem="AssetSIVSummary" Property="TotalAmount" Title="Total Amount" FormatString="{0:###,##0.00}" />
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+
+}

@@ -1,0 +1,30 @@
+﻿
+
+@inject DialogService DialogService;
+
+<RadzenRow AlignItems="AlignItems.Center" Gap="0.8rem">
+    <RadzenColumn Size="10">
+        <CustomField Text="Ajustment Qty" Orientation="horizontal" LabelColumn="5" ContentColumn="7">
+            <RadzenNumeric TValue="float" Name="Variance" @bind-Value=_variance class="w-100" />
+        </CustomField>
+    </RadzenColumn>
+    <RadzenColumn>
+        <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Adjust" Click="@(() => HandleSave())" />
+    </RadzenColumn>
+</RadzenRow>
+
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public float Value { get; set; }
+
+    private float _variance = 0f;
+
+    private void HandleSave() {
+        DialogService.Close(_variance);
+    }
+}

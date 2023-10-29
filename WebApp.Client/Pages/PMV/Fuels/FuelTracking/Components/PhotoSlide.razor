@@ -1,0 +1,61 @@
+﻿@using WebApp.UILibrary.Providers;
+
+
+
+<RadzenStack Orientation="Orientation.Vertical">
+    
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px">
+        <RadzenButton Icon="@IconProvider.GetIconMenu("back")" Click="@(() => SetNavigation(0))" />
+        @if(_currentImageIndex == 0) {
+            <RadzenStack AlignItems="AlignItems.Center">
+                <RadzenText Text="@($"Start Shift Fuel Meter {OpeningMeter.ToString("###,##0.00")}")" TextStyle="TextStyle.Subtitle2" />
+                <RadzenImage Path="@OpeningImagePath" Style="width: 15rem; height:180px; border-radius: 20px " Click="@(() => HandleZoomClick(OpeningImagePath))" />
+                <RadzenText Text="Start Shift Fuel Meter Photo" TextStyle="TextStyle.Caption" />
+            </RadzenStack>
+        }
+        else
+        {
+            <RadzenStack AlignItems="AlignItems.Center">
+                <RadzenText Text="@($"End Shift Fuel Meter {ClosingMeter.ToString("###,##0.00")}")" TextStyle="TextStyle.Subtitle2" />
+                <RadzenImage Path="@ClosingImagePath" Style="width: 15rem; height:180px; border-radius: 20px" Click="@(() => HandleZoomClick(ClosingImagePath))" />
+                <RadzenText Text="End Shift Fuel Meter Photo" TextStyle="TextStyle.Caption" />
+            </RadzenStack>
+        }
+        <RadzenButton Icon="@IconProvider.GetIconMenu("next")" Click="@(() => SetNavigation(1))" />
+    </RadzenStack>
+</RadzenStack>
+
+
+@code {
+
+    private int _currentImageIndex = 0;
+
+    [Parameter]
+    public string OpeningImagePath { get; set; } = "";
+
+    [Parameter]
+    public string ClosingImagePath { get; set; } = "";
+
+    [Parameter]
+    public float OpeningMeter { get; set; }
+
+    [Parameter]
+    public float ClosingMeter { get; set; }
+
+    [Parameter]
+    public EventCallback<EventPhotoArgs> OnZoomClick { get; set; }
+
+
+    private void HandleZoomClick(string imagesrc)
+    {
+        OnZoomClick.InvokeAsync(new EventPhotoArgs { ImageSrc = imagesrc });
+    }
+
+    private void SetNavigation(int index)
+    {
+        _currentImageIndex = index;
+        StateHasChanged();
+    }
+
+    
+}

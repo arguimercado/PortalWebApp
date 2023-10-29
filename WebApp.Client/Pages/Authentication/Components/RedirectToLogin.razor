@@ -1,0 +1,26 @@
+@page "/"
+
+@inject PageNavigation Navigation
+@inject AuthenticationStateProvider CustomProvider
+
+<h3>You are not authorized</h3>
+@code {
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        AuthState = CustomProvider.GetAuthenticationStateAsync();
+        var authState = await AuthState;
+        if(!authState.User.Identity.IsAuthenticated) {
+            Navigation.NavigateTo($"/accounts/login?returnUrl={Uri.EscapeDataString(Navigation.CurrentUri())}");
+        }
+        else
+        {
+            Navigation.NavigateTo("/home");
+        }
+
+    }
+}

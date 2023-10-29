@@ -1,0 +1,44 @@
+
+
+<RadzenCard Variant="Variant.Outlined"  Style="padding:0;background: #fcfcfc">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems=AlignItems.Center class="cst-rc-header">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
+            @if(!string.IsNullOrEmpty(Icon)) {
+                <RadzenIcon Icon=@Icon />
+            }
+            <span>@TitleHeader</span>
+        </RadzenStack>
+        <RadzenStack>
+            @TopNav
+        </RadzenStack>
+    </RadzenStack>
+    
+    <RadzenStack Gap="5px" style="padding:10px">
+        @ChildContent
+    </RadzenStack>
+</RadzenCard>
+
+<style>
+    .cst-rc-header {
+        background-color: rgb(99, 103, 230);
+        min-height: 40px;
+        padding: 0 15px;
+        color: white;
+    }
+</style>
+
+@code {
+    
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? TopNav { get; set; }
+
+    [Parameter]
+    public string TitleHeader { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+    
+}

@@ -1,0 +1,38 @@
+
+@if(IsFullRow) {
+    <div class="@($"d-flex justify-content-{AdjustContent} mb-{Margin} flex-{Direction} w-100 {AlignCenter}")">
+        @ChildContent
+    </div>
+}
+else {
+
+    <div class="@($"row d-flex justify-content-{AdjustContent} mb-{Margin} w-100 {AlignCenter}")">
+        @ChildContent 
+    </div>
+}
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool IsFullRow { get; set; } = false;
+
+    [Parameter]
+    public string AdjustContent { get; set; } = "start";
+
+    [Parameter]
+    public int Margin { get; set; } = 3;
+
+    [Parameter]
+    public string Direction { get; set; } = "column";
+
+    [Parameter]
+    public bool FullWidth { get; set; } = true;
+
+    [Parameter]
+    public bool IsAlignCenter { get; set; } = false;
+
+    private string AlignCenter => IsAlignCenter ? "align-items-center" : "";
+
+}

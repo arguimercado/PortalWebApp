@@ -1,0 +1,25 @@
+﻿
+<RadzenStack>
+    @if(IsSwitch) {
+        @Sub
+    }
+    else
+    {
+        @Main
+    }
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? Main { get; set; }
+
+    [Parameter]
+    public RenderFragment? Sub { get; set; }
+
+    [Parameter]
+    public bool IsSwitch { get; set; } = false;
+    
+
+
+}

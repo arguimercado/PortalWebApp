@@ -1,0 +1,91 @@
+﻿@if (IsModern)
+{
+    <RadzenStack Orientation=Radzen.Orientation.Vertical Gap="0.5rem" class="py-1 px-1">
+        <RadzenFormField Text="@Text" Style="width: 100%; color: #cecece;">
+            @ChildContent
+        </RadzenFormField>
+        @Error
+    </RadzenStack>
+
+}
+else
+{
+    
+    @if(Orientation == "vertical") {
+        @if(Column > 0) {
+            <CustomCol Column=Column>
+                <CustomRow IsFullRow=true Direction="column">
+                    <RadzenLabel Text="@DisplayText" class="fw-bold" />
+                    @ChildContent
+                </CustomRow>
+            </CustomCol>
+        }
+        else {
+            <RadzenStack Orientation="Radzen.Orientation.Vertical" Gap="5px" Style="padding:5px 0">
+                <RadzenLabel Text="@DisplayText" class="fw-bold" />
+                @ChildContent
+            </RadzenStack>
+        }
+    }
+    else {
+        @if(Column > 0) {
+            <CustomCol Column=Column>
+                <CustomRow>
+                    <CustomCol Column=LabelColumn>
+                        <RadzenLabel Text="@DisplayText" class="fw-bold" />
+                    </CustomCol>
+                    <CustomCol Column=ContentColumn>
+                        @ChildContent
+                    </CustomCol>
+                </CustomRow>
+            </CustomCol>
+        }
+        else {
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn Size=LabelColumn>
+                    <RadzenLabel Text="@DisplayText" class="fw-bold"/>
+                </RadzenColumn>
+                <RadzenColumn Size=ContentColumn>
+                    @ChildContent
+                </RadzenColumn>
+            </RadzenRow>
+        }
+    }
+}
+
+
+@code {
+
+
+    [Parameter]
+    public RenderFragment? Error { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public bool? MarkRequired { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Orientation { get; set; } = "vertical";
+
+    [Parameter]
+    public int Column { get; set; } = 0;
+
+    [Parameter]
+    public int LabelColumn { get; set; } = 2;
+
+    [Parameter]
+    public int ContentColumn { get; set; } = 10;
+    [Parameter]
+    public bool IsAlignCenter { get; set; } = false;
+
+   
+    private string DisplayText => MarkRequired == true ? $"{Text} *" : Text;
+
+    [Parameter]
+    public bool IsModern { get; set; } = false;
+}

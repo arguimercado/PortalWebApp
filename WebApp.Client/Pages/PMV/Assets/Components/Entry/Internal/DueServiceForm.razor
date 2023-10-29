@@ -1,0 +1,155 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssetServiceViewModel>
+@inject DialogService DialogService
+
+<CustomRow IsFullRow>
+    <RadzenDataGrid Data="Data"
+                    AllowColumnResize=true
+                    AllowSorting=true
+                    TItem="ServiceDueEntryModel"
+                    EditMode="DataGridEditMode.Single"
+                    RowUpdate="@HandleUpdate"
+                    @ref="Grid">
+        <Columns>
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Property="Name" Title="Service Name" />
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Property="Remarks" Title="Remarks/Part No" Width="250px">
+                <EditTemplate Context="service">
+                    <RadzenTextBox @bind-Value="service.Remarks" class="w-100" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Property="LastServiceDate" Title="Last Service Date" TextAlign="TextAlign.Center" Width="250px" FormatString="{0:dd-MMM-yyyy}">
+                <EditTemplate Context="due">
+                    <RadzenDatePicker TValue="DateTime?" DateFormat="dd-MMM-yyyy" @bind-Value="due.LastServiceDate"  class="w-100" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Property="LastSMUReading" Title="Last Reading" TextAlign="TextAlign.Center" Width="200px">
+                <EditTemplate Context="due">
+                    <RadzenNumeric TValue="int" @bind-Value="due.LastSMUReading" class="w-100"  />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Title="Alert Km" Property="KmAlert" TextAlign="TextAlign.Center" Width="120px">
+                <EditTemplate Context="due">
+                    <RadzenNumeric TValue="int" @bind-Value="due.KmAlert" class="w-100" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Property="AlertDue" Title="Alert Due" TextAlign="TextAlign.Center" Width="120px" />
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Property="KmInterval" Title="Interval Km" TextAlign="TextAlign.Center" Width="120px">
+                <EditTemplate Context="due">
+                    <RadzenNumeric TValue="int" @bind-Value="due.KmInterval" class="w-100" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Property="IntervalDue" Title="Interval Due" TextAlign="TextAlign.Center" Width="120px" />
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Property="SMU" Title="SMU" TextAlign="TextAlign.Center" Width="80px" />
+
+            <RadzenDataGridColumn TItem="ServiceDueEntryModel" Context="due" TextAlign="TextAlign.Center" Width="100px">
+                <Template Context="due">
+                    <RadzenButton Icon="edit" 
+                        ButtonStyle="ButtonStyle.Secondary" 
+                        Variant="Variant.Text" 
+                        Size="ButtonSize.Small" 
+                        Click="@(args => EditRow(due))" @onclick:stopPropagation="true"></RadzenButton>
+
+                    <RadzenButton Icon="delete"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Variant="Variant.Text"
+                                  Size="ButtonSize.Small"
+                                  Click="@(args => HandleDelete(due))"></RadzenButton>
+                </Template>
+
+                <EditTemplate Context="due">
+                    
+                    <RadzenButton Icon="check" 
+                        ButtonStyle="ButtonStyle.Success" 
+                        Variant="Variant.Text"
+                                  Size="ButtonSize.Small" Click="@((args) => SaveRow(due))">
+                    </RadzenButton>
+                    <RadzenButton Icon="close" 
+                        ButtonStyle="ButtonStyle.Warning" 
+                        Variant="Variant.Text" 
+                        Size="ButtonSize.Small" 
+                        class="my-1 ms-1" 
+                        Click="@((args) => CancelEdit(due))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</CustomRow>
+<CustomRow AdjustContent="end">
+    <CustomCol Column="4" ColumnClass="d-flex justify-content-end alignt-items-center">
+        <RadzenButton Text="Load From Group" ButtonStyle="ButtonStyle.Light" class="me-4" Click="HandleLoad" />
+    </CustomCol>
+</CustomRow>
+
+@code {
+
+    private RadzenDataGrid<ServiceDueEntryModel>? Grid;
+
+    [Parameter]
+    public IEnumerable<ServiceDueEntryModel> Data {
+        get => Model.ServiceDues.ToList();
+        set => Model.ServiceDues = value.ToList();
+    }
+
+    [Parameter]
+    public IEnumerable<SelectItem> ServiceGroups { get; set; } = new List<SelectItem>();
+
+    [Parameter]
+    public int AssetId { get; set; }
+   
+
+    protected ServiceDueEntryModel dueModel { get; set; } = new();
+
+
+    protected async Task HandleLoadClick() {
+        await Model.CreateServiceDue(AssetId);
+    }
+
+    protected async Task HandleLoad() {
+
+        var result = await DialogService.OpenAsync("Group ", ds =>
+            @<RadzenStack Orientation="Orientation.Vertical" Gap="10px">
+                <CustomField Text="Alert Group">
+                    <RadzenDropDown TValue="string"
+                                TextProperty="Text"
+                                ValueProperty="Value"
+                                Data="@ServiceGroups"
+                                @bind-Value="@Model.ServiceDueId" />
+                </CustomField>
+                <RadzenButton Text="Load" Click="@(async () => { await HandleLoadClick(); ds.Close(); })" />                
+            </RadzenStack>);
+    }
+
+    protected async void SaveRow(ServiceDueEntryModel due) {
+        await Grid.UpdateRow(due);
+    }
+
+    protected void CancelEdit(ServiceDueEntryModel due) {
+        Grid.CancelEditRow(due);
+    }
+
+    protected async void EditRow(ServiceDueEntryModel due) {
+        await Grid.EditRow(due);
+    }
+
+    protected async void HandleUpdate(ServiceDueEntryModel due) {
+        
+        var result = await Model.UpdateServiceDue(AssetId, due);
+        if(result == false) {
+            Grid.CancelEditRow(due);
+        }
+        
+        Grid?.Reload();
+    }
+
+    protected async void HandleDelete(ServiceDueEntryModel due)
+    {
+        await Model.DeleteServiceDue(due);
+        Grid?.Reload();
+    }
+
+
+
+}

@@ -1,0 +1,38 @@
+﻿@using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Models;
+
+
+@inherits ComponentViewModelBase<FuelTrackingViewModel>
+
+<RadzenDataGrid 
+    TItem="FuelLogModel" 
+    Data="Model.SelectedStation.Logs"
+    SelectionMode="DataGridSelectionMode.Single"
+    AllowVirtualization=true
+    AllowColumnResize=true
+    AllowSorting=true
+    RowSelect="HandleRowSelect"
+    Style="max-height:350px;">
+    <Columns>
+        <RadzenDataGridColumn TItem="FuelLogModel" Property="DocumentNo" Title="Document No" Width="120px" />
+        <RadzenDataGridColumn TItem="FuelLogModel" Property="FueledDate" Title="Fueled Date"  FormatString="{0:dd-MMM-yyyy}"/>
+        <RadzenDataGridColumn TItem="FuelLogModel" Property="OpeningMeter" Title="Start Shift Fuel Meter" FormatString="{0:###,##0}" />
+        <RadzenDataGridColumn TItem="FuelLogModel" Property="ClosingMeter" Title="End Shift Fuel Meter" FormatString="{0:###,##0}" />
+        <RadzenDataGridColumn TItem="FuelLogModel" Property="OpeningBalance" Title="Start Shift Fuel Balance" FormatString="{0:###,##0.00}" />
+        <RadzenDataGridColumn TItem="FuelLogModel" Title="Status" Width="120px">
+            <Template>
+                <RadzenBadge IsPill Text="@context.Status" BadgeStyle="BadgeStyle.Info" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    
+    [Parameter]
+    public EventCallback<object> OnSelect { get; set; }
+
+    private async Task HandleRowSelect(object args) {
+        await OnSelect.InvokeAsync(args);
+    }
+}

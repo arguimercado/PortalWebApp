@@ -1,0 +1,96 @@
+﻿@page "/fuel/stock"
+@using Portal.WebClient.Pages.Fuels.Finance.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.Finance.Models;
+@using WebApp.UILibrary.Providers;
+
+
+@inherits ComponentViewModelBase<FuelLedgerViewModel>
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Tanker Fuel Stock Card">
+        
+    </CustomLayoutHeader>
+    <RadzenRow Gap="20px">
+        <RadzenColumn Size="3">
+            <CustomCard TitleHeader="Search" Icon="@IconProvider.GetIconMenu("search")">
+                <RadzenStack Gap="10px">
+                    <CustomField Text="Date From" IsModern>
+                        <RadzenDropDown TValue="string"
+                                        Value="Model.Month.ToString()"
+                                        Data="@(Model.GetMonths())"
+                                        Change="@((args) => Model.SetMonth(args))"
+                                        TextProperty="Text"
+                                        ValueProperty="Value" />
+                    </CustomField>
+                    <CustomField Text="Date To" IsModern>
+                        <RadzenNumeric @bind-Value="Model.Year" />
+                    </CustomField>
+                    <CustomField>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="5px">
+                            <RadzenCheckBox @bind-Value="Model.ForcePost" TValue="bool" />
+                            <RadzenText Text="Force to Post" />
+                        </RadzenStack>
+                    </CustomField>
+                    <CstButton  ButtonType="EnumButtonType.Download" Text="Extract" Click="Model.Extract" />
+                </RadzenStack>
+            </CustomCard>
+        </RadzenColumn>
+        <RadzenColumn>
+
+            <RadzenDataGrid 
+                AllowColumnResize=true
+                TItem="TankerStockContainer"
+                        Data="Model.ContainerList.OrderByDescending(m => m.Month)">
+                <Template Context="entries">
+                    <RadzenDataGrid 
+                            AllowColumnResize=true
+                            TItem="TankerStockModel" 
+                            Data="entries.FuelEntries">
+                        <Columns>
+                            <RadzenDataGridColumn TItem="TankerStockModel" Property="TankerCode" Title="Tanker Code" />
+                            <RadzenDataGridColumn TItem="TankerStockModel" Property="OpeningBalance" Title="Opening Balance" FormatString="{0:###,##0.00}" />
+                            <RadzenDataGridColumn TItem="TankerStockModel" Property="TotalRefill" Title="Total Refill" FormatString="{0:###,##0.00}" />
+                            <RadzenDataGridColumn TItem="TankerStockModel" Property="TotalDispense" Title="Total Dispense" FormatString="{0:###,##0.00}">
+                                <FooterTemplate>
+                                    <RadzenText Text="@entries.FuelEntries.Sum(t => t.TotalDispense).ToString("###,##0.00")" />
+                                </FooterTemplate>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="TankerStockModel" Property="TotalDistribute" Title="Total Issued To LV" FormatString="{0:###,##0.00}">
+                                <FooterTemplate>
+                                    <RadzenText Text="@entries.FuelEntries.Sum(t => t.TotalDistribute).ToString("###,##0.00")" />
+                                </FooterTemplate>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="TankerStockModel" Property="TotalAdjustment" Title="Total Adjustment" FormatString="{0:###,##0.00}" />
+                        </Columns>
+                    </RadzenDataGrid>
+                </Template>
+                <Columns>
+                    <RadzenDataGridColumn TItem="TankerStockContainer" Property="Month" Title="Month">
+                        <Template>
+                            <RadzenText Text="@(new DateTime(context.Year,context.Month,1).ToString("MMMM"))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="TankerStockContainer" Property="Year" Title="Year" />
+                    <RadzenDataGridColumn TItem="TankerStockContainer" Property="TankerCount" Title="Total Tanker" />
+                    <RadzenDataGridColumn TItem="TankerStockContainer" Property="TotalDispense" Title="Total Dispense" FormatString="{0:###,##0.00}" />
+                    <RadzenDataGridColumn TItem="TankerStockContainer" Property="TotalDistribute" Title="Total Issued To LV" FormatString="{0:###,##0.00}" />
+                    <RadzenDataGridColumn TItem="TankerStockContainer" Property="TotalFlowVariance" Title="Total Variance (in Flow Meter)" FormatString="{0:###,##0.00}" />
+                    <RadzenDataGridColumn TItem="TankerStockContainer" Width="80px" TextAlign="TextAlign.Center">
+                        <Template>
+                            <CstButton ButtonType="EnumButtonType.Excel"  Size="ButtonSize.Small" IconOnly ButtonVariant="Variant.Text" Click="@(() => Model.Exports(context.Month,context.Year))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</CustomPageLayout>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) {
+            await Model.Load();
+        }
+    }
+}

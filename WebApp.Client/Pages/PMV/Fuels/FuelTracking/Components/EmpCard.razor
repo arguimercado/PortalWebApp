@@ -1,0 +1,27 @@
+﻿@using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
+
+@inherits ComponentViewModelBase<FuelTrackingViewModel>
+
+<RadzenRow JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" >
+    <RadzenColumn Size="3">
+        <RadzenCard Variant="Variant.Text">
+            <RadzenImage Path="@Model.Employee.Photo" Style="width: 70%" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="9">
+        <RadzenStack Gap="0.5rem">
+            <CustomFieldDisplay Label="Employee Id" Text="@Model.Employee.EmpCode" />
+            <CustomFieldDisplay Label="Employee Name" Text="@Model.Employee.EmpName" />
+            <CustomFieldDisplay Label="Mobile No" Text="@Model.Employee.MobilePhone" />
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter]
+    public string EmployeeId { get; set; } = "";
+
+    protected override async Task OnParametersSetAsync() {
+        await Model.GetEmployeeInfo(EmployeeId);
+    }
+}

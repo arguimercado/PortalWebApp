@@ -1,0 +1,46 @@
+﻿@using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Models;
+
+
+
+@inherits ComponentViewModelBase<FuelTrackingViewModel>
+@inject DialogService DialogService
+
+<RadzenFieldset>
+    <RadzenRow>
+        <RadzenColumn Size="9">
+            <RadzenRow>
+                <RadzenColumn Size="4">
+                    <CustomFieldDisplay Label="Asset Code" Text="@Transaction.AssetCode" TextColumn="7" LabelColumn="5"/>
+                    <CustomFieldDisplay Label="Project Code" Text="@Transaction.ProjectCode" TextColumn="7" LabelColumn="5" />
+                    <CustomFieldDisplay Label="Date" Text="@Transaction.FuelDateTime.ToString("dd-MMM-yyyy")" TextColumn="7" LabelColumn="5" />
+                    <CustomFieldDisplay Label="Time" Text="@Transaction.FuelDateTime.ToString("hh:mm tt")" TextColumn="7" LabelColumn="5" />
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <CustomFieldDisplay Label="Operator" Text="@Transaction.OperatorDriver" TextColumn="7" LabelColumn="5" />
+                    <CustomFieldDisplay Label="Remarks" Text="@Transaction.Remarks" TextColumn="7" LabelColumn="5" />
+                    <CustomFieldDisplay Label="Fueler" Text="@Transaction.CreatedBy" TextColumn="7" LabelColumn="5" />
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <CustomFieldDisplay Label="Refill Qty" Text="@Transaction.RefillQuantity.ToString("###,##0.00")" TextColumn="7" LabelColumn="5" />
+                    <CustomFieldDisplay Label="Disp/Dist Qty" Text="@Transaction.ConsumedQuantity.ToString("###,##0.00")" TextColumn="7" LabelColumn="5" />
+                    <CustomFieldDisplay Label="Adjustment Qty" Text="@Transaction.AdjustmentQuantity.ToString("###,##0.00")" TextColumn="7" LabelColumn="5" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenColumn>
+        <RadzenColumn Size="3">
+            <ItemPhoto ImagePath="@Model.GetImagePath" Photos="Transaction.Photos" OnPhotoClick="@HandlePhotoClick" />
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenFieldset>
+
+@code {
+    [Parameter]
+    public FuelTransactionModel Transaction { get; set; } = new();
+
+    private void HandlePhotoClick(EventPhotoArgs args)
+    {
+        DialogService.Open<ZoomPhoto>("Zoom", parameters: new Dictionary<string, object> { { "ImageSource", Model.GetImage(args.ImageSrc) } });
+    }
+
+}

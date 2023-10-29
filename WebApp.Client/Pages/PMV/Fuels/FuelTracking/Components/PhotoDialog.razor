@@ -1,0 +1,43 @@
+﻿@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Models;
+
+
+<RadzenRow>
+    <RadzenColumn>
+        <RadzenCard Variant="Variant.Text">
+            <RadzenImage Path="@Selected" Style="width: 70%" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="4">
+        <RadzenStack Gap="0.5rem">
+            <CustomFieldDisplay Label="Asset" Text="@Data.AssetCode" />
+            <CustomFieldDisplay Label="Log Type" Text="@Data.LogType" />
+            <CustomFieldDisplay Label="Quantity" Text="@Data.Quantity.ToString("###,###0")" />
+            <RadzenDataList TItem="string" WrapItems=false Data="Photos"
+                            PagerHorizontalAlign="HorizontalAlign.Center">
+                <Template Context="data">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenCard  Variant="Variant.Text" onclick="@(() => HandleImageSelect(data))">
+                            <RadzenImage Path="@data" Style="width: 100%; border-radius: 5%" />
+                        </RadzenCard>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataList>
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter]
+    public string[]? Photos { get; set; } = Array.Empty<string>();
+
+    [Parameter]
+    public FuelTransactionModel Data { get; set; } = new();
+
+    private string Selected = "";
+
+    private void HandleImageSelect(string selected)
+    {
+        Selected = selected;
+        StateHasChanged();
+    }
+}

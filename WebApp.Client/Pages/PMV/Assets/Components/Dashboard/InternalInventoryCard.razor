@@ -1,0 +1,101 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssetDashboardViewModel>
+
+<RadzenStack>
+    <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3" Text="Internal Asset" />
+    <RadzenDataGrid TItem="CategoryCountModel" Data="@Model.Dashboard.CategoryCounts"
+                    AllowPaging="true"
+                    AllowColumnReorder="true"
+                    AllowColumnResize="true"
+                    AllowFiltering=true
+                    AllowSorting="true"
+                    ShowPagingSummary="true">
+        <Columns>
+            
+            <RadzenDataGridColumn TItem="CategoryCountModel" Property="Category" Title="Category">
+                <FooterTemplate>
+                    <strong>Total: </strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            
+            <RadzenDataGridColumn TItem="CategoryCountModel" TextAlign="TextAlign.Center" Title="Active">
+                <Template Context="category">
+                    <a href="#"
+                       @onclick:preventDefault="true"
+                       @onclick="@(() => HandleSearch("internal", category.Code,"1"))">@category.Active.ToString("###,##0")</a>
+                </Template>
+                <FooterTemplate>
+                    <strong>@Model.Dashboard.CategoryCounts.Sum(c => c.Active).ToString("###,##0")</strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            
+            <RadzenDataGridColumn TItem="CategoryCountModel" Title="Inactive" TextAlign="TextAlign.Center">
+                <Template Context="category">
+                    <a href="#"
+                       @onclick:preventDefault="true"
+                       @onclick="@(() => HandleSearch("internal", category.Code, "1"))">@category.Inactive.ToString("###,##0")</a>
+                </Template>
+                <FooterTemplate>
+                    <strong>@Model.Dashboard.CategoryCounts.Sum(c => c.Inactive).ToString("###,##0")</strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            
+            <RadzenDataGridColumn TItem="CategoryCountModel" Title="Sold" TextAlign="TextAlign.Center">
+                <Template Context="category">
+                    <a href="#"
+                       @onclick:preventDefault="true"
+                       @onclick="@(() => HandleSearch("internal", category.Code, "2"))">@category.Sold.ToString("###,##0")</a>
+                </Template>
+                <FooterTemplate>
+                    <strong>@Model.Dashboard.CategoryCounts.Sum(c => c.Sold).ToString("###,##0")</strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            
+            <RadzenDataGridColumn TItem="CategoryCountModel" Title="TradedIn" TextAlign="TextAlign.Center">
+                <Template Context="category">
+                    <a href="#"
+                       @onclick:preventDefault="true"
+                       @onclick="@(() => HandleSearch("internal", category.Code, "3"))">@category.TradedIn.ToString("###,##0")</a>
+                </Template>
+                <FooterTemplate>
+                    <strong>@Model.Dashboard.CategoryCounts.Sum(c => c.TradedIn).ToString("###,##0")</strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CategoryCountModel" Title="Scrapped" TextAlign="TextAlign.Center">
+                <Template Context="category">
+                    <a href="#"
+                       @onclick:preventDefault="true"
+                       @onclick="@(() => HandleSearch("internal", category.Code, "4"))">@category.Scrapped.ToString("###,##0")</a>
+                </Template>
+                <FooterTemplate>
+                    <strong>@Model.Dashboard.CategoryCounts.Sum(c => c.Scrapped).ToString("###,##0")</strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CategoryCountModel" Title="Retired" TextAlign="TextAlign.Center">
+                <Template Context="category">
+                    <a href="#"
+                       @onclick:preventDefault="true"
+                       @onclick="@(() => HandleSearch("internal", category.Code, "5"))">@category.Retired.ToString("###,##0")</a>
+                </Template>
+                <FooterTemplate>
+                    <strong>@Model.Dashboard.CategoryCounts.Sum(c => c.Retired).ToString("###,##0")</strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CategoryCountModel" Property="Summary" Title="Total" FormatString="{0:###,##0}" TextAlign="TextAlign.Center">
+                <FooterTemplate>
+                    <strong>@Model.Dashboard.CategoryCounts.Sum(c => c.Summary).ToString("###,##0")</strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+
+@code {
+
+    protected void HandleSearch(string assetType, string category, string status) {
+        PageNavigation.NavigateTo($"/asset/manage/{assetType}/{category}/{status}");
+    }
+}

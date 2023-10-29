@@ -1,0 +1,86 @@
+﻿@using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Models;
+
+@inherits ComponentViewModelBase<FuelTrackingViewModel>
+
+@inject DialogService DialogService
+
+<RadzenRow>
+    <RadzenColumn>
+        <CustomFieldDisplay Label="Tanker Code" LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.Station" TextStyle="TextStyle.Subtitle1" />
+        </CustomFieldDisplay>
+        <CustomFieldDisplay Label="Fueling Date " LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.FueledDate.ToString("dd-MMM-yyyy")" TextStyle="TextStyle.Subtitle1" />
+        </CustomFieldDisplay>
+        <CustomFieldDisplay Label="Reference No" LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.ReferenceNo.ToString()" TextStyle="TextStyle.Subtitle1" />
+        </CustomFieldDisplay>
+        <CustomFieldDisplay Label="Start Shift Fuel Balance" LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.OpeningBalance.ToString("###,##0.00")" TextStyle="TextStyle.Subtitle1" />
+        </CustomFieldDisplay>
+        <CustomFieldDisplay Label="Current Quantity" LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.RemainingBalance.ToString("###,##0.00")" TextStyle="TextStyle.Subtitle1" />
+        </CustomFieldDisplay>
+        <CustomFieldDisplay Label="Created By" LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.Fueler" TextStyle="TextStyle.Subtitle1" />
+        </CustomFieldDisplay>
+    </RadzenColumn>
+    <RadzenColumn>
+        <CustomFieldDisplay Label="Status" LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.Status" class="rz-color-warning-dark" />
+        </CustomFieldDisplay>
+
+        <CustomFieldDisplay Label="Start Shift Fuel Meter" LabelColumn="5" TextColumn="7">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText Text="@Selected.OpeningMeter.ToString("###,##0.00")" TextStyle="TextStyle.Subtitle1" />
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Click="@(() => HandleEditMeter("opening"))" />
+            </RadzenStack>
+        </CustomFieldDisplay>
+        <CustomFieldDisplay Label="Start Shift Fuel Meter Var." LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.OpeningVariance.ToString("###,##0.00")" TextStyle="TextStyle.Subtitle1" />
+        </CustomFieldDisplay>
+        <CustomFieldDisplay Label="End Shift Fuel Meter" LabelColumn="5" TextColumn="7">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText Text="@Selected.ClosingMeter.ToString("###,##0.00")" TextStyle="TextStyle.Subtitle1" />
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Info" Click="@(() => HandleEditMeter("closing"))" />
+            </RadzenStack>
+        </CustomFieldDisplay>
+        <CustomFieldDisplay Label="End Shift Fuel Meter Var." LabelColumn="5" TextColumn="7">
+            <RadzenText Text="@Selected.ClosingVariance.ToString("###,##0.00")" TextStyle="TextStyle.Subtitle1" />
+        </CustomFieldDisplay>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+
+    [Parameter]
+    public FuelLogModel Selected { get; set; } = new();
+
+    private async Task HandleEditMeter(string type)
+    {
+        float value = 0f;
+        string title = "";
+        if (type == "opening")
+        {
+            value = Selected.OpeningMeter;
+            title = "Opening Meter Adjustment:";
+        }
+        else
+        {
+            value = Selected.ClosingMeter;
+            title = "Closing Meter Adjustment:";
+        }
+
+        var result = await DialogService.OpenAsync<MeterAdjustment>(title, parameters: new Dictionary<string, object> {
+            {"Title",title},
+            {"Value",value}
+        }, options: new DialogOptions { Width = "30%", Draggable = true });
+
+        if (result != null)
+        {
+            await Model.UpdateMeter(result, type);
+        }
+
+    }
+}

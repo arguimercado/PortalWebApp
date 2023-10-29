@@ -1,0 +1,136 @@
+﻿@using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Components.Entry.ViewModels;
+@using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Models;
+
+
+@inherits ComponentViewModelBase<GroupAlertViewModel>
+
+@inject ServiceAlertViewModel ServiceAlertViewModel
+@inject DialogService DialogService
+
+@if(isShowServiceEntry)
+{
+    <RadzenTemplateForm TItem="ServiceAlertModel" Data="ServiceAlertViewModel.ServiceAlert" Submit="HandleServiceAlertSubmit">
+        <RadzenStack>
+            <RadzenFieldset Text="Register Alert" class="w-100">
+                <CustomField Text="Category">
+                    <RadzenDropDown 
+                        TValue="string"
+                        Data="categories"
+                        TextProperty="Text"
+                        ValueProperty="Value"
+                        @bind-Value="ServiceAlertViewModel.ServiceAlert.ServiceCategory" />
+                </CustomField>
+                <CustomField Text="Service Code">
+                    <RadzenTextBox Name="ServiceCode" @bind-Value="ServiceAlertViewModel.ServiceAlert.ServiceCode" />
+                </CustomField>
+                <CustomField Text="Description">
+                    <RadzenTextBox Name="Description" @bind-Value="ServiceAlertViewModel.ServiceAlert.Description" />
+                </CustomField>
+            </RadzenFieldset>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="10px">
+                <RadzenButton Text="Save" ButtonType="ButtonType.Submit" />
+                <RadzenButton Text="Cancel" Click="(() => DialogService.CloseSide())" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+else
+{   
+    <RadzenTemplateForm TItem="GroupAlertDetailModel" Data="DetailViewModel" Submit="HandleClickSave">
+        <RadzenStack>
+            <RadzenFieldset Text="Detail" class="w-100">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="10px">
+                    <CustomField Text="Service Code">
+                        <RadzenRow AlignItems="AlignItems.Center" Gap="2px">
+                            <RadzenColumn Size="1">
+                                <RadzenButton Icon="add" Variant="Variant.Outlined" Size="ButtonSize.ExtraSmall" Click="@(() => isShowServiceEntry =true)" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="11">
+                                <RadzenDropDown Data="Model.GroupAlertContainer.AssetServices"
+                                                Name="ServiceAlertId"
+                                                TValue=String
+                                                AllowClear="true"
+                                                AllowFiltering="true"
+                                                Placeholder="Select..."
+                                                TextProperty="Text"
+                                                ValueProperty="Value"
+                                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                @bind-Value="DetailViewModel.ServiceAlertId"
+                                                Change="(args => GetDescription(args))" class="w-100" />
+                                <RadzenRequiredValidator Component="ServiceAlertId" Text="Service Code is Required" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </CustomField>
+                    <CustomField Text="Alert (Km)">
+                        <RadzenNumeric Name="KmAlert" TValue="int" @bind-Value="DetailViewModel.KmAlert" />
+                        <RadzenNumericRangeValidator Component="KmAlert" Text="Km Alert is Required" Min="1" />
+                    </CustomField>
+                    <CustomField Text="Interval (Km)">
+                        <RadzenNumeric TValue="int"  @bind-Value="DetailViewModel.KmInterval" />
+                    </CustomField>
+                    <CustomField Text="SMU">
+                        <RadzenDropDown 
+                            TValue="string" 
+                            Data="@(new string[]{ "KM","HR" })"
+                            @bind-Value="DetailViewModel.SMU" />
+                    </CustomField>
+                </RadzenStack>
+                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" Gap="10px" class="my-2">
+                    <RadzenCheckBox TValue="bool" @bind-Value="DetailViewModel.NotifyManagementWhenAlert" />
+                    <RadzenLabel Text="Notify management at alert level" />
+                </RadzenStack>
+                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" Gap="10px" class="my-2">
+                    <RadzenCheckBox TValue="bool" @bind-Value="DetailViewModel.NotifyManagementAfterInterval" />
+                    <RadzenLabel Text="Notify management above interval" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="10px">
+                    <RadzenButton Text="Save" ButtonType="ButtonType.Submit" />
+                    <RadzenButton Text="Cancel" Click="(() => DialogService.CloseSide())" />
+                </RadzenStack>
+            </RadzenFieldset>
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+
+@code {
+
+    [Parameter]
+    public GroupAlertDetailModel DetailViewModel { get; set; } = new();
+
+    private bool isShowServiceEntry = false;
+    private IEnumerable<SelectItem> categories = new List<SelectItem>
+    {
+        new SelectItem {Text = "Engine",Value="Engine"},
+        new SelectItem {Text = "Fuel",Value="Fuel"},
+        new SelectItem {Text = "Hydrolic",Value="Hydrolic"},
+        new SelectItem {Text = "Coolant",Value="Coolant"},
+        new SelectItem {Text = "Others",Value="Others"},
+    };
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ServiceAlertViewModel.PropertyChanged += HandleChanged;
+    }
+
+    private async Task HandleServiceAlertSubmit() {
+        await ServiceAlertViewModel.Save(data => 
+                Model.GroupAlertContainer.AssetServices.Add(
+                    new SelectItem { Value = data.ServiceCode, Text = $"{data.ServiceCode} - {data.Description}" }));
+        DialogService.CloseSide();
+    }
+
+
+    protected void HandleClickSave()
+    {
+
+        Model.AddUpdateDetail(DetailViewModel);
+        DialogService.CloseSide();
+    }
+
+    protected void GetDescription(object value)
+    {
+        var alert = Model.GroupAlertContainer.AssetServices.SingleOrDefault(a => a.Value == (string)value);
+        DetailViewModel.Name = alert!.Text;
+    }
+}

@@ -1,0 +1,118 @@
+﻿@page "/fuel/dashboard"
+@using WebApp.Client.Pages.PMV.Fuels.Dashboard.Models;
+@using WebApp.Client.Pages.PMV.Fuels.Dashboard.ViewModels;
+@using WebApp.UILibrary.Providers;
+
+@attribute [Authorize]
+@inherits ComponentViewModelBase<FuelDashboardViewModel>
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Fuel Dashboard" Icon=@IconProvider.GetIconMenu("dashboard")>
+
+    </CustomLayoutHeader>
+    <RadzenRow>
+        <RadzenColumn Size="4" Style="margin-top: 10px">
+            <RadzenCard>
+                <RadzenLabel Text="Latest Closing Meter" />
+                <RadzenDataList Data="@CurrentMeters.ToList()"
+                                TItem="StationSummaryModel"
+                                PageSize="5"
+                                PagerHorizontalAlign="HorizontalAlign.Left"
+                                ShowPagingSummary="true">
+                    <Template Context="station">
+                        <CustomRow>
+                            <RadzenColumn Size="4" Class="station">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="height:100%">
+                                    <RadzenText TagName="TagName.H5" TextStyle="TextStyle.H6">
+                                        @(station.Station)
+                                    </RadzenText>
+                                </RadzenStack>
+                            </RadzenColumn>
+                            <RadzenColumn Size="8">
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-color-secondary">Closing Meter: @(station.CurrentMeter.ToString("###,##0"))</RadzenText>
+                                    <RadzenText Style="font-size: 0.8rem">
+                                        <span>Document No: @station.DocumentNo </span>
+                                        <span>Latest Log Date:  @(station.CurrentDate.HasValue ? station.CurrentDate.Value.ToString("dd-MMM-yyyy") : "") </span>
+                                </RadzenText>
+                                <RadzenText Style="font-size: 0.8rem">
+                                    <span>Opening Meter: @station.OpeningMeter.ToString("###,##0") </span>
+                                    <span>Closing Meter: @station.ClosingMeter.ToString("###,##0")</span>
+                                </RadzenText>
+                            </RadzenColumn>
+                        </CustomRow>
+                    </Template>
+                </RadzenDataList>
+            </RadzenCard>
+        </RadzenColumn>
+
+        <RadzenColumn Size="8" Style="margin-top: 10px">
+            <RadzenCard>
+                <RadzenStack 
+                    AlignItems="AlignItems.Center" 
+                    Orientation="Orientation.Vertical" 
+                    Gap="5">
+
+                    <RadzenDataGrid TItem="StationSummaryModel"
+                                    AllowColumnReorder="true"
+                                    AllowColumnResize="true"
+                                    AllowSorting="true"
+                                    Data="@CurrentMeters">
+                        <Columns>
+                            <RadzenDataGridColumn TextAlign="TextAlign.Center"
+                                                  Sortable=false
+                                                  TItem="StationSummaryModel" 
+                                                  Title="@($"Year {DateTime.Today.Year.ToString()}")">
+                                <Columns>
+                                    <RadzenDataGridColumn TItem="StationSummaryModel" Property="Station" Title="Station" />
+                                    <RadzenDataGridColumn TItem="StationSummaryModel" Property="TotalRefill" Title="Total Refill" FormatString="{0:###,##0}" TextAlign="TextAlign.Right" />
+                                    <RadzenDataGridColumn TItem="StationSummaryModel" Property="TotalDistribute" Title="Total Distribute" FormatString="{0:###,##0}" TextAlign="TextAlign.Right" />
+                                    <RadzenDataGridColumn TItem="StationSummaryModel" Property="TotalDispense" Title="Total Dispense" FormatString="{0:###,##0}" TextAlign="TextAlign.Right" />
+                                    <RadzenDataGridColumn TItem="StationSummaryModel" Property="TotalAdjustment" Title="Total Adjustment" FormatString="{0:###,##0}" TextAlign="TextAlign.Right" />
+                                </Columns>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+
+                    <RadzenAlert Title="Information" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                        <ul>
+                            <li><strong>Total Refill:</strong> Shows the total quantity of diesel filled-in to a fixed tank</li>
+                            <li><strong>Total Distribute:</strong> Shows the total quantity of diesel distributed from fixed tank to diesel tanker</li>
+                            <li><strong>Total Dispense:</strong>  Shows the total quantity of diesel dispensed to consumer</li>
+                            <li><strong>Total Adjustment:</strong> Shows the total quantity of diesel adjusted from both diesel tanker and fixed Tank</li>
+                        </ul>
+                    </RadzenAlert>
+                </RadzenStack>
+
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</CustomPageLayout>
+
+<style>
+    .station {
+        min-height: 72px;
+        background-color: var(--rz-secondary-lighter);
+        padding: 3px;
+    }
+
+    .price-badge {
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 20px;
+        padding: 8px;
+    }
+</style>
+@code {
+    bool allowVirtualization;
+
+    protected IEnumerable<StationSummaryModel> CurrentMeters => Model.FuelDashboard.TankSummary;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Model.Load();
+        }
+    }
+
+}

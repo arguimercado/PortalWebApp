@@ -1,0 +1,21 @@
+
+<div class="@($"col-md-{Column.ToString()} {ColumnClass}")" style="position:relative">
+    @ChildContent
+</div>
+
+
+@code {
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public int Column { get; set; } = 12;
+
+    
+
+    [Parameter]
+    public string ColumnClass { get; set; } = "";
+
+    
+}

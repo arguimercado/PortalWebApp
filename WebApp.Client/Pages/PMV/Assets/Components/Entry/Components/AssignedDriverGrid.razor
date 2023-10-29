@@ -1,0 +1,216 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssignedDriverViewModel>
+
+@inject AssetViewModel AssetModel
+@inject DialogService DialogService 
+
+<RadzenStack>
+    <RadzenRow Gap="10px">
+        <RadzenColumn Size="3">
+            <RadzenTemplateForm TItem="AssignedDriver" Data="Model.Driver" Submit="HandleSubmit">
+                <RadzenFieldset>
+                    <CustomField Text="Employee/Non Employee" IsModern>
+                        <ChildContent>
+                        <RadzenDropDown AllowVirtualization=true
+                                        AllowClear=true
+                                        Name="EmpType"
+                                        Data="@InternalExternals"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                                        @bind-Value="Model.Driver.EmpType"/>
+                        </ChildContent>
+                        <Error>
+                            <RadzenRequiredValidator Component="EmpType" Text="Employee Type is required" />
+                        </Error>
+                    </CustomField>
+                    <CustomField Text="Employee ID" IsModern>
+                        <RadzenDropDown AllowVirtualization=true
+                                        Name="EmpCode"
+                                        Disabled="@(Model.Driver.EmpType == "employee" ? false : true)"
+                                        TValue="string"
+                                        Data="AssetModel.AssetContainer.Drivers"
+                                        TextProperty="FullName"
+                                        ValueProperty="EmpCode"
+                                        class="w-100"
+                                        Change="@(args => OnSelectDriver(args))"
+                                        Value="Model.Driver.EmpCode"
+                                        AllowClear=true
+                                        AllowFiltering=true
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" />
+
+                    </CustomField>
+                    <CustomField Text="Name" IsModern>
+                        <RadzenTextBox Name="EmpName" @bind-value="Model.Driver.EmpName" />
+                    </CustomField>
+                    <CustomField Text="RP No" IsModern>
+                        <RadzenTextBox Name="RPNo" @bind-value="Model.Driver.RPNo" />
+                    </CustomField>
+                    <CustomField Text="Location" IsModern>
+                        <RadzenTextBox Name="AssetLocation" @bind-Value="Model.Driver.AssetLocation" class="w-100" />
+                    </CustomField>
+                    <CustomField Text="Company" IsModern>
+                        <RadzenTextBox Name="Company" @bind-Value="Model.Driver.Company" class="w-100" />
+                    </CustomField>
+                    <CustomField Text="Mobile No" IsModern>
+                        <RadzenTextBox Name="MobileNo" @bind-Value="Model.Driver.MobileNo" class="w-100" />
+                    </CustomField>
+                    <CustomField Text="Assigned At" IsModern>
+                        <ChildContent>
+                        <RadzenDatePicker TValue="DateTime?"
+                                            Name="AssignedAt"
+                                          DateFormat="dd-MMM-yyyy"
+                                          AllowClear=true
+                                          @bind-Value="Model.Driver.AssignedAt" class="w-100" />
+                        </ChildContent>
+                        <Error>
+                            <RadzenRequiredValidator Component="AssignedAt" Text="Assigned At is required" />
+                        </Error>
+                    </CustomField>
+                    <CustomField Text="Return Date" IsModern>
+                        <RadzenDatePicker TValue="DateTime?"
+                                          DateFormat="dd-MMM-yyyy"
+                                          Name="ReturnedAt"
+                                          AllowClear=true
+                                          @bind-Value="Model.Driver.ReturnedAt" class="w-100" />
+                    </CustomField>
+                    <CustomField Text="DCS No" IsModern>
+                        <RadzenNumeric TValue="int?" Name="DscSlNo" @bind-Value="Model.Driver.DcsSlNo" class="w-100" />
+                    </CustomField>
+                </RadzenFieldset>
+                <RadzenStack JustifyContent="JustifyContent.Center" Style="padding: 10px" Orientation="Orientation.Horizontal">
+                    <CstButton ButtonType="EnumButtonType.Add" ActionType="ButtonType.Submit" />
+                    <CstButton ButtonType="EnumButtonType.Cancel" Click="Model.Clear" />
+                </RadzenStack>
+            </RadzenTemplateForm>
+        </RadzenColumn>
+        <RadzenColumn Size="9">
+            <RadzenDataGrid @ref="driversGrid"
+                            TItem="AssignedDriver"
+                            Data="@AssignedDrivers"
+                            AllowColumnResize=true
+                            Style="font-size: 10px"
+                            ColumnWidth="280px">
+
+                <Columns>
+                    <RadzenDataGridColumn TItem="AssignedDriver" Title="SNo" TextAlign="TextAlign.Center" Width="40px" Resizable=false>
+                        <Template Context="driver">
+                            <span> @(AssignedDrivers.ToList().IndexOf(driver) + 1)</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AssignedDriver" Title="Assigned Person" Width="320px">
+                        <Template Context="driver">
+                            <span>@($"{driver.EmpCode} - {driver.EmpName} ({driver.Company})")</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AssignedDriver" Property="AssetLocation" Title="Location" Width="120px"/>
+                    <RadzenDataGridColumn TItem="AssignedDriver" Property="AssignedAt" Title="Assigned Date" FormatString="{0:dd-MMM-yyyy}" Width="200px" />
+                    <RadzenDataGridColumn TItem="AssignedDriver" Property="ReturnedAt" Title="Returned Date" FormatString="{0:dd-MMM-yyyy}" />
+                    <RadzenDataGridColumn TItem="AssignedDriver" Property="DcsSlNo" Title="DCS No" Width="140px" />
+                    <RadzenDataGridColumn TItem="AssignedDriver"
+                                          TextAlign="TextAlign.Center"
+                                          Resizable=false
+                                          Width="80px">
+                        <Template Context="driver">
+                            <RadzenStack Gap="2px" Orientation="Orientation.Horizontal">
+                                <RadzenButton Icon="edit"
+                                              ButtonStyle="ButtonStyle.Info" Variant="Variant.Text" Size="ButtonSize.Small"
+                                              Shade="Shade.Dark"
+                                              Click="@(args => HandleEdit(driver))" @onclick:stopPropagation="true"></RadzenButton>
+
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Text"
+                                              Shade="Shade.Dark" Size="ButtonSize.Small"
+                                              Class="my-1 ms-1" Click="@(args => DeleteRow(driver))" @onclick:stopPropagation="true" />
+
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+
+@code {
+
+    [Parameter]
+    public string AssetCode { get; set; } = "";
+    [Parameter]
+    public string AssetType { get; set; } = "";
+    [Parameter]    
+    public IEnumerable<AssignedDriver> AssignedDrivers { get; set; } = new List<AssignedDriver>();
+    [Parameter]
+    public EventCallback<EventArgs> OnRefresh { get; set; }
+
+
+    private List<SelectItem> InternalExternals = new()
+    {
+        new SelectItem { Text = "Employee", Value = "employee" },
+        new SelectItem { Text = "Non Employee", Value = "nonemployee" }
+    };
+
+    private RadzenDataGrid<AssignedDriver>? driversGrid;
+
+    private void HandleEdit(AssignedDriver driver)
+    {
+        Model.EditDriver(driver);
+    }
+
+    private void HandleClear()
+    {
+        Model.Clear();
+    }
+
+    private async Task HandleSubmit()
+    {
+
+        var confirmation = await DialogService.Confirm("Are you sure you want to save?", "Save");
+        if (!confirmation.HasValue || !confirmation.Value)
+        {
+            return;
+        }
+
+        await Model.AddDriver(AssetCode,AssetType);
+        await OnRefresh.InvokeAsync(new EventArgs());
+        await driversGrid!.Reload();
+
+    }
+
+    protected async Task DeleteRow(AssignedDriver driver)
+    {
+        var confirmation = await DialogService.Confirm("Are you sure you want to delete?", "Delete");
+        if (!confirmation.HasValue || !confirmation.Value)
+        {
+            return;
+        }
+
+        await Model.DeleteDriver(driver);
+        await OnRefresh.InvokeAsync(new EventArgs());
+        await driversGrid!.Reload();
+    }
+
+
+    private void OnSelectDriver(object args)
+    {
+        if(args != null) {
+            var empCode = args.ToString();
+            var employee = AssetModel.AssetContainer.Drivers.FirstOrDefault(e => e.EmpCode == empCode);
+            if(employee != null ) {
+                Model.Driver.EmpCode = empCode!;
+                Model.Driver.EmpName = employee!.EmpName;
+                Model.Driver.Company = employee!.VisaDesignation;
+                Model.Driver.Department = employee!.LocationOfWork;
+                Model.Driver.RPNo = employee.RPNo;
+                Model.Driver.MobileNo = employee.MobilePhone;
+            }
+            StateHasChanged();
+        }
+    }
+
+
+  
+
+
+}

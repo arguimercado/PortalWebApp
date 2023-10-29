@@ -1,0 +1,30 @@
+﻿<RadzenSidebar @bind-Expanded="@SidebarExpand">
+    <RadzenPanelMenu>
+        <RadzenPanelMenuItem Text="Home" Icon="home" />
+        <RadzenPanelMenuItem Text="PMV">
+            <RadzenPanelMenuItem Text="Asset">
+                <RadzenPanelMenuItem Text="Asset Manage" Path="/asset/manage/edit" />
+            </RadzenPanelMenuItem>
+            <RadzenPanelMenuItem Text="Fuel" Icon="home">
+                <RadzenPanelMenuItem Text="Fuel Manage" Path="/fuel/manage" />
+                <RadzenPanelMenuItem Text="Fuel Tracking" Path="/fuel/tracking" />
+                <RadzenPanelMenuItem Text="Fuel Stock" Path="/fuel/stock" />
+                <RadzenPanelMenuItem Text="Fuel Station" Path="/fuel/station" />
+            </RadzenPanelMenuItem>
+        </RadzenPanelMenuItem>
+        <RadzenPanelMenuItem Text="My Approvals" />
+        <RadzenPanelMenuItem Text="My Tasks" />
+        <RadzenPanelMenuItem Text="Approved IMS Docs" />
+    </RadzenPanelMenu>
+</RadzenSidebar>
+
+@code {
+    
+
+
+    [Parameter]
+    public bool SidebarExpand { get; set; } = false;
+
+
+    
+}

@@ -1,0 +1,47 @@
+﻿@using Portal.WebClient.Pages.Fuels.FuelEffeciency.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEffeciency.Models;
+@using WebApp.UILibrary.Components.Grid;
+
+@inherits ComponentViewModelBase<FuelLogEfficiencyViewModel>
+
+<RadzenDataGrid Data=Data 
+                TItem="FuelLogEffeciencyModel"
+                AllowFiltering=true
+                AllowPaging="true" PageSize="20"
+                AllowColumnReorder="true"
+                AllowColumnResize="true"
+                AllowSorting="true"
+                ColumnWidth="200px"
+                Style="overflow-x:scroll"
+                PageSizeOptions="@PageSizeOption.Option"
+                ShowPagingSummary="true">
+    <Columns>
+        <RadzenDataGridColumn Width="50px" 
+            TItem="FuelLogEffeciencyModel" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" >
+            <Template Context="data">
+                @(Data.IndexOf(data) + 1)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="AssetCode" Title="Asset Code">
+            
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="Location" Title="Fueling Location" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="OnHireTo" Title="On Hire To" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="Station" Title="Fueled By" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="FuelDateTime" Title="Date/Time" FormatString="{0: dd-MMM-yyyy hh:mm tt}" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="Reading" Title="Current SMU (Km.)" FormatString="{0:###,##0}" TextAlign="TextAlign.Right" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="Diff" Title="SMU Diff." FormatString="{0:###,##0}" TextAlign="TextAlign.Right" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="Quantity" Title="Quantity (Ltr)." FormatString="{0:###,##0}" TextAlign="TextAlign.Right" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="LH" Title="L/Hour" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="HL" Title="H/Liter" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="FuelLogEffeciencyModel" Property="DocumentNo" Title="Document No." />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+
+    private IList<FuelLogEffeciencyModel> Data => Model.EffeciencyContainer.EffeciencyLists.ToList();
+
+    
+
+}

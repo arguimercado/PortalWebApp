@@ -1,0 +1,268 @@
+﻿@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Components.Supports
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Models;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.ViewModels;
+
+
+@inherits ComponentViewModelBase<FuelLogEntryViewModel>
+@inject DialogService DialogService
+
+<RadzenRow>
+    <RadzenColumn Size="9">
+        <CustomCard Icon="edit" TitleHeader="Fuel Transaction Entry">
+            <RadzenTemplateForm TItem="FuelTransactionModel" Data="RecordSource" Submit="HandleSubmit">
+                <RadzenRow Gap="15px">
+                    <RadzenColumn Size="2">
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="2px">
+                            <CustomField Text="Log Type" IsModern>
+                                <ChildContent>
+                                    <RadzenDropDown Name="LogType"
+                                                    TValue="string"
+                                                    Data="Model.FuelLogContainer.LogTypeSelections"
+                                                    TextProperty="Text"
+                                                    ValueProperty="Value"
+                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                    AllowFiltering="true"
+                                                    @bind-Value="RecordSource.LogType"
+                                                    Change="@((args) => HandleLogTypeChange())" />
+                                </ChildContent>
+                            </CustomField>
+                            <RadzenRequiredValidator Component="LogType" Text="Log Type is required" />
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="2px">
+                            <CustomField Text="Asset" IsModern=true>
+                                <ChildContent>
+                                    <RadzenDropDown Name="AssetCode"
+                                                    TValue="string"
+                                                    Data="Model.AssetSelection"
+                                                    TextProperty="Text"
+                                                    ValueProperty="Value"
+                                                    AllowVirtualization=true
+                                                    FilterOperator="StringFilterOperator.StartsWith"
+                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                    AllowFiltering="true"
+                                                    @bind-Value="RecordSource.AssetCode"
+                                                    Change="@((args) => HandleAssetChange(RecordSource.LogType,(string)args))" />
+                                </ChildContent>
+                            </CustomField>
+                            <RadzenRequiredValidator Component="AssetCode" Text="Enter Asset Code" />
+                        </RadzenStack>
+
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="2px">
+                            <CustomField Text="Project Code" IsModern=true>
+                                <RadzenDropDown Name="ProjectCode"
+                                                TValue="String"
+                                                AllowVirtualization=true
+                                                AllowClear=true
+                                                AllowFiltering=true
+                                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                FilterOperator="StringFilterOperator.StartsWith"
+                                                Data="Model.FuelLogContainer.LocationSelections"
+                                                TextProperty="Text"
+                                                ValueProperty="Value"
+                                                @bind-Value=RecordSource.ProjectCode />
+                            </CustomField>
+                            <RadzenStack>
+                                @if (Model.Efficiencies != null && Model.Efficiencies.Count() > 0)
+                                {
+                                    if (Model.IsLoading)
+                                    {
+                                        <RadzenButton IsBusy=true BusyText="Loading" Variant="Variant.Text" Size="ButtonSize.Small" />
+                                    }
+                                    else
+                                    {
+                                        <RadzenBadge @onclick="@(() => {
+                                                    RecordSource.ProjectCode = Model.Efficiencies.FirstOrDefault()!.Location;
+                                                    StateHasChanged();
+                                                })"
+                                                     BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark" Variant="Variant.Text" Style="margin-top: 5px">
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
+                                                <RadzenIcon Icon="location_on" />@Model.Efficiencies.FirstOrDefault()!.Location
+                                            </RadzenStack>
+                                        </RadzenBadge>
+                                    }
+                                }
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="2px">
+                            <CustomField Text="KM/HR" IsModern>
+                                <RadzenNumeric style="width: 100%;"
+                                               TValue="int"
+                                               Name="Mileage"
+                                               Change="@((args) => HandleMileageChange(args))"
+                                               @bind-Value=RecordSource.Reading />
+                            </CustomField>
+                            <RadzenStack>
+                                @if (Model.Efficiencies != null && Model.Efficiencies.Count() > 0)
+                                {
+                                    if (Model.IsLoading)
+                                    {
+                                        <RadzenButton IsBusy=true BusyText="Loading" Variant="Variant.Text" Size="ButtonSize.Small" />
+                                    }
+                                    else
+                                    {
+                                        <RadzenBadge @onclick="HandleDialogOpen" BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark" Variant="Variant.Text" Style="margin-top: 5px">
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
+                                                <RadzenIcon Icon="speed" />@Model.Efficiencies.FirstOrDefault()!.Reading.ToString("###,#00")
+                                            </RadzenStack>
+                                        </RadzenBadge>
+                                    }
+                                }
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="2">
+                        <RadzenStack Gap="2px">
+                            <CustomField Text="Quantity" IsModern>
+                                <ChildContent>
+                                    <RadzenNumeric style="width: 100%;"
+                                                   Name="Quantity"
+                                                   @bind-Value=RecordSource.Quantity />
+                                </ChildContent>
+                            </CustomField>
+                            <RadzenStack>
+                                @if (Model.Efficiencies != null && Model.Efficiencies.Count() > 0)
+                                {
+                                    if (Model.IsLoading)
+                                    {
+                                        <RadzenButton IsBusy=true BusyText="Loading" Variant="Variant.Text" Size="ButtonSize.Small" />
+                                    }
+                                    else
+                                    {
+                                        <RadzenBadge @onclick="HandleDialogOpen" BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark" Style="margin-top: 5px" Variant="Variant.Text">
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="padding: 0 0.25rem 0 0; text-transform: none;">
+                                                <RadzenIcon Icon="tag" />@Model.Efficiencies.FirstOrDefault()!.Quantity.ToString("###,#00")
+                                            </RadzenStack>
+                                        </RadzenBadge>
+                                    }
+                                }
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow Gap="12px">
+                    <RadzenColumn Size="3">
+                        <CustomField Text="Driver/Operator" IsModern>
+                            <ChildContent>
+                                <RadzenDropDown TValue="string"
+                                                Name="OperatorDriver"
+                                                AllowVirtualization=true
+                                                TextProperty="FullName"
+                                                ValueProperty="EmpCode"
+                                                AllowFiltering=true
+                                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                AllowClear=true
+                                                Data="Model.FuelLogContainer.FuelerSelections"
+                                                @bind-Value=RecordSource.OperatorDriver />
+                            </ChildContent>
+                        </CustomField>
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">
+                        <CustomField Text="Remarks" IsModern>
+                            <ChildContent>
+                                <RadzenTextBox Name="Remarks" @bind-Value="RecordSource.Remarks" />
+                            </ChildContent>
+                        </CustomField>
+                    </RadzenColumn>
+                    <RadzenColumn Size="5">
+                        <CstTimePicker Data="RecordSource.FuelDateTime" Change="HandleTimeChange" Label="Fuel Time" />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenStack Style="margin-top: 25px" JustifyContent="JustifyContent.End" Gap="10px" Orientation="Orientation.Horizontal">
+                    <CstButton ButtonType="EnumButtonType.Add" ActionType="ButtonType.Submit" Size="ButtonSize.Small" />
+                    <CstButton ButtonType="EnumButtonType.Cancel" Click="HandleCancel" Size="ButtonSize.Small" />
+                </RadzenStack>
+            </RadzenTemplateForm>
+        </CustomCard>
+    </RadzenColumn>
+    <RadzenColumn>
+        <CustomCard TitleHeader="Photos">
+            <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+                <PhotoSlide Photos="@RecordSource.Photos" ImagePath="@(Model.GetImagePath())" />
+            </RadzenStack>
+        </CustomCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    public FuelTransactionModel RecordSource => Model.Detail;
+
+    void HandleCancel()
+    {
+        OnCancel.InvokeAsync();
+    }
+
+    async Task HandleSubmit()
+    {
+     
+        await Model.UpdateRow();
+    }
+
+    void HandleTimeChange(DateTime value)
+    {
+        RecordSource.FuelDateTime = value;
+    }
+
+
+
+    void HandleMileageChange(int args)
+    {
+
+        var previousReadingRecord = Model.Efficiencies.FirstOrDefault();
+        if (previousReadingRecord is not null)
+        {
+            if (args < previousReadingRecord.Reading)
+                DialogService.Alert("Warning! Current reading is less than the previous reading", "SMU Warning");
+        }
+    }
+
+    void HandleLogTypeChange(object args)
+    {
+        if (Model.Detail.LogType.ToLower() == "refill")
+        {
+            Model.Detail.AssetCode = Model.FuelLogContainer.FuelLog.Station;
+        }
+    }
+
+    protected void HandleDialogOpen()
+    {
+        DialogService.Open<EffeciencyListDialog>(title: "History", null,
+        new DialogOptions() { Width = "900px", Height = "1200px", Resizable = true, Draggable = true });
+    }
+
+    protected async Task HandleAssetChange(string logType, string argumentValue)
+    {
+        //do not included non asset
+        if (argumentValue.ToLower() == "noneasset")
+            return;
+
+        if (!string.IsNullOrEmpty(argumentValue) && !string.IsNullOrEmpty(logType))
+        {
+            var assetCode = argumentValue;
+            await Model.GetAssetEfficiency(logType, assetCode);
+            if (Model.Efficiencies.Count() > 0)
+            {
+                RecordSource.Remarks = Model.Efficiencies.FirstOrDefault()?.PlateNo ?? "";
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            await DialogService.Alert("Please Select Asset code");
+        }
+    }
+
+    protected void HandleLogTypeChange()
+    {
+        Model.GetAssetSelection(RecordSource.LogType);
+    }
+}

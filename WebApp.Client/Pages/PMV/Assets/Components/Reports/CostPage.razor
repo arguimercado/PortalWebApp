@@ -1,0 +1,127 @@
+﻿@page "/asset/cost"
+@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<CostReportViewModel>
+
+@inject AssetExportViewModel ExportViewModel
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Spare Parts Cost" Icon="local_gas_station">
+        <CstButton ButtonType="EnumButtonType.Excel" Click="@HandleExport"/>
+    </CustomLayoutHeader>
+    <CustomLayoutBody>
+        <RadzenStack>
+        <RadzenRow Gap="3px" >
+            <RadzenColumn Size="2">
+                <CustomField Text="Category">
+                    <RadzenDropDown Name="CategoryId"
+                                    TValue="string"
+                                    AllowClear="true"
+                                    AllowFiltering=true
+                                    TextProperty="Text"
+                                    ValueProperty="Value"
+                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    FilterOperator="StringFilterOperator.StartsWith"
+                                    AllowVirtualization=true
+                                    Data="Model.CostReport.Categories"
+                                    @bind-Value="Filter.CategoryId" />
+                </CustomField>
+            </RadzenColumn>
+            <RadzenColumn Size="2">
+                <CustomField Text="Sub Category">
+                    <RadzenDropDown Name="SubCategory"
+                                    TValue="string"
+                                    AllowClear="true"
+                                    AllowFiltering=true
+                                    TextProperty="Text"
+                                    ValueProperty="Value"
+                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    FilterOperator="StringFilterOperator.StartsWith"
+                                    AllowVirtualization=true
+                                    Data="Model.CostReport.FilterSubCategory(Filter.CategoryId)"
+                                    @bind-Value="Filter.SubCategory" />
+                </CustomField>
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <CustomField Text="Asset Code">
+                    <RadzenDropDown Name="AssetCodes"
+                                    TValue="IEnumerable<string>"
+                                    AllowFiltering=true
+                                    AllowClear="true"
+                                    Multiple="true"
+                                    Chips="true"
+                                    TextProperty="Text"
+                                    ValueProperty="Value"
+                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    FilterOperator="StringFilterOperator.StartsWith"
+                                    AllowVirtualization=true
+                                    Data="Model.CostReport.FilterAsset(Filter.CategoryId)"
+                                    Change=@((args) => HandleChange(args))
+                                    Value="Filter.AssetCodes" />
+                </CustomField>
+
+            </RadzenColumn>
+            <RadzenColumn Size="2">
+                <CustomField Text="Date From">
+                    <RadzenDatePicker DateFormat="dd-MMM-yyyy"
+                                        TValue="DateTime?"
+                                        AllowClear=true
+                                        @bind-Value="Filter.DateFrom" />
+                </CustomField>
+            </RadzenColumn>
+            <RadzenColumn Size="2">
+                <CustomField Text="Date To">
+                    <RadzenDatePicker DateFormat="dd-MMM-yyyy"
+                                        TValue="DateTime?"
+                                        AllowClear=true
+                                        @bind-Value="Filter.DateTo" />
+                </CustomField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow Style="margin: 10px 0" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+            <RadzenColumn Size="1" Style="text-align: right">
+                <CstButton ButtonType="EnumButtonType.Search" Click="HandleSearch" />
+            </RadzenColumn>
+        </RadzenRow>
+        </RadzenStack>
+        <RadzenStack>
+            <AssetCostGrid />
+        </RadzenStack>
+    </CustomLayoutBody>
+</CustomPageLayout>
+
+@code {
+
+    protected MCRequest Filter { get; set; } = new MCRequest();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Model.LoadMaintenanceCost(Filter);
+        }
+    }
+
+    protected async Task HandleExport() {
+
+         await ExportViewModel.ExportMaintenanceCost(Filter);
+    }
+
+    protected async Task HandleSearch() {
+        await Model.LoadMaintenanceCost(Filter, true);
+    }
+
+    private void HandleChange(object args) {
+        //cast args to string array
+        if (args is IEnumerable<string>) {
+            //cast the value
+            Filter.AssetCodes = ((IEnumerable<string>)args).Cast<string>()
+                                    .Select(x => x.ToString()).ToArray();
+        }
+        else {
+            Filter.AssetCodes = Array.Empty<string>();
+        }
+    }
+}

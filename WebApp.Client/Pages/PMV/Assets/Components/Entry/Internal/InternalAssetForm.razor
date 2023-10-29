@@ -1,0 +1,651 @@
+﻿@page "/asset/form/internal/{assetCode?}"
+
+@using WebApp.Client.Pages.PMV.Assets.Components.Entry.Components
+@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+@using WebApp.UILibrary.Providers;
+
+
+@attribute [Authorize]
+
+@inherits ComponentViewModelBase<AssetViewModel>
+@inject DialogService DialogService
+
+<CustomPageLayout>
+    <RadzenTemplateForm TItem="InternalAssetModel"
+                        Data="Asset" Submit="HandleSubmit">
+        <CustomLayoutHeader Title="PMV - Internal Asset Form"
+                            Icon=@IconProvider.GetIconMenu("intern-asset")>
+            <RadzenSplitButton Text="Action" Click="HandleAction">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Create New" Value="new" Icon="add" />
+                    <RadzenSplitButtonItem Text="Search Asset" Value="search" Icon="search" />
+                </ChildContent>
+            </RadzenSplitButton>
+        </CustomLayoutHeader>
+        <RadzenStack>
+            <CustomCard TitleHeader="Asset Info" Icon="directions_car">
+                <TopNav>
+                    <CstSwitcher IsSwitch="@IsReadOnly">
+                        <Main>
+                            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.3rem" AlignItems="AlignItems.Center">
+                                <RadzenButton Icon="save"
+                                              ButtonType="ButtonType.Submit"
+                                              ButtonStyle="ButtonStyle.Light"
+                                              Size="ButtonSize.Small" Variant="Variant.Text" Shade="Shade.Lighter" />
+                            </RadzenStack>
+                        </Main>
+                        <Sub>
+                            <RadzenButton Icon="edit"
+                                          Click="ToggleReadonly"
+                                          ButtonStyle="ButtonStyle.Light"
+                                          Size="ButtonSize.Small" Variant="Variant.Text" Shade="Shade.Lighter" />
+
+                        </Sub>
+                    </CstSwitcher>
+
+                </TopNav>
+                <ChildContent>
+                    <RadzenFieldset class="w-100">
+                        <RadzenRow>
+                            <RadzenColumn Size=4>
+                                <CustomField Text="Asset Code" Orientation="horizontal" LabelColumn="4" ContentColumn="8">
+                                    <RadzenLabel Text=@Asset.AssetCode />
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size=3>
+                                <CustomField Text="Category" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenDropDown TValue="int"
+                                                        Name="Category"
+                                                        Disabled=@IsReadOnly
+                                                        Data="Model.AssetContainer.Categories"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        Value="Asset.Cid.ToString()"
+                                                        Change="(args => Asset.Cid = int.Parse(args.ToString()))" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenCustomValidator Component="Category" Validator="@(() => !string.IsNullOrEmpty(Asset.Cid.ToString()))" Text="Category is required" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=3>
+                                <CustomField Text="Sub Category" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenDropDown TValue="string"
+                                                        Name="SubCatCode"
+                                                        Disabled=@IsReadOnly
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        AllowFiltering=true
+                                                        AllowClear=true
+                                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                        Change="(args=>HandleSubCategory(args))"
+                                                        Data="Model.AssetContainer.GetSubCategoryByCat"
+                                                        @bind-Value="Asset.SubCatCode" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="SubCatCode" Text="SubCategory is required" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=6>
+                                <CustomField Text="Asset Description" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox Name="AssetDesc" @bind-Value=Asset.AssetDesc Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="AssetDesc" Text="Asset Description is required" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Make" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenDropDown TValue="string"
+                                                        Name="Make"
+                                                        Disabled="@IsReadOnly"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        AllowFiltering=true
+                                                        AllowClear=true
+                                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                        Data="Model.AssetContainer.Brands"
+                                                        @bind-Value="Asset.BrandCode" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="Make"
+                                                                 Text="Make is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Model" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox Name="Model" @bind-Value=@Asset.Model Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="Model" Text="Model is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Year" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenNumeric Name="Year" TValue="int"
+                                                       @bind-Value=@Asset.Year Disabled="@IsReadOnly" />
+
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="Year" Text="Year is required" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Color" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox @bind-Value=@Asset.Color Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size="2">
+                                <CustomField Text="Register Under" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenDropDown TValue="string"
+                                                        Name="CompanyCode"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        AllowFiltering=true
+                                                        AllowClear=true
+                                                        Disabled="@IsReadOnly"
+                                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                        Data="Model.AssetContainer.Companies"
+                                                        @bind-Value="Asset.CompanyCode" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="CompanyCode" Text="Register Under is required" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Condition Rank" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenNumeric Name="ConditionRank" TValue="int" @bind-Value=@Asset.ConditionRank Disabled="@IsReadOnly" />
+
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenNumericRangeValidator Component="ConditionRank" Min="1" Max="10000" Text="Conditional Rank should not be zero" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Plate No" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox Name="PlateNo" @bind-Value=@Asset.PlateNo Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="PlateNo" Text="Plate No is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Chasis No" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox Name="ChasisNo" @bind-Value=@Asset.ChasisNo Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="ChasisNo" Text="Chasis No is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Engine No" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox Name="EngineNo" @bind-Value=@Asset.EngineNo Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="EngineNo" Text="EngineNo No is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Km/Hr" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenNumeric TValue="int"
+                                                       @bind-Value=@Asset.KmPerHr
+                                                       Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Dimension" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox @bind-Value=@Asset.Additional.Dimension Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Parking Area (sqm)" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenNumeric @bind-Value=@Asset.ParkingArea Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn Size=4>
+                                <CustomField Text="Vendor" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenDropDown TValue="string"
+                                                        Name="VendorCode"
+                                                        AllowVirtualization=true
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        AllowFiltering=true
+                                                        AllowClear=true
+                                                        Disabled="@IsReadOnly"
+                                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                        Data="Model.AssetContainer.Vendors"
+                                                        @bind-Value="Asset.VendorCode" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="VendorCode" Text="VendorCode is required" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Purchase No" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox Name="LPONo" @bind-Value=@Asset.LPONo Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="LPONo" Text="PO No is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Purchase Date" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenDatePicker @bind-Value=@Asset.PurchaseDate
+                                                          TValue="DateTime?"
+                                                          DateFormat="dd-MMM-yyyy"
+                                                          Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Delivery Note" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenTextBox Name="DeliveryNote"
+                                                       @bind-Value=@Asset.DeliveryNote
+                                                       Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="DeliveryNote" Text="DN No is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Purchase Cost" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenNumeric Name="NetValue"
+                                                       TValue="float"
+                                                       @bind-Value=@Asset.NetValue
+                                                       Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenNumericRangeValidator Component="NetValue" Min="0" Text="Purchase Cost Value must have a value" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="First Registration Date" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenDatePicker TValue="DateTime?"
+                                                          DateFormat="dd-MMM-yyyy"
+                                                          @bind-Value="Asset.FirstRegDate"
+                                                          Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size="2">
+                                <CustomField Text="Account Category" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenDropDown TValue="string"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        AllowFiltering=true
+                                                        AllowClear=true
+                                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                        Data="Model.AssetContainer.Accounts"
+                                                        @bind-Value="Asset.AccountCategory"
+                                                        Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size="2">
+                                <CustomField Text="Rate Of Depreciation" IsModern=true>
+                                    <ChildContent>
+                                        <RadzenNumeric TValue="float"
+                                                       Name="RateOfDepreciation"
+                                                       @bind-Value=@Asset.RateOfDepreciation
+                                                       Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenNumericRangeValidator Component="RateOfDepreciation" 
+                                            Min="1" Text="Rate of Depreciation must have a value" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size="2">
+                                <CustomField Text="Rent/Owned" IsModern>
+                                    <ChildContent>
+                                        <RadzenDropDown TValue="string"
+                                                        Name="RentOrOwned"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        Data="Model.AssetContainer.RentOwnes"
+                                                        @bind-Value="Asset.RentOrOwned"
+                                                        Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="RentOrOwned" Text="Rent Or Owned Note is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Rate" IsModern>
+                                    <ChildContent>
+                                        <RadzenNumeric Name="Rate" TValue="float"
+                                                       @bind-Value=@Asset.Rate
+                                                       Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenCustomValidator Component="Rate" Validator="@(() => HandleRateValueRequire(Asset.RentOrOwned))" Text="Rate is require if it's rentable'" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Rate Type" IsModern>
+                                    <ChildContent>
+                                        <RadzenDropDown Name="HireMethods"
+                                                        TValue="string"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        Data="Model.AssetContainer.HireMethods"
+                                                        @bind-Value="Asset.RateType"
+                                                        Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenCustomValidator Component="HireMethods" Validator="@(() => HandleRateTypeRequire(Asset.RentOrOwned))" Text="Rate type is require if it's rentable'" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Asset Type" IsModern>
+                                    <ChildContent>
+                                        <RadzenDropDown Name="AssetType"
+                                                        TValue="string"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        Data="Model.AssetContainer.AssetTypes"
+                                                        @bind-Value="Asset.Additional.AssetType"
+                                                        Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="AssetType" Text="Asset Types is required put N/A if not applicable" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Owner" IsModern>
+                                    <ChildContent>
+                                        <RadzenDropDown Name="Owner"
+                                                        TValue="string"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        AllowFiltering=true
+                                                        AllowClear=true
+                                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                        Data="Model.AssetContainer.Companies"
+                                                        @bind-Value="Asset.Additional.Owner"
+                                                        Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Operated by" IsModern>
+                                    <RadzenDropDown Name="OperatedBy"
+                                                    TValue="string"
+                                                    TextProperty="Text"
+                                                    ValueProperty="Value"
+                                                    AllowFiltering=true
+                                                    AllowClear=true
+                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                    Data="Model.AssetContainer.Companies"
+                                                    @bind-Value="Asset.Additional.OperatedBy"
+                                                    Disabled="@IsReadOnly" />
+
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField IsAlignCenter=true Text="Modified Asset" IsModern>
+                                    <RadzenStack Style="padding:10px">
+                                        <RadzenCheckBox TValue="bool?"
+                                                        @bind-Value="Asset.ModifiedAsset"
+                                                        Disabled="@IsReadOnly" />
+                                    </RadzenStack>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size=2>
+                                <CustomField Text="Status" IsModern>
+                                    <ChildContent>
+                                        <RadzenDropDown Name="Status"
+                                                        TValue="string"
+                                                        TextProperty="Text"
+                                                        ValueProperty="Value"
+                                                        Data="Model.AssetContainer.Statuses"
+                                                        Value="Asset.Status.ToString()"
+                                                        Change="@(args => Asset.Status = int.Parse(args.ToString()))"
+                                                        Disabled="@IsReadOnly" />
+                                    </ChildContent>
+                                    <Error>
+                                        <RadzenRequiredValidator Component="Status" Text="Status is Required" />
+                                    </Error>
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <CustomField Text="Tank Capacity" IsModern> 
+                                    <ChildContent>
+                                        <RadzenNumeric Disabled="@IsReadOnly"
+                                            TValue="int" 
+                                            Name="TankCapacity" @bind-Value=Asset.TankCapacity />
+                                    </ChildContent>
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="3">
+                                <CustomField Text="Warranty Expiry Date" IsModern>
+                                    <RadzenDatePicker TValue="DateTime?"
+                                                      Name="Warranty"
+                                                      DateFormat="dd-MMM-yyyy"
+                                                      AllowClear=true
+                                                      @bind-Value="Asset.Additional.Warranty"
+                                                      Disabled="@IsReadOnly" />
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size="3">
+                                <CustomField Text="Registration Expiry Date" IsModern>
+                                    <RadzenDatePicker TValue="DateTime?"
+                                                      Name="RegistrationExpiry"
+                                                      DateFormat="dd-MMM-yyyy"
+                                                      AllowClear=true
+                                                      @bind-Value="Asset.Additional.RegistrationExpiry"
+                                                      Disabled="@IsReadOnly" />
+                                </CustomField>
+                            </RadzenColumn>
+                            <RadzenColumn Size="3">
+                                <CustomField Text="Insurance Expiry Date" IsModern>
+                                    <RadzenDatePicker TValue="DateTime?"
+                                                      Name="Insurance"
+                                                      DateFormat="dd-MMM-yyyy"
+                                                      AllowClear=true
+                                                      @bind-Value="Asset.Additional.Insurance"
+                                                      Disabled="@IsReadOnly" />
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size=12>
+                                <CustomField Text="Remarks" IsModern>
+                                    <RadzenTextArea @bind-Value=@Asset.Remarks
+                                                    Disabled="@IsReadOnly" />
+                                </CustomField>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenFieldset>
+                </ChildContent>
+            </CustomCard>
+            @if (AssetCode is not null)
+            {
+                <RadzenTabs TabPosition="TabPosition.Top" class="mt-3" Style="min-height:400px">
+                    <Tabs>
+                        <RadzenTabsItem Text="Maintenance Setup">
+                            <DueServiceForm Data="@Model.AssetContainer.InternalAsset.Dues"
+                                            ServiceGroups="@Model.AssetContainer.ServiceGroups"
+                                            AssetId="@Model.Asset.SlNo" />
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="Attachments">
+                            <DocumentForm AssetId=@Model.AssetContainer.InternalAsset.SlNo.ToString() />
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="Assigned Person">
+                            <AssignedDriverGrid 
+                                AssetCode="@Model.AssetContainer.InternalAsset.AssetCode" 
+                                AssignedDrivers="@Model.AssetContainer.InternalAsset.Drivers" 
+                                OnRefresh="@((args) => HandleRefresh(args))" 
+                                AssetType="internal"/>
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
+            }
+        </RadzenStack>
+    </RadzenTemplateForm>
+</CustomPageLayout>
+
+
+@code {
+    /*
+    * NewAction<Asset>
+    * EditAction<Asset>
+    *
+    *
+    */
+    [Parameter]
+    public string? AssetCode { get; set; }
+    private readonly string _assetType = "internal";
+
+    private bool IsReadOnly = false;
+
+    private void ToggleReadonly()
+    {
+        IsReadOnly = !IsReadOnly;
+        StateHasChanged();
+    }
+
+
+
+    protected InternalAssetModel Asset => Model.AssetContainer.InternalAsset;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) {
+            if (AssetCode is not null)
+                IsReadOnly = true;
+
+            await Model.NewEditAsync(AssetCode, _assetType);
+        }
+    }
+
+    private bool HandleRateValueRequire(string compare)
+    {
+        if (compare.ToLower() == "rentable")
+        {
+            return Model.Asset.Rate > 0;
+        }
+
+        return true;
+    }
+
+    private bool HandleRateTypeRequire(string compare)
+    {
+        if (compare.ToLower() == "rentable") {
+            return !string.IsNullOrEmpty(Model.Asset.RateType);
+        }
+
+        return true;
+    }
+
+    private async Task HandleRefresh(EventArgs args) 
+            => await Model.NewEditAsync(AssetCode, _assetType);
+
+    protected void HandleCategoryChange(string cid)
+    {
+        Asset.Cid = int.Parse(cid);
+    }
+
+    protected async Task HandleSubmit() {
+        if (await Model.SaveAsync(_assetType)) {
+            if (string.IsNullOrEmpty(AssetCode)) {
+                PageNavigation.NavigateTo("asset/manage/edit");
+            }
+        }
+    }
+
+    protected async Task HandleAction(RadzenSplitButtonItem item) {
+        if (item.Value == "new") {
+            var confirm = await DialogService.Confirm("Do you to create new", "New Entry", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+            if (confirm.Value) {
+                await Model.NewEditAsync("", _assetType);
+                PageNavigation.NavigateTo("/asset/form/internal","","",true);
+            }
+        }
+        else if(item.Value == "search")
+        {
+            var result = await DialogService.OpenAsync<InternalSearch>("Search");
+            if(result != null)
+            {
+                PageNavigation.NavigateTo("/asset/form/internal", result.AssetCode,"",true,true);
+            }
+        }
+    }
+
+    protected async Task HandleSubCategory(object value)
+    {
+        if (value is not null)
+        {
+            await Model.GetAssetNo((string)value);
+            var sub = Model.AssetContainer.SubCategories.FirstOrDefault(p => p.Value == (string)value);
+            if (sub is not null)
+            {
+                Asset.AssetDesc = sub.Text;
+            }
+        }
+    }
+}

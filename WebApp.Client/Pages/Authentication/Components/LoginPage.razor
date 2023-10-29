@@ -1,0 +1,98 @@
+﻿@page "/accounts/login/{username?}/{key?}"
+
+@using Portal.WebClient.Pages.Accounts.ViewModels;
+@using WebApp.Client.Pages.Authentication.Models;
+
+
+
+@layout LoginLayout
+
+@attribute [AllowAnonymous]
+
+@inject PageNavigation PageNavigation
+@inject LoginViewModel ViewModel
+@inject AuthenticationStateProvider AuthStateProvider
+
+    <RadzenTemplateForm Data=@("LoginWithRemember") Style="display:none">
+        <RadzenLogin AllowResetPassword=true
+                     AllowRememberMe=true
+                     AllowRegister=false
+                     Login="Authenticate" />
+        <RadzenAlert Visible=@(!string.IsNullOrEmpty(_message))
+                     AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose=false>
+            @_message
+        </RadzenAlert>
+    </RadzenTemplateForm>
+    <RadzenAlert Variant="Variant.Flat" Size="AlertSize.Medium" Shade="Shade.Lighter" AlertStyle="AlertStyle.Info">
+        Verifying your account. Please wait...
+    </RadzenAlert>
+@code {
+
+    private string _message = "";
+
+    [Parameter]
+    public string Username { get; set; } = "";
+
+
+
+    [Parameter]
+    public string Key { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthState;
+        if (authState.User.Identity.IsAuthenticated) {
+            var stringKey = "/";
+            if(!string.IsNullOrEmpty(Key)) {
+                stringKey = Key.Replace('-', '/');
+            }
+            PageNavigation.DirectNavigate(stringKey);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            
+            
+            if (!string.IsNullOrEmpty(Username))
+            {
+                var result = await ViewModel.Validate(new LoginModel { EmpCode = Username });
+                if (result.IsSuccess) {
+                    var stringKey = Key.Replace('-', '/');
+
+                    PageNavigation.DirectNavigate(stringKey);
+                }
+                else
+                {
+                    _message = result.Error;
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+
+    protected async Task Authenticate(LoginArgs args) {
+
+
+        var result = await ViewModel.Login(new LoginModel { EmpCode = args.Username, Password = args.Password });
+
+        if (result.IsSuccess)
+        {   
+            PageNavigation.NavigateTo("/");
+        }
+        else
+        {
+            _message = result.Error;
+            StateHasChanged();
+        }
+    }
+
+}
+
+

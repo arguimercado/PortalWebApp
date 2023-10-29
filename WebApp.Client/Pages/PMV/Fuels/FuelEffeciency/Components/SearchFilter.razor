@@ -1,0 +1,60 @@
+@using Portal.WebClient.Pages.Fuels.FuelEffeciency.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEffeciency.Models;
+
+
+@inherits ComponentViewModelBase<FuelLogEfficiencyViewModel>
+
+<RadzenFieldset Text="Search" class="w-100">
+    <RadzenRow>
+        <RadzenColumn Size=5>
+            <CustomField Text="Asset Code" Orientation="horizontal" LabelColumn=3 ContentColumn=9>
+                <RadzenDropDown class="w-100"
+                                Data=Model.EffeciencyContainer.AssetSelections
+                                TValue="string"
+                                Multiple="true"
+                                AllowFiltering=true
+                                TextProperty="Text"
+                                AllowVirtualization="true"
+                                Chips=true
+                                ValueProperty="Value"
+                                Value=@Filter.Assets
+                                Change=@(args => OnClickHandle(args)) />
+
+            </CustomField>
+        </RadzenColumn>
+        <RadzenColumn Size=7>
+            <CustomField Text="Date" Orientation="horizontal">
+                <div class="d-flex flex-direction-row">
+                    <RadzenDatePicker TValue="DateTime"
+                                      DateFormat="dd-MMM-yyyy"
+                                      @bind-Value="@Filter.DateFrom" class="flex-fill me-2" />
+                    <RadzenDatePicker TValue="DateTime"
+                                      DateFormat="dd-MMM-yyyy"
+                                      @bind-Value="@Filter.DateTo"
+                                      class="flex-fill me-2" />
+                    <RadzenButton Icon="search" Click="HandleSearchClick" />
+                </div>
+            </CustomField>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenFieldset>
+
+@code {
+
+    [Parameter]
+    public FuelEfficiencyFilterParam Filter { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<FuelEfficiencyFilterParam> OnClickSearch { get; set; }
+
+    protected void HandleSearchClick()
+    {
+        OnClickSearch.InvokeAsync();
+    }
+
+    protected void OnClickHandle(object values)
+    {
+        var str = values is IEnumerable<object> ? string.Join(",", (IEnumerable<object>)values) : values;
+        Filter.StringAssets = str as string;
+    }
+}

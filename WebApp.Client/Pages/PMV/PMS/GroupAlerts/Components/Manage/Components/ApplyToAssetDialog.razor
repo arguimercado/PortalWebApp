@@ -1,0 +1,63 @@
+﻿
+@using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Components.Manage.ViewModels;
+
+@inherits ComponentViewModelBase<GroupAlertListViewModel>
+@inject DialogService DialogService
+
+<RadzenStack Gap="3">
+    <CustomFieldDisplay Label="Selected Group" Text="@Model.SelectedItem!.GroupName"/>
+    <CustomField Text="Category" IsModern>
+        <RadzenDropDown TValue="string"
+                        Data="Model.Categories"
+                        TextProperty="Text"
+                        ValueProperty="Value"
+                        Value="Model.SelectedCategory"
+                        Change="@((args) => HandleChangeCategory(args))" />
+    </CustomField>
+    <CustomField Text="Sub Category" IsModern>
+        <RadzenDropDown TValue="string"
+                        Data="SubCategories.ToList()"
+                        TextProperty="Text"
+                        ValueProperty="Value"
+                        @bind-Value="Model.SelectedSubCategory" />
+    </CustomField>
+
+    <CustomField Text="Apply to" IsModern>
+        <RadzenRadioButtonList @bind-Value=@Model.ApplyTo TValue="int" class="m-2" Style="color:#000 !important">
+            <Items>
+                <RadzenRadioButtonListItem Text="New" Value="0" />
+                <RadzenRadioButtonListItem Text="Existing" Value="1" />
+                <RadzenRadioButtonListItem Text="All" Value="2" />
+            </Items>
+        </RadzenRadioButtonList>
+    </CustomField>
+
+    <RadzenButton Click="HandleApplyClick" Text="Apply" IsBusy=Model.IsLoading/>
+</RadzenStack>
+
+@code {
+
+
+
+    private IEnumerable<SelectItem> SubCategories = new List<SelectItem>();
+
+
+    private async Task HandleApplyClick()
+    {
+        //open dialog for confirmation and then apply
+        var result = await DialogService.Confirm("Are you sure you want to apply this group alert to the selected assets?");
+        if(result == true)
+        {
+            await Model.Apply();
+        }
+    }
+
+    private void HandleChangeCategory(object args)
+    {
+        if (args != null) {
+            SubCategories = Model.GetSubCategories(args?.ToString());
+            Console.WriteLine(SubCategories.Count());
+            StateHasChanged();
+        }
+    }
+}

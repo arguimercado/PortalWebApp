@@ -1,0 +1,85 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssetExportViewModel>
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <div class="rz-p-12">
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenCheckBoxList @bind-Value=@Fields 
+                    TValue="int" class="mb-5"
+                    Orientation="Orientation.Vertical">
+                    <Items>
+                        <RadzenCheckBoxListItem Text="Asset Code" Value="1" />
+                        <RadzenCheckBoxListItem Text="Asset Description" Value="2" />
+                        <RadzenCheckBoxListItem Text="Category" Value="3" />
+                        <RadzenCheckBoxListItem Text="Sub Category" Value="4" />
+                        <RadzenCheckBoxListItem Text="Make" Value="5" />
+                        <RadzenCheckBoxListItem Text="Model" Value="6" />
+                        <RadzenCheckBoxListItem Text="Year" Value="7" />
+                        <RadzenCheckBoxListItem Text="Color" Value="8" />
+                        <RadzenCheckBoxListItem Text="Chasis No" Value="9" />
+                        <RadzenCheckBoxListItem Text="Engine No" Value="10" />
+                        <RadzenCheckBoxListItem Text="Registration Under" Value="11" />
+                    </Items>
+                </RadzenCheckBoxList>
+            </RadzenColumn>
+            <RadzenColumn>
+                <RadzenCheckBoxList @bind-Value=@Fields
+                                    TValue="int" Orientation="Orientation.Vertical">
+                    <Items>
+                        <RadzenCheckBoxListItem Text="Purchase Date" Value="12" />
+                        <RadzenCheckBoxListItem Text="Condition Rank" Value="13" />
+                        <RadzenCheckBoxListItem Text="Vendor" Value="14" />
+                        <RadzenCheckBoxListItem Text="On Hire To" Value="15" />
+                        <RadzenCheckBoxListItem Text="Location" Value="16" />
+                        <RadzenCheckBoxListItem Text="Net Value" Value="17" />
+                        <RadzenCheckBoxListItem Text="Km Hr" Value="18" />
+                        <RadzenCheckBoxListItem Text="Parking Field" Value="19" />
+                        <RadzenCheckBoxListItem Text="Status" Value="20" />
+                        <RadzenCheckBoxListItem Text="Plate No" Value="21" />
+                    </Items>
+                </RadzenCheckBoxList>
+            </RadzenColumn>
+        </RadzenRow>
+    </div>
+    <div>
+        <RadzenButton Text="Export" Click="@(args => Export())" ButtonStyle="ButtonStyle.Success" Shade="Shade.Lighter" Variant="Variant.Flat"/>
+    
+    </div>
+</RadzenStack>
+
+@code {
+
+
+
+    IEnumerable<int> Fields = new int[] { 1,2 };
+    string[] FieldNames = new string[] { 
+        "code","description", "category", "subcategory", "make","model","year","color",
+        "chasisNo","engineNo","registrationUnder", "purchaseDate", "conditionRank", "vendor", "onHireTo","location","netValue","kmhr","parkingField","status","plateNo" };
+
+    [Parameter]
+    public FilterAssetParam Filter { get; set; } = new();
+
+    protected async Task Export()
+    {
+        List<string> selectedFieldName = new();
+
+        for(var i = 0; i < Fields.Count(); i++) {
+            var index = Fields.ElementAt(i) - 1;
+            var fieldName = FieldNames[index];
+            selectedFieldName.Add(fieldName);
+        }
+        
+        if (selectedFieldName.Count > 0) {
+            Filter.Fields = string.Join(",", selectedFieldName.ToArray());
+        }
+
+        await Model.ExportToExcel(Filter);
+
+    }
+
+
+   
+}

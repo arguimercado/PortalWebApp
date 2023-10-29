@@ -1,0 +1,101 @@
+﻿@page "/fuel/tracking"
+@using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Models;
+@using WebApp.Client.Pages.PMV.Fuels.Models;
+@using WebApp.UILibrary.Providers;
+
+    
+
+@inherits ComponentViewModelBase<FuelTrackingViewModel>
+@inject DialogService DialogService
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Fuel Log Tracking" Icon=@IconProvider.GetIconMenu("fuel")>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10px">
+            <RadzenButton Text="Refresh" Icon="autorenew" Click=@Model.Load />
+            @if(Model.SelectedLog != null) {
+                <RadzenButton Text="Print" Icon="@IconProvider.GetIconMenu("print")" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Click="@(() => Model.PrintLog())" />
+            }
+        </RadzenStack>
+    </CustomLayoutHeader>
+    <RadzenRow>
+        <RadzenColumn Size="2">
+            <StationList />
+        </RadzenColumn>
+        <RadzenColumn Size="10">
+            <RadzenStack Gap="20px">
+                <CustomCard>
+                    <LogList OnSelect="HandleSelect" />
+                </CustomCard>
+                @if (Model.SelectedLog != null) {
+                    <CustomCard TitleHeader="Detail">
+                        <TopNav>
+                            <RadzenStack Orientation="Orientation.Horizontal" Gap="5px">
+                                @if(Model.SelectedLog.Status != EnumFuelLogStatus.Posted.ToString() && Model.SelectedLog.Status != EnumFuelLogStatus.Submitted.ToString()) {
+                                    <RadzenButton 
+                                        Icon="@(Model.SelectedLog.Status == "Locked" ? "lock_open" : "lock_outline")" 
+                                        Text="@(Model.SelectedLog.Status == "Locked" ? "Unlock" : "Lock")" 
+                                        ButtonStyle="ButtonStyle.Light" 
+                                        Size="ButtonSize.Small" 
+                                        Variant="Variant.Text" Click="@(() => Model.ToggleLocked())" />
+                                }
+
+                                <RadzenButton Icon="add" Text="Add New" 
+                                    ButtonStyle="ButtonStyle.Light" 
+                                    Size="ButtonSize.Small" 
+                                    Variant="Variant.Text" Click="HandleAddNew"/>
+
+                                @if(Model.SelectedLog.Status == EnumFuelLogStatus.Pending.ToString()) {
+                                    
+                                    <RadzenButton Text="Approve" Icon="approval" Value="Approved"  
+                                        ButtonStyle="ButtonStyle.Light" 
+                                        Click="@(() => Model.SetStatus("Approved"))" 
+                                        Variant="Variant.Text" Size="ButtonSize.Small" />
+                                }
+
+                                @if(Model.SelectedLog.Status == EnumFuelLogStatus.Submitted.ToString())
+                                {
+                                    <RadzenButton Text="Post" Icon="@IconProvider.GetIconMenu("post")" Click="@(() => HandlePost())" Size="ButtonSize.Small" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" />
+                                }
+                            </RadzenStack>
+                        </TopNav>
+                        <ChildContent>
+                            <LogView />
+                        </ChildContent>
+                    </CustomCard>
+                }
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+</CustomPageLayout>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Model.Load();
+        }
+    }
+
+    private void HandleSelect(object args) {
+        if (args is not null) {               
+            Model.SelectLog(args as FuelLogModel);
+        }
+    }
+
+    private async Task HandleAddNew() {
+        Model.CreateNewEntry();
+        await DialogService.OpenSideAsync<AddNewDialog>("Add New Fuel Transaction", null);
+        StateHasChanged();
+    }
+
+    private async Task HandlePost() {
+
+        var confirmation = await DialogService.Confirm("Are you sure do you want to post?");
+        if(confirmation.HasValue && confirmation.Value) {
+            await Model.Post();
+            //PageNavigation.Reload();
+        }
+    }
+}

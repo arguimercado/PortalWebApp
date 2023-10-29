@@ -1,0 +1,50 @@
+@page "/fuel/asset"
+@using Portal.WebClient.Pages.Fuels.FuelEffeciency.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEffeciency.Models;
+
+@attribute [Authorize]
+@inherits ComponentViewModelBase<FuelLogEfficiencyViewModel>
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Fuel Effeciency Monitoring" Icon="local_gas_station">
+        <CstButton ButtonType="EnumButtonType.Excel" Click="@HandleExport"/>
+    </CustomLayoutHeader>
+    <RadzenStack>
+        <CustomRow IsFullRow>
+            <SearchFilter OnClickSearch="HandleSearchClick" Filter=@Filter />
+        </CustomRow>
+        <CustomRow IsFullRow>
+            <FuelEfficiencyGrid />
+        </CustomRow>
+    </RadzenStack>
+</CustomPageLayout>
+
+@code {
+
+    protected FuelEfficiencyFilterParam Filter { get; set; } = new FuelEfficiencyFilterParam();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {  
+
+        if(firstRender) {
+
+            if(Model.EffeciencyContainer.AssetSelections.Count() == 0) {
+                var filter = new FuelEfficiencyFilterParam();
+                filter.IsPostBack = false;
+                await Model.LoadFuelEffeciency(filter);
+            }
+        }
+    }
+
+    protected async Task HandleExport()
+    {
+        await Model.EffeciencyExportExcel(Filter);
+    }
+
+    protected async Task HandleSearchClick() {
+
+        Filter.IsPostBack = true;
+        await Model.LoadFuelEffeciency(Filter);
+    }
+
+    
+}

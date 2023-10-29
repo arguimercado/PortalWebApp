@@ -1,0 +1,54 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssetReadViewModel>
+
+<RadzenDataGrid TItem="ServiceDueReadModel" 
+    Data="Model.Asset.ServiceDues.ToList()"
+                AllowPaging="true" PageSize="20"
+                AllowColumnReorder="true"
+                AllowColumnResize="true"
+                AllowSorting="true"
+                ColumnWidth="200px"
+                Style="overflow-x:scroll"
+                ShowPagingSummary="true">
+    <Columns>
+        <RadzenDataGridColumn TItem="ServiceDueReadModel"  Width="40px" Filterable=false Sortable=false>
+            <Template Context="service">
+                @if(service.Status.ToLower() != "good") {
+                    <RadzenIcon Icon="info_outline" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="Code" Title="Service Code"  />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="Name" Title="Description" />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="CurrentSMUReading" Title="Current Reading" FormatString="{0:###,##0}" />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="LastServiceDate" Title="Last Service" FormatString="{0:dd-MMM-yyyy}" />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="LastSMUReading" Title="Last Reading" FormatString="{0:###,##0}" />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="KmAlert" Title="Km Alert Every" FormatString="{0:###,##0}" />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="AlertDue" Title="Alert Due" FormatString="{0:###,##0}" />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="KmInterval" Title="Km Interval Within" FormatString="{0:###,##0}" />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="IntervalDue" Title="Interval Due" FormatString="{0:###,##0}" />
+        <RadzenDataGridColumn TItem="ServiceDueReadModel" Property="Status" Title="Status" TextAlign="TextAlign.Center">
+            <Template Context="due">
+                @if(due.Status.ToLower() == "good") {
+                    <strong class="text-success text-center">
+                        @due.Status
+                    </strong>
+                }
+                else
+                {
+                    <strong class="text-warning text-center">
+                        <RadzenIcon Icon="warning" />
+                        @due.Status
+                    </strong>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+
+}
+

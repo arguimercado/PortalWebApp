@@ -1,0 +1,19 @@
+﻿
+
+<RadzenText class="@(IsVoid ? "cstunderline" : "")" Text="@Text" />
+
+<style>
+    .cstunderline {
+        text-decoration: line-through;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public bool IsVoid { get; set; } = false;
+
+    [Parameter]
+    public string Text { get; set; }
+
+    
+}

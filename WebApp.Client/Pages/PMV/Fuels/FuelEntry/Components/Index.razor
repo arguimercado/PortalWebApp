@@ -1,0 +1,80 @@
+﻿@page "/fuel/form/{documentNo?}"
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Models;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.Models;
+
+@attribute [Authorize]
+@inherits ComponentViewModelBase<FuelLogEntryViewModel>
+
+@inject DialogService DialogService
+
+<CustomPageLayout>
+    <RadzenTemplateForm TItem="FuelLogModel" Data="@Entry" Submit="HandleSubmit">
+        <CustomLayoutHeader Title=@Title Icon="local_gas_station">
+            <RadzenButton ButtonType="ButtonType.Button" Icon="add" Click="@HandleAddNew" ButtonStyle="ButtonStyle.Success" />
+            
+            @if (!string.IsNullOrEmpty(DocumentNo)) {
+                <RadzenButton ButtonType="ButtonType.Button"
+                              Icon="print"
+                              Click="@HandlePrint"
+                              ButtonStyle="ButtonStyle.Success" />
+            }
+
+            @if (Model.FuelLogContainer.FuelLog.Status != EnumFuelLogStatus.Posted.ToString()) {
+                <RadzenButton ButtonType="ButtonType.Submit"
+                                Icon="save"
+                                Text="Save as Draft"
+                                Click="@(() => HandleAction("draft"))"
+                                ButtonStyle="ButtonStyle.Success" />
+            }
+            
+            @if(Model.FuelLogContainer.FuelLog.FuelTransactions.Count() > 0 && Model.FuelLogContainer.FuelLog.Status != EnumFuelLogStatus.Submitted.ToString() 
+            && Model.FuelLogContainer.FuelLog.Status != EnumFuelLogStatus.Posted.ToString()) {
+                <RadzenButton Text="Submit" Variant="Variant.Flat" ButtonType="ButtonType.Submit" Icon="send" Click="@(() => HandleAction("send"))" ButtonStyle="ButtonStyle.Success" />
+            }
+        </CustomLayoutHeader>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="5px">
+            <MainHeader />
+            @if (!string.IsNullOrEmpty(DocumentNo))
+            {
+                <DetailList />
+            }
+        </RadzenStack>
+    </RadzenTemplateForm>
+</CustomPageLayout>
+
+
+@code {
+    [Parameter]
+    public string? DocumentNo { get; set; }
+
+    protected FuelLogModel Entry => Model.FuelLogContainer.FuelLog;
+    protected FuelTransactionModel Detail => Model.Detail;
+
+    protected string Post { get; set; } = "pending";
+    public string Title => "Fuel Log Form";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            await Model.Load(DocumentNo, "p");
+        }
+    }
+
+    private async Task HandleAddNew() {
+
+        var confirm = await DialogService.Confirm("Do you to create new log?", "Create New");
+        if (confirm.Value == true) {
+            PageNavigation.NavigateTo($"/fuel/form", null, "", true, false);
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandlePrint() => await Model.PrintLog();
+
+    private void HandleAction(string value) => Post = value;
+
+    private async Task HandleSubmit() {
+        var result = await Model.SaveUpdate(Post);
+        //PageNavigation.NavigateTo($"/fuel/form/{Model.FuelLogContainer.FuelLog.DocumentNo}", "", "", true);
+    }
+}

@@ -1,0 +1,75 @@
+﻿@page "/asset/group/manage"
+
+@using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Components.Manage.ViewModels;
+@using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Models;
+
+@inherits ComponentViewModelBase<GroupAlertListViewModel>
+@inject DialogService DialogService
+
+@attribute [Authorize]
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Manage Group Alert" Icon="group_work">
+        <RadzenButton Icon="add" Text="Add Group" Click="@(() => PageNavigation.NavigateTo($"/asset/group/form"))" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" />
+    </CustomLayoutHeader>
+    <RadzenStack>
+        <RadzenDataGrid TItem="GroupAlertModel"
+                        Data=Data.ToList()
+                        AllowColumnResize=true
+                        AllowFiltering=true>
+            <Columns>
+                <RadzenDataGridColumn TItem="GroupAlertModel" Title="SN#" Width="40px">
+                    <Template>
+                        <span>@(Data.ToList().IndexOf(@context) + 1)</span>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="GroupAlertModel" Property="GroupName" Title="Group Name" Width="180px" />
+                <RadzenDataGridColumn TItem="GroupAlertModel" Property="Description" Title="Description" />
+                <RadzenDataGridColumn TItem="GroupAlertModel"
+                                      Filterable="false" Sortable="false"
+                                      Context="service"
+                                      Resizable=false
+                                      TextAlign="TextAlign.Center" Width="80px">
+                    <Template Context="service">
+                        <RadzenButton ButtonStyle="ButtonStyle.Secondary"
+                                      Click="@(() => HandleOpenDialog(service.Id))"
+                                      Variant="Variant.Text"
+                                      Icon="cloud_upload"
+                                      Size="ButtonSize.Small" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="GroupAlertModel"
+                                      Filterable="false" Sortable="false"
+                                      Context="service"
+                                      Resizable=false
+                                      TextAlign="TextAlign.Center" Width="80px">
+                    <Template Context="service">
+                        <RadzenButton ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Icon="edit"
+                                      Size="ButtonSize.Small"
+                                      Click="@(() => PageNavigation.NavigateTo($"/asset/group/form",service.Id))" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+</CustomPageLayout>
+
+@code {
+    public IEnumerable<GroupAlertModel> Data => Model.List;
+
+    private IEnumerable<SelectItem> SubCategories = new List<SelectItem>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Model.Filter();
+        }
+    }
+
+    protected async Task HandleOpenDialog(string id)
+    {
+        Model.Select(id);
+        await DialogService.OpenAsync<ApplyToAssetDialog>($"Apply {Model.SelectedItem!.Description} to Asset");
+
+    }
+}

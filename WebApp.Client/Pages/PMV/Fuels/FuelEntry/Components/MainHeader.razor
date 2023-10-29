@@ -1,0 +1,295 @@
+﻿@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Components.Supports;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Models;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.ViewModels;
+ 
+
+
+@inherits ComponentViewModelBase<FuelLogEntryViewModel>
+
+@inject DialogService DialogService
+
+<CustomCard Icon="info">
+    <RadzenRow Gap="10px">
+        <RadzenColumn Size="8">
+            <RadzenRow Gap="5px">
+                <RadzenColumn Size="4">
+                    <CustomField Text="Tanker Code" MarkRequired=true IsModern>
+                        <ChildContent>
+                        <RadzenDropDown Name="Code"
+                                        Disabled="@(Model.IsReadonly() || Model.IsLockForEditing())"
+                                        TValue="string"
+                                        Data="Model.FuelLogContainer.StationSelections"
+                                        TextProperty="Code"
+                                        ValueProperty="Code"
+                                        Change="@(args => CheckOpeningMeter(args))"
+                                        @bind-Value="Entry.Station" />
+                        </ChildContent>
+                        <Error>
+                            <RadzenRequiredValidator Component="Code" Popup="true" Style="position: absolute; bottom:0" />
+                        </Error>
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <CustomField Text="Reference No" IsModern>
+                        <RadzenTextBox Name="ReferenceNo"
+                                        ReadOnly=true
+                                        Value="@Entry.ReferenceNo.ToString()" class="w-100" />
+                        
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <CustomField Text="Fueled Date" MarkRequired=true IsModern>
+                        <ChildContent>
+                            <RadzenDatePicker Name="FueledDate"
+                                              TValue="DateTime"
+                                              Disabled="Model.IsReadonly() && Model.IsLockForEditing()"
+                                              DateFormat="dd-MMM-yyyy"
+                                              Change="@(() => Model.ClearRow())"
+                            @bind-Value="Entry.FueledDate"
+                                              Class="w-100" />
+                        </ChildContent>
+                        <Error>
+                            <RadzenRequiredValidator Component="FueledDate" Popup="true" Style="position: absolute; bottom:0" />
+                        </Error>
+                    </CustomField>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="4">
+                    <CustomField Text="Shift Start Time" IsModern>
+                        <RadzenDatePicker TValue="DateTime?"
+                                          Disabled="Model.IsReadonly()"
+                                          HourFormat="12"
+                                          ShowTime="true" TimeOnly="true" DateFormat="h:mm tt"
+                                          Value=Entry.GetShiftStartTimeValue()
+                                          Change="@(args => HandleDateChange("start",args))"
+                                          Class="w-100" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <CustomField Text="Shif End Time" IsModern>
+                        <RadzenDatePicker TValue="DateTime?"
+                                          Disabled="Model.IsReadonly()"
+                                          HourFormat="12"
+                                          ShowTime="true" TimeOnly="true" DateFormat="h:mm tt"
+                                          Value=Entry.GetShiftEndTimeValue()
+                                          Change="@(args => HandleDateChange("end",args))"
+                                          Class="w-100" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <CustomField Text="Log Type" MarkRequired=true IsModern>
+                        <ChildContent>
+                            <RadzenDropDown Name="LogType"
+                                            Disabled="Model.IsReadonly() || Model.IsLockForEditing()"
+                                            TValue="string"
+                                            Data="Model.FuelLogContainer.LogTypeSelections"
+                                            Change="@((args) => HandleLogTypeChange())"
+                                            TextProperty="Text"
+                                            ValueProperty="Value"
+                                            @bind-Value="Entry.LogType" 
+                                            />
+
+                        </ChildContent>
+                    </CustomField>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="4">
+                    <CustomField Text="Start Shift Tanker Km" IsModern>
+                        <RadzenNumeric TValue="int" class="w-100"
+                                       Disabled="Model.IsReadonly()"
+                                       Name="StartShiftTankerKm"
+                        @bind-Value=Entry.StartShiftTankerKm />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <CustomField Text="End Shift Tanker Km" IsModern>
+                        <RadzenNumeric TValue="int?" class="w-100"
+                                       Disabled="Model.IsReadonly()"
+                                       Name="EndShiftTankerKm"
+                        @bind-Value=Entry.EndShiftTankerKm />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <CustomField Text="Fueler" IsModern>
+                        <ChildContent>
+                            <RadzenDropDown Name="Fueler"
+                                            AllowVirtualization=true
+                                            Disabled="Model.IsReadonly()"
+                                            TValue="string"
+                                            Data="Model.FuelLogContainer.FuelerSelections"
+                                            TextProperty="FullName"
+                                            ValueProperty="EmpCode"
+                                            AllowFiltering=true
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                            AllowClear=true
+                            @bind-Value="Entry.Fueler" />
+                        </ChildContent>
+                        <Error>
+                            <RadzenRequiredValidator Component="Fueler" Popup="true" Text="Fueler is required" Style="position: absolute; bottom:0" />
+                        </Error>
+                    </CustomField>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn>
+                    <CustomField Text="Remarks" IsModern>
+                        <RadzenTextArea Name="Remarks" @bind-Value=@Entry.Remarks
+                                        Disabled="Model.IsReadonly()" />
+                    </CustomField>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenColumn>
+        <RadzenColumn>
+            <RadzenStack>
+                <RadzenCard Variant="Variant.Outlined" Style="padding:10px">
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="2px">
+                        <CustomFieldDisplay Label="Status" LabelColumn=6 TextColumn=6>
+                            <RadzenText Text="@Entry.Status" />
+                        </CustomFieldDisplay>
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <CustomFieldDisplay Label="Document No" Text=@Entry.DocumentNo.ToString("0000") LabelColumn=6 TextColumn=6 />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <CustomFieldDisplay Label="Reference No" LabelColumn=6 TextColumn=6>
+                                    <RadzenStack Orientation="Orientation.Horizontal"  Gap="2px">
+                                        <NavLink class="nav-link" href="@($"https://portal.helm.qa/pmv/fuel/viewDoc.php?docId={ConvertDocument(Entry.ReferenceNo)}")" target="_blank">
+                                            <span>@Entry.ReferenceNo.ToString("0000")</span>
+                                        </NavLink>
+                                    </RadzenStack>
+                                </CustomFieldDisplay>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <CustomField Text="Open. Fuel Balance" IsModern>
+                                    <RadzenNumeric TValue="float" @bind-Value="@Entry.OpeningBalance" />
+                                </CustomField>
+                                @* <CustomFieldDisplay Label="Current Fuel Meter" LabelColumn=8 TextColumn=4>
+                                    @Entry.ClosingMeter
+                                </CustomFieldDisplay> *@
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <CustomFieldDisplay Label="Start Shift Fuel Balance" LabelColumn=8 TextColumn=4>
+                                    @Entry.OpeningBalance.ToString("###,##0.00")
+                                </CustomFieldDisplay>
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <CustomFieldDisplay Label="Current Fuel Balance" LabelColumn=8 TextColumn=4>
+                                    @Entry.RemainingBalance.ToString("###,##0.00")
+                                </CustomFieldDisplay>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenCard>
+                <RadzenCard>
+                    <RadzenStack>
+                        <CustomFieldDisplay Label="Start Shift Fuel Meter" LabelColumn=8 TextColumn=4>
+                            <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
+                                <RadzenStack>
+                                    @Entry.OpeningMeter.ToString("###,##0.00")
+                                    <RadzenBadge Text="@($"{Entry.PreviousClosingMeter.ToString("###,##0.00")}")" BadgeStyle="BadgeStyle.Danger" />
+                                </RadzenStack>
+                                <RadzenButton Icon="visibility" Size="ButtonSize.Small" Variant="Variant.Text" ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenPhotoZoomDialog(Model.FuelLogContainer.FuelLog.OpeningMeterPhoto) )" />
+                                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Text" ButtonStyle="ButtonStyle.Primary" Click="@(() => HandleEditMeter("opening"))" />
+                            </RadzenStack>
+                        </CustomFieldDisplay>
+                        <CustomFieldDisplay Label="End Shift Fuel Meter" LabelColumn=8 TextColumn=4>
+                            <RadzenStack Orientation="Orientation.Horizontal" Gap="10px">
+                                    @Entry.ClosingMeter.ToString("###,##0.00")
+                                <RadzenButton Icon="visibility" Size="ButtonSize.Small" Variant="Variant.Text" ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenPhotoZoomDialog(Model.FuelLogContainer.FuelLog.ClosingMeterPhoto!) )" />
+                                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Text" ButtonStyle="ButtonStyle.Primary" Click="@(() => HandleEditMeter("closing"))" />
+                            </RadzenStack>
+                        </CustomFieldDisplay>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenStack>
+        
+        </RadzenColumn>
+    </RadzenRow>
+</CustomCard>
+
+
+@code {
+    protected FuelLogModel Entry => Model.FuelLogContainer.FuelLog;
+
+    private void OpenPhotoZoomDialog(string imagePath)
+    {
+        DialogService.Open<ZoomPhoto>("Image", 
+            parameters: new Dictionary<string, object> { { "ImageSource", Model.GetImage(imagePath) } }, 
+            new DialogOptions { Draggable = true, Resizable = true });
+    }
+
+    private async Task HandleEditMeter(string type)
+    {
+        float value = 0f;
+        string title = "";
+        if (type == "opening")
+        {
+            value = Entry.OpeningMeter;
+            title = "Opening Meter Adjustment:";
+        }
+        else
+        {
+            value = Entry.ClosingMeter;
+            title = "Closing Meter Adjustment:";
+        }
+
+        var result = await DialogService.OpenAsync<MeterAdjustment>(title, parameters: new Dictionary<string, object> {
+            {"Title",title},
+            {"Value",value}
+        }, options: new DialogOptions { Width = "30%", Draggable = true });
+
+        if (result != null)
+        {
+            await Model.UpdateMeter(result, type);
+        }
+    }
+
+    protected void CheckOpeningMeter(object stationCode)
+    {
+
+        if (stationCode is null) return;
+
+        var station = Model.FuelLogContainer.StationSelections.FirstOrDefault(s => s.Code == (string)stationCode);
+        if (station != null)
+        {
+            if (station.OpeningMeter <= 0)
+            {
+                DialogService.Alert(message: $"Warning station {station.Code} must have an opening meter.");
+            }
+        }
+    }
+
+    private long ConvertDocument(int docno)
+    {
+        var number = Math.BigMul(docno, 12345);
+        return number;
+    }
+
+    protected void HandleDateChange(string name, object value)
+    {
+        if (name.ToLower() == "start")
+        {
+            Entry.SetShiftStartTimeValue((DateTime)value);
+        }
+        else if (name.ToLower() == "end")
+        {
+            Entry.SetShiftEndTimeValue((DateTime)value);
+        }
+        else
+        {
+
+        }
+
+    }
+
+    protected void HandleLogTypeChange()
+    {
+        Model.GetAssetSelection(Model.FuelLogContainer.FuelLog.LogType);
+    }
+}

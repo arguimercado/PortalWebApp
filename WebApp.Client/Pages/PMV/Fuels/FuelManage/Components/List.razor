@@ -1,0 +1,107 @@
+@page "/fuel/manage"
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Components;
+@using WebApp.Client.Pages.PMV.Fuels.FuelManage.Models;
+@using WebApp.Client.Pages.PMV.Fuels.FuelManage.ViewModels;
+@using WebApp.UILibrary.Providers;
+
+
+
+@attribute [Authorize]
+@inherits ComponentViewModelBase<FuelLogListViewModel>
+@inject DialogService DialogService
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Manage Fuel Log" Icon=@IconProvider.GetIconMenu("manage")>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px">
+            <RadzenButton Icon="@IconProvider.GetIconMenu("asset")" Text="Fuel Efficiency"  Click="HandleEffeciencyLink"/>
+            <CstButton ButtonType="EnumButtonType.Add" Text="Create Log" Click="CreateFuel" />
+            <CstButton ButtonType="EnumButtonType.Excel" Click="HandleExcelExport" />
+        </RadzenStack>
+    </CustomLayoutHeader>
+    <RadzenStack>
+        <RadzenFieldset Text="Search" class="w-100">
+            <RadzenRow>
+                <RadzenColumn Size=6>
+                    <CustomField Text="Station Tank" Orientation="horizontal" LabelColumn=3 ContentColumn=9>
+                        <RadzenDropDown 
+                            class="w-100"
+                            Data=Model.ReportContainer.StationSelections
+                            TValue="string"
+                            Multiple="true"
+                            TextProperty="Code"
+                            Chips=true
+                            ValueProperty="Code"
+                            Value=@Filter.FuelStations
+                            Change=@(args => HandleDropdownChange(args))
+                        />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size=6>
+                    <CustomField Text="Fuel Date" Orientation="horizontal">
+                            <RadzenStack Orientation="Orientation.Horizontal" Gap="5px" AlignItems="AlignItems.Center">
+                                <RadzenDatePicker 
+                                    TValue="DateTime" 
+                                    DateFormat="dd-MMM-yyyy"  
+                                    @bind-Value="@Filter.DateFrom" class="flex-fill me-2"/>
+                                <RadzenDatePicker 
+                                    TValue="DateTime" 
+                                    DateFormat="dd-MMM-yyyy"  
+                                    @bind-Value="@Filter.DateTo" 
+                                    class="flex-fill me-2"/>
+                                <RadzenButton Icon="search" Click="HandleSearchClick"/>
+                            </RadzenStack>
+                    </CustomField>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenFieldset>
+        <DataLogGrid />
+    </RadzenStack>
+  
+</CustomPageLayout>
+@code {
+    protected FuelSearchFilterParam Filter => Model.Filter;
+
+    private IEnumerable<SelectItem> Stations = new List<SelectItem>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if(firstRender) {
+            if(IsFirstLoad) {
+                Filter.IsPostBack = false;
+                await Model.LoadFuelLogReport();
+            }
+        }
+    }
+
+    private async Task CreateFuel()
+    {
+        await DialogService.OpenSideAsync<DialogForm>("Create Log", null);
+    }
+
+    private async Task HandleExcelExport()
+    {
+        await Model.FuelTransactionExportExcel(Filter);
+    }
+
+    private async Task HandleSearchClick()
+    {
+        Filter.IsPostBack = true;
+        await Model.LoadFuelLogReport();
+    }
+
+    private void HandleDropdownChange(object values)
+    {
+        var str = values is IEnumerable<object> ? string.Join(",", (IEnumerable<object>)values) : values;
+        Filter.StringFuelStation = str as string;
+    }
+
+    private void HandleEffeciencyLink()
+    {
+        PageNavigation.NavigateTo("/fuel/asset");
+    }
+
+
+  
+    
+
+}
+

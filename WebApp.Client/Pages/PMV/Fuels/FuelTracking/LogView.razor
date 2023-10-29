@@ -1,0 +1,222 @@
+﻿@using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
+@using Radzen.Blazor.Rendering;
+@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Components;
+@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Models;
+@using WebApp.Client.Pages.PMV.Fuels.Models;
+@using WebApp.UILibrary.Components.Grid;
+
+
+@inherits ComponentViewModelBase<FuelTrackingViewModel>
+@inject DialogService DialogService
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center" Style="min-height:260px">
+        <RadzenColumn Size="9" Style="min-height: 260px">
+            <RadzenFieldset Style="height:100%">
+                <MainViewCard Selected="@Selected"/>
+            </RadzenFieldset>
+        </RadzenColumn>
+        <RadzenColumn Size="3" Style="min-height: 260px">
+            <RadzenFieldset Style="height:100%">
+                <PhotoSlide 
+                    OpeningImagePath="@Model.GetImage(Selected.OpeningMeterPhoto)"
+                    OpeningMeter="@Model.SelectedLog!.OpeningMeter"
+                    ClosingImagePath="@Model.GetImage(Selected.ClosingMeterPhoto)" 
+                    ClosingMeter="@Model.SelectedLog!.ClosingMeter"
+                            OnZoomClick="HandlePhotoZoom" />
+            </RadzenFieldset>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>
+            <DetailCard Transaction="@SelectedTransaction" />
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack>
+        <RadzenDataGrid AllowColumnPicking=true
+            AllowColumnResize=true
+            AllowMultiColumnSorting=true
+            AllowSorting=true
+            AllowPaging="true"
+            PageSize="PageSizeOption.DefaultSize"
+            AllowFiltering=true
+            TItem="FuelTransactionModel" 
+            Data="Selected.FuelTransactions.ToList()"
+            PageSizeOptions="PageSizeOption.Option"
+            SelectionMode="DataGridSelectionMode.Single"
+            RowSelect="HandleSelectTransaction"
+            ShowPagingSummary="true">
+            <Columns>
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Title="SNo" Width="50px" TextAlign=TextAlign.Center Resizable=false Sortable=false Filterable=false Pickable=false>
+                    <Template Context="data">
+                        <span class="@(!data.IsMatch ? "rz-color-danger-darker" : "")">@(Selected.FuelTransactions.ToList().IndexOf(data) + 1)</span>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="AssetCode" Title="Asset Code">
+                    <Template Context="data">
+                        <a href="#" @onclick:preventDefault style="text-decoration:none" @onclick="@(() => HandleShowAsset(data.AssetCode))">
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="10px">
+                                <RadzenText Text="@data.AssetCode"  TextStyle="TextStyle.Caption" />
+                            </RadzenStack>
+                        </a>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="ProjectCode" Title="Project Code" />
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="FuelDateTime" Title="Date" FormatString="{0:dd-MMM-yyyy}" />
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="FuelDateTime" Title="Time" FormatString="{0: hh:mm tt}" />
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="RefillQuantity" Title="Refill Qty (Liter)" FormatString="{0:###,##0.00}" Width="150px">
+                    <FooterTemplate>
+                        Total: <b>@String.Format("{0:P}", Selected.FuelTransactions.Sum(f => f.RefillQuantity).ToString("###,##0.00"))</b>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="ConsumedQuantity" Title="Consumed. Qty (Liter)" FormatString="{0:###,##0.00}" Width="150px">
+                    <FooterTemplate>
+                        Total: <b>@String.Format("{0:P}", Selected.FuelTransactions.Sum(f => f.ConsumedQuantity).ToString("###,##0.00"))</b>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="AdjustmentQuantity" Title="Adj. Qty (Liter)" FormatString="{0:###,##0.00}" Width="150px">
+                    <FooterTemplate>
+                        Total: <b>@String.Format("{0:P}", Selected.FuelTransactions.Sum(f => f.AdjustmentQuantity).ToString("###,##0.00"))</b>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="Photo"  Title="Operator/Driver Id" Width="200px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <a href="#" @onclick:preventDefault class="@(!data.IsMatch ? "rz-color-danger-dark" : "rz-color-dark")" style="text-decoration:none">
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="10px">
+                                <RadzenIcon Icon="account_circle"/>
+                                <RadzenText Text="@data.OperatorDriver" class="@(!data.IsMatch ? "rz-color-danger-dark" : "")" TextStyle="TextStyle.Caption" />
+                            </RadzenStack>
+                        </a>
+                    </Template> 
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="Remarks" Title="Remarks" />
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Property="CreatedBy" Title="Fueler">
+                    <Template>
+                        <a href="#" @onclick:preventDefault @onclick="@(async () => await HandleShowEmployee(context.CreatedBy!))" style="text-decoration:none">
+                            <RadzenStack Orientation="Orientation.Horizontal" Gap="2px">
+                                <RadzenIcon Icon="account_circle"/>
+                                <RadzenText Text="@context.CreatedBy" TextStyle="TextStyle.Caption"/>
+                            </RadzenStack>
+                        </a>
+                    </Template>
+                </RadzenDataGridColumn>
+               
+                @* <RadzenDataGridColumn TItem="FuelTransactionModel" Width="40px">
+                    <Template Context="data">
+                        @if(data.LogType != EnumLogType.Void.ToString()) {
+                            <RadzenButton Icon="delete" Size="ButtonSize.Small" 
+                                Variant="Variant.Text" 
+                                ButtonStyle="ButtonStyle.Secondary" 
+                                Click="@(() => HandleVoid(data))"/>
+                        }
+                    </Template>
+                </RadzenDataGridColumn> *@
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+</RadzenStack>
+
+
+@code {
+    private FuelLogModel Selected => Model.SelectedLog ?? new();
+    private FuelTransactionModel SelectedTransaction { get; set; } = new();
+
+    private Popup? popup;
+    private RadzenButton? btnUser;
+
+    private async Task HandlePhotoZoom(EventPhotoArgs args)
+    {
+        await DialogService.OpenAsync<ZoomPhoto>("Zoom", parameters: new Dictionary<string, object> { { "ImageSource",args.ImageSrc } }, new DialogOptions {Draggable = true, Resizable=true });
+    }
+
+    private async Task HandlePhotoView(FuelTransactionModel transaction) {
+
+        if(transaction.Photos == null || transaction.Photos.Length == 0)  {
+            await DialogService.Alert("No Photo Available", "Alert");
+            return;
+        }
+
+        List<string> stringUrlPhotos = new List<string>();
+
+        foreach(var photo in transaction.Photos) {
+            stringUrlPhotos.Add(Model.GetImage(photo));
+        };
+
+        await DialogService.OpenAsync<PhotoDialog>("Photo", new Dictionary<string, object>
+        {
+            { "Photos", stringUrlPhotos.ToArray()},
+            {"Data", transaction}
+        }, new DialogOptions { Width = "50%",Draggable=true });
+
+    }
+
+    private void HandleSelectTransaction(object args) {
+        SelectedTransaction = args as FuelTransactionModel;
+    }
+
+   
+
+    private async Task HandleShowEmployee(string employeeId)
+    {
+
+        await DialogService.OpenAsync<EmpCard>("Employee Card", new Dictionary<string, object>
+        {
+            { "EmployeeId", employeeId }
+        }, new DialogOptions { Width = "40%", Draggable=true });
+    }
+
+    private async Task HandleShowAsset(string assetCode)
+    {
+        await DialogService.OpenAsync<AssetCard>("Asset Card", new Dictionary<string, object>
+        {
+            { "AssetCode", assetCode }
+        }, new DialogOptions { Width = "40%", Draggable = true });
+    }
+
+    private async Task HandleVoid(FuelTransactionModel args) {
+        
+        var confirmation = await DialogService.Confirm("Do you want void transaction", "Void Transaction", 
+                                            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if(confirmation.HasValue && confirmation.Value) {
+            var newTransactionConfirmation = await DialogService.Confirm("Do you want to create new transaction", "New Transaction", 
+                                            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+
+            if (newTransactionConfirmation.HasValue && newTransactionConfirmation.Value)
+            {
+                Model.FuelEntry = new FuelTransactionModel {
+                    Id = args.Id,
+                    FuelLogId = Model.SelectedLog?.Id!,
+                    AssetCode = args.AssetCode,
+                    ProjectCode = args.ProjectCode,
+                    FuelDateTime = args.FuelDateTime,
+                    OperatorDriver = args.OperatorDriver,
+                    Quantity = args.Quantity,
+                    Reading = args.Reading,
+                    DriverQatarIdUrl = args.DriverQatarIdUrl,
+                    Photo = args.Photo,
+                    MarkDelete = false,
+                    Remarks = args.Remarks,
+                    VerifierId = args.VerifierId,
+                    IsMatch = args.IsMatch,
+                    LogType = args.LogType,
+                    MarkVoid = true
+                };
+
+                await DialogService.OpenSideAsync<AddNewDialog>("New Transaction");
+            }
+            else
+            {
+                Model.FuelEntry = new FuelTransactionModel {
+                    Id = args.Id,
+                    FuelLogId = Model.SelectedLog?.Id!,
+                    MarkDelete = true,
+                    MarkVoid = false,
+                    LogType = EnumLogType.Void.ToString()
+                };
+
+                await Model.Void();
+            }
+        }
+    }
+
+
+}

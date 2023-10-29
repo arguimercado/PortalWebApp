@@ -1,0 +1,22 @@
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Models;
+    
+
+<CustomRow IsFullRow>
+    <RadzenTextBox />
+    <RadzenButton Icon="search" />
+</CustomRow>
+<CustomRow>
+    <RadzenDataGrid Data=@Fuels TItem="FuelLogModel" 
+        AllowColumnReorder=true>
+        <Columns>
+            <RadzenDataGridColumn Title="Document No" TItem="FuelLogModel" Property="DocumentNo" />
+            <RadzenDataGridColumn Title="Document No" TItem="FuelLogModel" Property="OpeningMeter" />
+            <RadzenDataGridColumn Title="Document No" TItem="FuelLogModel" Property="ClosingMeter" />
+        </Columns>
+    </RadzenDataGrid>
+</CustomRow>
+
+@code {
+    public IEnumerable<FuelLogModel> Fuels { get; set; } = new List<FuelLogModel>();
+
+}

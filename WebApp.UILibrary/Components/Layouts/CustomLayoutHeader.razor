@@ -1,0 +1,45 @@
+﻿@using WebApp.UILibrary.Components.Navigation;
+
+
+@inject PageNavigation PageNavigation
+
+<RadzenStack 
+    
+        Orientation="Orientation.Horizontal" 
+        JustifyContent="JustifyContent.Left"
+             AlignItems="AlignItems.Center" class="border-info border-bottom border-bottom-1 border-info px-3 py-2 w-100 mb-3">
+
+    <RadzenRow AlignItems="AlignItems.Center" class="w-100">
+        <RadzenColumn Size="8">
+            <RadzenStack AlignItems="AlignItems.Center" Gap="5" Orientation="Orientation.Horizontal">
+                <RadzenButton Icon="arrow_back_ios"
+                              ButtonStyle="ButtonStyle.Light"
+                              Shade="Shade.Lighter" Click="HandleClick" />
+                <h4><RadzenIcon Icon="@Icon" /></h4>
+                <RadzenText TextStyle="TextStyle.H5" Text="@Title" />
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="5px" JustifyContent="JustifyContent.End">
+                @ChildContent
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+
+@code {
+    [Parameter]
+    public required string Title { get; set; }
+    [Parameter]
+    public required string Icon { get; set; }
+    [Parameter]
+    public required RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool IsShowBack { get; set; }
+
+    private void HandleClick() {
+        PageNavigation.NavigateBack();
+    }
+}

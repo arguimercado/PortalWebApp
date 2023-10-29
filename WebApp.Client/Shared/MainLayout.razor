@@ -1,0 +1,28 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Portal ver 2.0</PageTitle>
+
+<RadzenLayout>
+    <RadzenDialog/>
+    <RadzenNotification/>
+    <RadzenTooltip/>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => _sidebarExpand = !_sidebarExpand)" />
+            <RadzenLabel Text="Header" />
+        </RadzenStack>
+    </RadzenHeader>
+    <Sidebar SidebarExpand=@_sidebarExpand />
+    <RadzenBody class="m-0 py-0">
+        <CustomSpinner>
+           @Body
+        </CustomSpinner>
+    </RadzenBody>
+    <RadzenFooter>
+        Footer
+    </RadzenFooter>
+</RadzenLayout>
+
+@code {
+    private bool _sidebarExpand = false;
+}

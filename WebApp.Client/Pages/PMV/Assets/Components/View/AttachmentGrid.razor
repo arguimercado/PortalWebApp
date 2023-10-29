@@ -1,0 +1,34 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssetReadViewModel>
+@inject IConfiguration Configuration
+
+<RadzenDataGrid TItem="AssetDocument" Data="Model.Asset.Documents">
+    <Columns>
+        <RadzenDataGridColumn TItem="AssetDocument" Title="SNo" TextAlign="TextAlign.Center" Width="40px">
+            <Template Context="document">
+                <span>@(Model.Asset.Documents.ToList().IndexOf(document) + 1)</span>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="AssetDocument" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="AssetDocument" Property="Description" Title="Description" />
+        <RadzenDataGridColumn TItem="AssetDocument" Property="DocumentReferenceNo" Title="Reference No" />
+        <RadzenDataGridColumn TItem="AssetDocument" Property="DocumentType" Title="Document Type" />
+        <RadzenDataGridColumn TItem="AssetDocument" Property="Attachment" Title="Attachment" TextAlign="TextAlign.Center" Width="8%">
+            <Template Context="document">
+                @if (!document.IsContentEmpty())
+                {
+                    <NavLink href="@($"{Configuration.GetValue<string>("Report:DownloadUrl")}/asset/document?documentId={document.DocumentId}")" target="_blank">
+                        <RadzenIcon Icon="attachment" />
+                    </NavLink>
+                }
+            </Template>
+                       
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+
+}

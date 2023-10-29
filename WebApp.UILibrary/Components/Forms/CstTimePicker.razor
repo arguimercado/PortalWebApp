@@ -1,0 +1,82 @@
+﻿
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.2rem" class="w-100">
+    <RadzenFormField Text="Date" Style="width:60%"  >
+        <RadzenDatePicker TValue="DateTime" @bind-Value="DateValue" DateFormat="dd-MMM-yyyy" Change="@((args) => HandleChange(args))" class="w-100" />
+    </RadzenFormField>
+    <RadzenFormField Text="@Label" Style="width:20%">
+        <RadzenMask Mask="**:**" CharacterPattern="[0-9]" Placeholder="hh:mm"
+        @bind-Value=Time Change="@((args) => HandleChange(args))" class="w-100" />
+    </RadzenFormField>
+    <RadzenFormField Text="AM/PM" Style="width:20%">
+        <RadzenDropDown TValue="string"
+                        Change="@((args) => HandleChange(args))"
+                        Data="@(new string[] { "AM", "PM"})"
+                        @bind-Value=AMPM
+                        class="w-100" />
+    </RadzenFormField>
+</RadzenStack>
+
+@code {
+
+    private DateTime _dateValue;
+
+    [Parameter]
+    public DateTime Data { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> Change { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    private string? AMPM { get; set; } = "AM";
+    private string? Time { get; set; } = "";
+    private string TimeValue { get; set; } = "";
+    private DateTime DateValue { get; set; } = DateTime.UtcNow;
+
+    protected override void OnParametersSet() {
+        ConvertBinding(Data);
+    }
+
+
+    private void ConvertBinding(DateTime dateValue) {
+        string timeHour = "";
+        string timeMinute = dateValue.Minute.ToString("00");
+        DateValue = dateValue;
+        if (dateValue.Hour > 12)
+        {
+            timeHour = (dateValue.Hour - 12).ToString("00");
+            AMPM = "PM";
+        }
+        else if (_dateValue.Hour == 12)
+        {
+            AMPM = "PM";
+            timeHour = dateValue.Hour.ToString("00");
+        }
+        else
+        {
+            timeHour = dateValue.Hour.ToString("00");
+            AMPM = "AM";
+        }
+        Time = $"{timeHour}:{timeMinute}";
+
+    }
+
+    protected async Task HandleChange(object args)
+    {
+        if (args != null)
+        {
+            var dateTime = $"{DateValue.ToString("yyyy-MM-dd")} {Time} {AMPM}";
+            if (DateTime.TryParse(dateTime, out DateTime newDateTime))
+            {
+                await Change.InvokeAsync(newDateTime);
+            }
+            else
+            {
+                await Change.InvokeAsync(DateValue);
+            }
+        }
+        //check if time is military time
+
+    }
+}

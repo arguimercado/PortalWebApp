@@ -1,0 +1,40 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+@using static WebApp.Client.Pages.PMV.Assets.Components.Dashboard.AssetDashboard;
+
+
+@inherits ComponentViewModelBase<AssetDashboardViewModel>
+
+<RadzenStack>
+    <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3" Text="External Asset" />
+    <RadzenDataGrid TItem="CategoryCountModel" Data=@Model.Dashboard.ExternalCounts>
+        <Columns>
+            <RadzenDataGridColumn TItem="CategoryCountModel" Property="Category" Title="Category">
+                <FooterTemplate>
+                    <strong>Total: </strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CategoryCountModel" Property="Active" Title="Total" FormatString="{0:###,##0}" TextAlign="TextAlign.Center">
+                <Template Context="category">
+                    <a href="#"
+                       @onclick:preventDefault="true"
+                       @onclick="@(() => HandleSearch("external", category.Code, "1"))">@category.Active.ToString("###,##0")</a>
+                </Template>
+                <FooterTemplate>
+                    <strong>@Model.Dashboard.ExternalCounts.Sum(c => c.Active).ToString("###,##0")</strong>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public EventCallback<SearchParameter> OnClickSearch { get; set; }
+
+    private void HandleSearch(string type, string category, string status)
+    {
+        OnClickSearch.InvokeAsync(new SearchParameter(type, category, status));
+    }
+
+}

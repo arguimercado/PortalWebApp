@@ -1,0 +1,95 @@
+﻿@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Models;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.ViewModels;
+    
+
+
+@inherits ComponentViewModelBase<FuelLogEntryViewModel>
+
+@inject DialogService DialogService
+
+<RadzenTemplateForm TItem="FuelLogModel" Data="Model.FuelLogContainer.FuelLog" Submit="HandleSubmit">
+    <RadzenStack 
+        Orientation="Orientation.Vertical">
+        <CustomField Text="Tanker Code" MarkRequired=true>
+            <RadzenDropDown Name="Code"
+                            TValue="string"
+                            Data="Model.FuelLogContainer.StationSelections"
+                            TextProperty="Code"
+                            ValueProperty="Code"
+                            Change="@(args => CheckOpeningMeter(args))"
+                            @bind-Value="Entry.Station" 
+                            class="w-100"/>
+            <RadzenRequiredValidator Component="Code" />
+        </CustomField>
+        <CustomField Text="Fueled Date" MarkRequired=true>
+            <RadzenDatePicker Name="FueledDate"
+                              TValue="DateTime"
+                              DateFormat="dd-MMM-yyyy"
+                            @bind-Value="Entry.FueledDate"
+                              class="w-100" />
+            <RadzenRequiredValidator Component="FueledDate"/>
+        </CustomField>
+        <CustomField Text="Log Type" MarkRequired=true>
+            <RadzenDropDown Name="LogType"
+                            TValue="string"
+                            Data="Model.FuelLogContainer.LogTypeSelections"
+                            TextProperty="Text"
+                            ValueProperty="Value"
+            @bind-Value="Entry.LogType" />
+            <RadzenRequiredValidator Component="LogType"/>
+        </CustomField>
+        <CustomField Text="Fueler">
+            <RadzenDropDown Name="Fueler"
+                            AllowVirtualization=true
+                            TValue="string"
+                            Data="Model.FuelLogContainer.FuelerSelections"
+                            TextProperty="FullName"
+                            ValueProperty="EmpCode"
+                            AllowFiltering=true
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            AllowClear=true
+                            class="w-100"
+            @bind-Value="Entry.Fueler" />
+        </CustomField>
+        <CustomField Text="Remarks">
+            <RadzenTextArea Name="Remarks" @bind-Value=@Entry.Remarks class="w-100"/>
+        </CustomField>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="10px">
+            <RadzenButton Text="Create" ButtonStyle="ButtonStyle.Success" ButtonType="ButtonType.Submit" />
+            <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Danger" Click="@(args => DialogService.CloseSide())" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+
+    protected FuelLogModel Entry => Model.FuelLogContainer.FuelLog;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Model.Load();
+        }
+
+    }
+
+    protected void CheckOpeningMeter(object stationCode) {
+
+        if (stationCode is null) return;
+
+        var station = Model.FuelLogContainer.StationSelections.FirstOrDefault(s => s.Code == (string)stationCode);
+        if (station != null) {
+            if (station.OpeningMeter <= 0) {
+                DialogService.Alert(message: $"Warning station {station.Code} must have an opening meter.");
+            }
+        }
+    }
+    
+
+    public async Task HandleSubmit() {
+        var result = await Model.SaveUpdate("draft");
+        if (result == 0)
+            PageNavigation.NavigateTo($"/fuel/form/{Model.FuelLogContainer.FuelLog.DocumentNo}");
+    }
+}

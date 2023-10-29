@@ -1,0 +1,134 @@
+﻿@page "/asset/group/form/{Id?}"
+
+@using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Components.Entry.ViewModels;
+@using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Models;
+
+@inherits ComponentViewModelBase<GroupAlertViewModel>
+@inject DialogService DialogService
+
+@attribute [Authorize]
+<CustomPageLayout>
+    <RadzenTemplateForm TItem="GroupAlertModel" Data="Group" Submit="HandleSubmit">
+        <CustomLayoutHeader Title="Group Alert Entry">
+            <RadzenButton Icon="save" Text="Save" ButtonStyle="ButtonStyle.Success" ButtonType="ButtonType.Submit" />
+        </CustomLayoutHeader>
+        <RadzenStack Gap="1rem">
+            <CustomCard>
+                <RadzenRow>
+                    <RadzenColumn Size="4">
+                        <CustomField Text="Group Name" IsModern>
+                            <ChildContent>
+                                <RadzenTextBox 
+                                                Disabled="@(!string.IsNullOrEmpty(Group.Id))"
+                                                Name="GroupName"
+                                                @bind-Value=@Group.GroupName
+                                                />
+                            </ChildContent>
+                            <Error>
+                                <RadzenRequiredValidator Component="GroupName"/>
+                            </Error>
+                        </CustomField>
+                    </RadzenColumn>
+                    <RadzenColumn Size="8">
+                        <CustomField Text="Description" IsModern>
+                            <ChildContent>
+                                <RadzenTextBox class="w-100"
+                                            Disabled="@(!string.IsNullOrEmpty(Group.Id))"
+                                            Name="Description"
+                                            @bind-Value=@Group.Description/>
+                            </ChildContent>
+                            <Error>
+                                <RadzenRequiredValidator Component="Description" Popup=true Style="position:absolute;bottom:0" />
+                            </Error>
+                        </CustomField>
+                    </RadzenColumn>
+                </RadzenRow>
+            </CustomCard>
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Icon="warning"
+                                Text="Add Alert"
+                                ButtonStyle="ButtonStyle.Warning" Click="HandleAddAlert" />
+            </RadzenStack>
+            <RadzenDataGrid TItem="GroupAlertDetailModel" Data=Group.Details.ToList() AllowSorting=true AllowColumnResize=true>
+                <Columns>
+                    <RadzenDataGridColumn TItem="GroupAlertDetailModel" Property="Name" Title="Service Name" />
+                    <RadzenDataGridColumn TItem="GroupAlertDetailModel" Property="KmAlert" Title="Alert (Km or Hr)" Width="10%" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="GroupAlertDetailModel" Property="KmInterval" Title="Interval (Km or Hr)" Width="10%" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="GroupAlertDetailModel" Property="SMU" Title="SMU" Width="10%" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="GroupAlertDetailModel" Context="detail" Title="Notify At Alert" Width="5%" TextAlign="TextAlign.Center">
+                        
+                        <Template Context="detail">
+                            @if (detail.NotifyManagementWhenAlert)
+                            {
+                                <RadzenIcon Icon="mail" />
+                            }
+                                
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="GroupAlertDetailModel" Context="detail" Title="Notify After Interval" Width="5%" TextAlign="TextAlign.Center">
+                        <Template Context="detail">
+                            @if(detail.NotifyManagementAfterInterval) {
+                                <RadzenIcon Icon="mail" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="GroupAlertDetailModel"
+                                            Filterable="false" 
+                                            Sortable="false"
+                                            Context="service"
+                                            TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="service">
+                            <RadzenButton Icon="edit"
+                                            ButtonStyle="ButtonStyle.Light"
+                                            Variant="Variant.Flat"
+                                            Size="ButtonSize.Medium"
+                                            Click="@(args => EditRow(service))"/>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenStack>
+    </RadzenTemplateForm>
+</CustomPageLayout>
+
+
+@code {
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    public GroupAlertModel Group => Model.GroupAlertContainer.GroupAlert;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) {
+            await Model.LoadAsync(Id);
+        }
+    }
+
+    protected async Task EditRow(GroupAlertDetailModel detail)
+    {   
+        var result = await DialogService.OpenSideAsync<Detail>("Service Alert",
+                        new Dictionary<string, object>() { 
+                            { "DetailViewModel", GroupAlertDetailModel.Clone(detail) } 
+                        },
+                        options: new SideDialogOptions { Position = DialogPosition.Right });
+    }
+
+
+    protected async Task HandleSubmit() {
+        var confirmation = await DialogService.Confirm("Are you sure do you want to save?");
+        if(confirmation.Value == true)
+        {
+            await Model.Save();
+            PageNavigation.NavigateTo("asset/group/manage");
+
+        }
+    }
+
+    protected async Task HandleAddAlert() {
+        var result = await DialogService.OpenSideAsync<Detail>("Service Alert", 
+                        options: new SideDialogOptions { Position = DialogPosition.Right });
+    }
+}

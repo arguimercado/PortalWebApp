@@ -1,0 +1,57 @@
+﻿@page "/asset/dashboard"
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+@using WebApp.UILibrary.Providers;
+
+
+@attribute [Authorize]
+@inherits ComponentViewModelBase<AssetDashboardViewModel>
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Asset Dashboard" Icon=@IconProvider.GetIconMenu("dashboard")>
+
+    </CustomLayoutHeader>
+    <RadzenStack Gap="20px">
+        <AssetMenu />
+        <RadzenRow>
+            <RadzenColumn Size="10">
+                <CustomCard TitleHeader="Asset Inventory">
+                    <RadzenTabs>
+                        <Tabs>
+                            <RadzenTabsItem Text="Internal Inventory">
+                                <InternalInventoryCard />
+                            </RadzenTabsItem>
+                            <RadzenTabsItem Text="External Inventory">
+                                <ExternalInventory OnClickSearch="HandleSearch" />
+                            </RadzenTabsItem>
+                        </Tabs>
+                    </RadzenTabs>
+                </CustomCard>
+            </RadzenColumn>
+            <RadzenColumn>
+                <CustomCard TitleHeader="New Asset Entry">
+
+                </CustomCard>
+            </RadzenColumn>
+        </RadzenRow>
+
+    </RadzenStack>
+   
+    
+</CustomPageLayout>
+
+@code {
+    
+    public record SearchParameter(string AssetType, string Category, string Status);
+
+    protected void HandleSearch(SearchParameter searchParameter) {   
+        PageNavigation.NavigateTo($"/asset/manage/{searchParameter.AssetType}/{searchParameter.Category}/{searchParameter.Status}","","",true);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) {
+            await Model.LoadCategoryCount();
+        }
+    }
+
+
+}

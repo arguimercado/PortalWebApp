@@ -1,0 +1,154 @@
+@page "/asset/form/external/{id?}"
+@using WebApp.Client.Pages.PMV.Assets.Components.Entry.Components
+@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+
+@attribute [Authorize]
+@inherits ComponentViewModelBase<AssetViewModel>
+
+<CustomPageLayout>
+    <RadzenTemplateForm 
+        TItem="ExternalAssetModel" 
+        Data="Asset" Submit="HandleSubmit">
+        <CustomLayoutHeader Title="External Asset Form" Icon="directions_car">
+            <CstButton ButtonType="EnumButtonType.Save"
+                       ActionType="ButtonType.Submit" />
+        </CustomLayoutHeader>
+        <RadzenStack>
+            <CustomCard TitleHeader="External Asset">
+                <RadzenRow>
+                    <RadzenColumn Size="4">
+                        <CustomFieldDisplay Label="Asset Code" Text="@Asset.AssetCode" />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow>
+                    <RadzenColumn Size=2>
+                        <CustomField Text="Plate Type" IsModern>
+                            <ChildContent>
+                            <RadzenDropDown Name="PlateType"
+                                            TValue=String
+                                            Data="Model.AssetContainer.PlateTypes"
+                                            TextProperty="Text"
+                                            ValueProperty="Value"
+                                            @bind-Value="Asset.PlateType"/>
+                            </ChildContent>
+                            <Error>
+                                <RadzenRequiredValidator Component="PlateType" Text="Plate Type is Required" />
+                            </Error>
+                        </CustomField>
+                    </RadzenColumn>
+                    <RadzenColumn Size=3>
+                        <CustomField Text="Plate No" IsModern>
+                            <ChildContent>
+                                <RadzenTextBox Name="PlateNo"
+                                               @bind-Value="Asset.PlateNum"/>
+                            </ChildContent>
+                            <Error>
+                                <RadzenRequiredValidator Component="PlateNo" Text="Plate No is Required" />
+                            </Error>
+                        </CustomField>
+                    </RadzenColumn>
+                    <RadzenColumn Size=3>
+                        <CustomField Text="Hire Under" IsModern>
+                            <ChildContent>
+                                <RadzenDropDown Name="CompanyCode"
+                                                TValue=String
+                                                AllowFiltering=true
+                                                AllowClear=true
+                                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                Data="Model.AssetContainer.Companies"
+                                                TextProperty="Text"
+                                                ValueProperty="Value"
+                                                @bind-Value="Asset.CompanyCode" />
+                            </ChildContent>
+                            <Error>
+                                <RadzenRequiredValidator Component="CompanyCode" Text="Hire Under is Required" />
+                            </Error>
+
+                        </CustomField>
+                    </RadzenColumn>
+                    <RadzenColumn Size=3>
+                        <CustomField Text="Vendor" IsModern>
+                            <ChildContent>
+                                <RadzenDropDown Name="VendorCode"
+                                                TValue=String
+                                                AllowFiltering=true
+                                                AllowClear=true
+                                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                Data="Model.AssetContainer.Vendors"
+                                                TextProperty="Text"
+                                                ValueProperty="Value"
+                                                @bind-Value="Asset.VendorCode"
+                                                 />
+                            </ChildContent>
+                            <Error>
+                                <RadzenRequiredValidator Component="VendorCode" Text="Vendor Code is Required" />
+                            </Error>
+                        </CustomField>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow>
+                    <RadzenColumn Size="8">
+                        <CustomField Text="Asset Description" IsModern>
+                            <ChildContent>
+                                <RadzenTextBox  Name="AssetDesc" @bind-Value=Asset.AssetDesc />
+                            </ChildContent>
+                            <Error>
+                                <RadzenRequiredValidator Component="AssetDesc" Text="Asset Desctiption is Required" />
+                            </Error>
+                        </CustomField>
+                    </RadzenColumn>
+                    <RadzenColumn Size="4">
+                        <CustomField Text="Hire / SubContract" IsModern>
+                            <ChildContent>
+                                <RadzenDropDown Name="HireSub"
+                                                TValue=String
+                                                Data="Model.AssetContainer.HireMethods"
+                                                TextProperty="Text"
+                                                ValueProperty="Value"
+                                                @bind-Value="Asset.HireSub"/>
+                            </ChildContent>
+                            <Error>
+                                <RadzenRequiredValidator Component="HireSub" Text="Hire/Sub is Required" />
+                            </Error>
+                        </CustomField>
+                    </RadzenColumn>
+                </RadzenRow>
+            </CustomCard>
+            <CustomCard TitleHeader="Operator/Driver">
+                <AssignedDriverGrid 
+                    AssetCode="@Model.AssetContainer.ExternalAsset.AssetCode" 
+                    AssignedDrivers="@Model.AssetContainer.ExternalAsset.Drivers" 
+                    OnRefresh="@((args) => HandleRefresh())"
+                    AssetType="external"/>
+            </CustomCard>
+        </RadzenStack>
+    </RadzenTemplateForm>
+</CustomPageLayout>
+
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    protected ExternalAssetModel Asset => Model.AssetContainer.ExternalAsset;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            await Model.NewEditAsync(Id, "external");
+        }
+    }
+
+    private async Task HandleRefresh()
+    {
+        await Model.NewEditAsync(Id, "external");
+    }
+
+    protected async Task HandleSubmit() {
+        if(await Model.SaveAsync("external")) {
+            PageNavigation.NavigateTo("/asset/manage/edit");
+        }
+    }
+}

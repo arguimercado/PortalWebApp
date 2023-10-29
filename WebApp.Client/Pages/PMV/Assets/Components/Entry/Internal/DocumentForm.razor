@@ -1,0 +1,161 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssetViewModel>
+@inject DialogService DialogService
+@inject IConfiguration Configuration
+
+
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center">
+    <RadzenRow>
+        <RadzenColumn Size="3">
+            <RadzenFieldset>
+                <CustomField Text="Title" IsModern>
+                    <ChildContent>
+                        <RadzenTextBox Name="Title" @bind-Value="Document.Title" />
+                    </ChildContent>
+                    <Error>
+                        <RadzenRequiredValidator Text="Title is required" />
+                    </Error>
+                </CustomField>
+                <CustomField Text="Description" IsModern>
+                    <RadzenTextBox Name="Title" @bind-Value="Document.Description" />
+                </CustomField>
+                <CustomField Text="Reference No" IsModern>
+                    <ChildContent>
+                        <RadzenTextBox Name="DocumentReferenceNo" @bind-Value="Document.DocumentReferenceNo" />
+                    </ChildContent>
+                    <Error>
+                        <RadzenRequiredValidator Text="Reference No is required" />
+                    </Error>
+                </CustomField>
+                <CustomField Text="Document Type" IsModern>
+                    <ChildContent>
+                        <RadzenTextBox Name="DocumentType" @bind-Value="Document.DocumentType" />
+                    </ChildContent>
+                    <Error>
+                        <RadzenRequiredValidator Text="Document Type is required" />
+                    </Error>
+                </CustomField>
+                <CustomField Text="Attach File" IsModern>
+                    <InputFile OnChange="HandleFileChange" Name="AttachedFile" style="padding:15px 10px;"/>
+                </CustomField>
+                <RadzenStack JustifyContent="JustifyContent.End">
+                    <RadzenButton Text="Add"  Click="AddDocument" />
+                </RadzenStack>
+            </RadzenFieldset>
+        </RadzenColumn>
+        <RadzenColumn>
+            <RadzenDataGrid TItem="AssetDocument"
+                            Data="Model.Asset.Documents"
+                            @ref="tGrid"
+                            AllowMultiColumnSorting=true
+                            AllowColumnResize=true>
+                <Columns>
+                    <RadzenDataGridColumn TItem="AssetDocument" Title="SNo" TextAlign="TextAlign.Center" Width="5%">
+                        <Template Context="document">
+                            <span> @(Model.Asset.Documents.IndexOf(document) + 1)</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AssetDocument" Property="Id" Width="0" />
+                    <RadzenDataGridColumn TItem="AssetDocument" Property="Title" Title="Title">
+                        <EditTemplate Context="document">
+                            <RadzenTextBox @bind-Value="document.Title" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AssetDocument" Property="Description" Title="Description">
+                        <EditTemplate Context="document">
+                            <RadzenTextBox @bind-Value="document.Description" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AssetDocument" Property="DocumentReferenceNo" Title="Reference No">
+                        <EditTemplate Context="document">
+                            <RadzenTextBox @bind-Value="document.DocumentReferenceNo" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AssetDocument" Property="DocumentType" Title="Document Type">
+                        <EditTemplate Context="document">
+                            <RadzenTextBox @bind-Value="document.DocumentType" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AssetDocument" Property="Attachment" Title="Attachment" TextAlign="TextAlign.Center" Width="8%">
+                        <Template Context="document">
+                            @if (!document.IsContentEmpty()) {
+                                <NavLink href="@($"{Configuration.GetValue<string>("Report:DownloadUrl")}/asset/document?documentId={document.Id}")" target="_blank">
+                                    <RadzenIcon Icon="attachment" />
+                                </NavLink>
+                            }
+                        </Template>
+                        <EditTemplate Context="document">
+                            <InputFile OnChange="HandleFileChange" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AssetDocument" Context="document"
+                                          TextAlign="TextAlign.Center" Width="10%">
+                        <Template Context="document">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat"
+                                          Shade="Shade.Lighter" Size="ButtonSize.Medium"
+                                          Class="my-1 ms-1" Click="@(args => DeleteRow(document))" @onclick:stopPropagation="true" />
+                        </Template>
+                        
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+    
+</RadzenStack>
+
+@code {
+
+
+    private RadzenDataGrid<AssetDocument> tGrid;
+    private AssetDocument? _assetDocument = null;
+    private AssetDocument Document = new();
+    private int _counter = 0;
+
+    [Parameter]
+    public string AssetId { get; set; } = "";
+
+    protected void Reset() {
+        tGrid.Reset();
+    }
+
+    private async Task AddDocument()
+    {
+        await Model.UpdateDocument(Document);
+        Document = new();
+        await tGrid.Reload();
+    }
+
+ 
+
+    protected async Task DeleteRow(AssetDocument docs) {
+        _assetDocument = new();
+        await Model.DeleteDocument(docs);
+        await tGrid.Reload();
+    }
+
+   
+    protected async Task OnUpdateRow(AssetDocument docs) {
+        await Model.UpdateDocument(docs);
+        await tGrid.Reload();
+    }
+
+    protected async Task OnCreateRow(AssetDocument docs) {
+        _counter = tGrid.Count;
+        await Model.UpdateDocument(docs);
+        await tGrid.Reload();
+    }
+
+    protected void HandleFileChange(InputFileChangeEventArgs args) {
+        var file = args.File;
+        if (file == null)
+            return;
+
+        if(Document != null) {
+            Document.SetStream(file.OpenReadStream(2000000), file.ContentType, file.Name);
+        }
+    }
+
+}

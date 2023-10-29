@@ -1,0 +1,22 @@
+﻿@if(ShowActionLink)
+{
+    <a href="@($"/asset/manage/view/{LinkValue}")" class="btn btn-light btn-sm" target="_blank" style="text-decoration:none">
+        <RadzenIcon Icon="pageview" />
+    </a>
+    <a href="@($"/asset/manage/internal/{LinkValue}")" class="btn btn-light btn-sm" target="_blank" style="text-decoration:none">
+        <RadzenIcon Icon="edit" />
+    </a>
+}
+else
+{
+    
+}
+
+
+@code {
+    [Parameter]
+    public bool ShowActionLink { get; set; }
+
+    [Parameter]
+    public string LinkValue { get; set; }
+}

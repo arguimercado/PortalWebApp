@@ -1,0 +1,36 @@
+﻿
+@inject CustomSpinnerViewModel ViewModel
+
+@implements IDisposable
+
+<div>
+    @if (ViewModel.Loading)
+    {
+        <div class="spinner-cover">
+            <div class="spinner"></div>
+        </div>
+    }   
+    @ChildContent
+</div>
+
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    protected override void OnInitialized() {
+
+        ViewModel.PropertyChanged += HandleStateChange;  
+
+    }
+
+    protected void HandleStateChange(object sender, EventArgs args) {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ViewModel.PropertyChanged -= HandleStateChange;
+
+    }
+}

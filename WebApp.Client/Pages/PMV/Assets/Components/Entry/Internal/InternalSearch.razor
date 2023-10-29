@@ -1,0 +1,24 @@
+﻿@inject DialogService DialogService
+
+<RadzenRow AlignItems="AlignItems.Center">
+    <RadzenColumn Size="10">
+        <CustomField Text="Asset Code" IsModern>
+            <RadzenTextBox Name="AssetCode" @bind-Value=@AssetCode />
+        </CustomField>
+    </RadzenColumn>
+    <RadzenColumn Size="2">
+        <CstButton ButtonType="EnumButtonType.Search" IconOnly=true  
+            Size="ButtonSize.Small"
+            Click="@(() => { DialogService.Close(new {AssetCode = AssetCode}); })"/>
+    </RadzenColumn>
+</RadzenRow>
+
+
+@code {
+
+    private string AssetCode { get; set; } = "";
+
+    private void HandleSearch() {
+        
+    }
+}

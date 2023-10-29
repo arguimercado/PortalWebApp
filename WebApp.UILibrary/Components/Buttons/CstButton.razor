@@ -1,0 +1,186 @@
+﻿
+
+<RadzenButton 
+    Icon=@GetStyle().Icon
+    Text=@(IconOnly ? "" : GetStyle().Title) Click="((args) => Click.InvokeAsync())"
+    Variant="@ButtonVariant"
+    ButtonStyle="@GetStyle().Style"
+    ButtonType="ActionType"
+    Disabled=@Disabled
+    class=@ButtonClass
+    Size=@Size
+    IsBusy=@IsBusy />
+
+@code {
+
+    [Parameter]
+    public EnumButtonType ButtonType { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public ButtonSize Size { get; set; } = ButtonSize.Medium;
+
+    [Parameter]
+    public Variant ButtonVariant { get; set; } = Variant.Flat;
+
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    [Parameter]
+    public ButtonType ActionType { get; set; } = Radzen.ButtonType.Button;
+
+    [Parameter]
+    public bool IconOnly { get; set; } = false;
+    [Parameter]
+    public string CustomIcon { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback Click { get; set; }
+
+    [Parameter]
+    public string ButtonClass { get; set; }
+
+    [Parameter]
+    public ButtonStyle CustomButtonStyle { get; set; } = ButtonStyle.Primary;
+
+    [Parameter]
+    public bool IsBusy { get; set; } = false;
+
+
+    protected ButtonCustStyle GetStyle()
+    {
+
+        if (ButtonType == EnumButtonType.Search)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "filter_alt",
+                    Title = IconOnly ? "" : string.IsNullOrEmpty(Text) ?  "Search" : Text,
+                    Style = ButtonStyle.Warning
+                };
+        }
+        else if (ButtonType == EnumButtonType.Add)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "add_circle_outline",
+                    Title = IconOnly ? "" : string.IsNullOrEmpty(Text) ? "Add New" : Text,
+                    Style = ButtonStyle.Success
+                };
+        }
+        else if(ButtonType == EnumButtonType.Multiple)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "control_point_duplicate",
+                    Title = IconOnly ? "" : "Multiple Add",
+                    Style = ButtonStyle.Success
+                };
+        }
+        else if (ButtonType == EnumButtonType.Save)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "save",
+                    Title = IconOnly ? "" : "Save",
+                    Style = ButtonStyle.Success
+                };
+        }
+        else if (ButtonType == EnumButtonType.SaveAsDraft)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "save",
+                    Title = IconOnly ? "" : "Save As Draft",
+                    Style = ButtonStyle.Warning
+                };
+        }
+        else if (ButtonType == EnumButtonType.SaveAsPost)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "save",
+                    Title = IconOnly ? "" : "Post",
+                    Style = ButtonStyle.Success
+                };
+        }
+        else if (ButtonType == EnumButtonType.Delete)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "delete",
+                    Title = IconOnly ? "" : "Remove",
+                    Style = ButtonStyle.Danger
+                };
+        }
+        else if(ButtonType == EnumButtonType.Edit)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "edit",
+                    Title = IconOnly ? "" : "Edit",
+                    Style = ButtonStyle.Secondary
+                };
+        }
+        else if (ButtonType == EnumButtonType.Cancel)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "close",
+                    Title = IconOnly ? "" : "Cancel",
+                    Style = ButtonStyle.Warning
+                };
+        }
+        else if(ButtonType == EnumButtonType.Pdf)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "picture_as_pdf",
+                    Title = "Save as PDF",
+                    Style = ButtonStyle.Light
+                };
+        }
+        else if (ButtonType == EnumButtonType.Excel)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "pivot_table_chart",
+                    Title = "Export to Excel",
+                    Style = ButtonStyle.Dark
+                };
+        }
+        else if (ButtonType == EnumButtonType.Upload)
+        {
+            return new ButtonCustStyle
+                {
+                    Icon = "upload_file",
+                    Title = IconOnly ? "Upload File" : "",
+                    Style = ButtonStyle.Dark
+                };
+        }
+        else if (ButtonType == EnumButtonType.Download)
+        {
+            return new ButtonCustStyle {
+                    Icon = "system_update_alt",
+                    Title = IconOnly ? "Dowload File" : "",
+                    Style = ButtonStyle.Light
+                };
+        }
+        else
+        {
+            return new ButtonCustStyle {
+                    Icon = CustomIcon,
+                    Title = Text,
+                    Style = CustomButtonStyle
+                };
+        }
+    }
+
+    
+    
+
+
+
+}

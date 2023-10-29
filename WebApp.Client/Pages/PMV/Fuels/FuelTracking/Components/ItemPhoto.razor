@@ -1,0 +1,94 @@
+﻿@using WebApp.UILibrary.Providers;
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px">
+    <RadzenButton Icon="@IconProvider.GetIconMenu("back")" Click="@(() => Prev())" />
+    @if (Photos.Count() > 0)
+    {
+        <RadzenStack AlignItems="AlignItems.Center">
+            <RadzenImage Path="@($"{ImagePath}?ImageName=" + ResolveImagePath(_currentImageIndex))" Style="width: 15rem; height:180px; border-radius: 20px " Click="@(() => HandlePhotoClick(ResolveImagePath(_currentImageIndex)))" />
+            <span>@($"{_currentImageIndex + 1}/{Photos.Count()}")</span>
+        </RadzenStack>
+    }
+    <RadzenButton Icon="@IconProvider.GetIconMenu("next")" Click="@(() => Next())" />
+</RadzenStack>
+
+
+
+@code {
+
+    private int _currentImageIndex = 0;
+    private int _index = 0;
+
+    [Parameter]
+    public string[] Photos { get; set; } = Array.Empty<string>();
+    
+    [Parameter]
+    public string ImagePath { get; set; } = "";
+    
+    [Parameter]
+    public EventCallback<EventPhotoArgs> OnPhotoClick { get; set; }
+    
+    [Parameter]
+    public EventCallback<EventPhotoArgs> OnZoomClick { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _currentImageIndex = 0;
+        base.OnParametersSet();
+    }
+
+   
+
+    private bool ShowPhoto(int index)
+    {
+        return (index) == _currentImageIndex;
+    }
+
+    private async Task HandlePhotoClick(string imagePath)
+    {
+        
+        await OnPhotoClick.InvokeAsync(new EventPhotoArgs { ImageSrc = imagePath });
+
+    }
+
+    private string ResolveImagePath(int index)
+    {
+        if (Photos.Length == index)
+            index = index - 1;
+
+
+        return Photos[index];
+    }
+
+
+    private void HandleZoomClick(string imagesrc)
+    {
+        OnZoomClick.InvokeAsync(new EventPhotoArgs { ImageSrc = imagesrc });
+    }
+
+    private void Prev()
+    {
+        _currentImageIndex--;
+        if (_currentImageIndex <= 0)
+        {
+            _currentImageIndex = 0;
+        }
+        StateHasChanged();
+    }
+
+    private void Next()
+    {
+        _currentImageIndex++;
+        if (_currentImageIndex >= Photos.Length - 1)
+        {
+            _currentImageIndex = Photos.Length - 1;
+        }
+        StateHasChanged();
+    }
+
+
+}
+
+@code {
+
+}

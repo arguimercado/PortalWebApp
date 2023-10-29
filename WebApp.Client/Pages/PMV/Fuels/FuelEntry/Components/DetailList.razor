@@ -1,0 +1,173 @@
+﻿@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.Models;
+@using WebApp.Client.Pages.PMV.Fuels.FuelEntry.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.Models;
+
+
+@inherits ComponentViewModelBase<FuelLogEntryViewModel>
+@inject DialogService DialogService
+
+
+<RadzenStack Orientation="Orientation.Vertical">
+    
+    @if (!Model.FuelLogContainer.FuelLog.IsPosted) {
+        <DetailEntry OnCancel="HandleCancel" />
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenCheckBox TValue="bool" @bind-Value="Model.FuelLogContainer.FuelLog.IsVoidExcluded" />
+        <RadzenText Text="Exclude Void"  />
+    </RadzenStack>
+    <RadzenDataGrid @ref="tGrid"
+                    Data="Model.FuelLogContainer.FuelLog.TransactionList"
+                    TItem="FuelTransactionModel"
+                    AllowPaging="true" 
+                    PageSize="20"
+                    AllowFiltering=true
+                    AllowColumnReorder=true
+                    SelectionMode="DataGridSelectionMode.Single"
+                    RowSelect="HandleRowSelect"
+                    ColumnWidth="200px"
+                    AllowVirtualization=true
+                    AllowSorting=true
+                    PageSizeOptions="@pageSizeOptions"
+                    AllowColumnResize=true
+                    ShowPagingSummary="true"
+                    Style="max-height: 650px">
+        <Columns>
+            <RadzenDataGridColumn TItem="FuelTransactionModel" Title="SNo" Width="50px" TextAlign=TextAlign.Center Resizable=false Sortable=false Filterable=false>
+                <Template>
+                    <span>@(Model.FuelLogContainer.FuelLog.FuelTransactions.ToList().IndexOf(context) + 1)</span>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="FuelTransactionModel" Property="AssetCode" Title="Asset Code" Width="120px" />
+            <RadzenDataGridColumn TItem="FuelTransactionModel" Property="Remarks" Title="Plate Num/Desc" />
+            <RadzenDataGridColumn TItem="FuelTransactionModel" Property="ProjectCode" Title="Project Code" />
+            <RadzenDataGridColumn TItem="FuelTransactionModel" Property="Reading" Title="KM/HR Reading" Width="150px" FormatString="{0:###,#00}">
+                <FooterTemplate>
+                    Refill Total: <b>@String.Format("{0:P}", Model.FuelLogContainer.FuelLog.TotalRefill.ToString("###,#00"))</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="FuelTransactionModel" Property="Quantity" Title="Qty (Liter)" Width="150px">
+                <Template>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                        <CustText IsVoid="@(context.LogType == EnumLogType.Void.ToString())" Text="@(context.Quantity.ToString("###,##0.00"))" />
+                        <RadzenBadge Text="@context.LogTypeAcro" BadgeStyle="BadgeStyle.Warning" />
+                    </RadzenStack>
+                </Template>
+                <FooterTemplate>
+                    Dispense/Dist Total: <b>@String.Format("{0:P}", Model.FuelLogContainer.FuelLog.TotalDispDist.ToString("###,#00"))</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="FuelTransactionModel"
+                                  Property="FuelDateTime"
+                                  Title="Fuel Time">
+                <Template>
+                    <CustText IsVoid="@(context.LogType == EnumLogType.Void.ToString())" Text="@context.FuelDateTime.ToString("hh:mm tt")" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="FuelTransactionModel" Property="OperatorDriver" Title="Operator/Driver">
+                <FooterTemplate>
+                    Adjustment Total: <b>@String.Format("{0:P}", Model.FuelLogContainer.FuelLog.TotalAdjustment.ToString("###,#00"))</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="FuelTransactionModel" Property="CreatedAt" Title="Created At">
+                <Template Context="data">
+                    @if (data.CreatedAt.HasValue)
+                    {
+                        <span>@data.CreatedAt.Value.ToString("dd-MMM-yyyy hh:mm tt")</span>
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            @if (!Model.FuelLogContainer.FuelLog.IsPosted)
+            {
+               
+                <RadzenDataGridColumn TItem="FuelTransactionModel" Context="Transaction" Width="100px"
+                    Reorderable=false 
+                    Pickable=false 
+                    Resizable=false 
+                    Sortable=false 
+                    Filterable=false TextAlign="TextAlign.Center">
+                    <Template Context="Transaction">
+                        @if(Transaction.LogType != EnumLogType.Void.ToString()) {
+                            <RadzenStack Gap="2px" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                                <RadzenButton Icon="edit"
+                                          Size="ButtonSize.Small"
+                                              Variant="Variant.Text"
+                                          Disabled="Model.FuelLogContainer.FuelLog.IsPosted"
+                                          ButtonStyle="ButtonStyle.Dark" Click="@(()=> HandleEditRow(Transaction))" />
+                                <RadzenButton Disabled="Model.FuelLogContainer.FuelLog.IsPosted"
+                                          Size="ButtonSize.Small"
+                                              Variant="Variant.Text"
+                                              Icon="delete" ButtonStyle="ButtonStyle.Dark" Click="@(args => HandleRemove(Transaction))" />
+                                <CstButton ButtonType="EnumButtonType.Upload" Click="HandleUpload" ButtonVariant="Variant.Text" Size="ButtonSize.Small" IconOnly=true />
+
+                            </RadzenStack>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+            }
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+<style>
+    .rz-state-highlight td {
+        background-color: #09A1AB !important;
+        
+    }
+
+    .rz-selectable .rz-datatable-even:hover:not(.rz-state-highlight) > td,
+    .rz-selectable .rz-datatable-odd:hover:not(.rz-state-highlight) > td {
+        background-color: aquamarine !important;
+        
+    }
+</style>
+
+@code {
+    RadzenDataGrid<FuelTransactionModel>? tGrid;
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+    private FuelTransactionModel? SelectedRow = null;
+    private bool IsEditMode = false;
+
+
+    protected string GetLogType(string logType) {
+        var selected = Model.FuelLogContainer.LogTypeSelections.FirstOrDefault(l => l.Value == logType);
+        return selected!.Text ?? "";
+    }
+
+
+    private async Task HandleEditRow(FuelTransactionModel entry)
+    {
+        SelectedRow = entry;
+        Model.EditRow(entry.Id);
+    }
+
+    private void HandleRowSelect(object args)
+    {
+        // if(args is not null)
+        // {
+        //     var fuelTransaction = args as FuelTransactionModel;
+        //     Model.EditRow(fuelTransaction!.Id);
+        // }
+    }
+
+    private void HandleUpload()
+    {
+
+    }
+
+
+    private async Task HandleRemove(FuelTransactionModel detail)
+    {
+        await Model.RemoveDetail(detail);
+    }
+
+    private void HandleCancel()
+    {
+        Model.ClearRow();
+        tGrid.CancelEditRow(Model.Detail); 
+        tGrid.Reload();
+        SelectedRow = null;
+    }
+
+}
+

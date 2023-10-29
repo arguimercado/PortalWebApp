@@ -1,0 +1,136 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssetListViewModel>
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="10px">
+    <RadzenTemplateForm TItem="FilterAssetParam" Data="FilterData" Submit="HandleSubmit">
+        <RadzenFieldset Text="Search" class="w-100">
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn Size="2">
+                    <CustomField  Text="Plate Type" IsModern>
+                        <RadzenDropDown Name="PlateType"
+                                        AllowClear=true
+                                        Data="Model.AssetListContainer.PlateTypes"
+                                        TValue="string"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                        @bind-Value="FilterData.PlateType" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn>
+                    <CustomField  Text="Asset Code/Plate Num" IsModern>
+                        <RadzenTextBox Name="AssetCode"
+                        @bind-Value="FilterData.AssetCode" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="2">
+                    <CustomField Text="Hire Under" IsModern>
+                        <RadzenDropDown Name="HireUnder"
+                                        TValue="string"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                                        AllowFiltering=true
+                                        AllowClear=true
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        Data="Model.AssetListContainer.Companies"
+                        @bind-Value="FilterData.CompanyCode" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="2">
+                    <CustomField Text="Vendor" IsModern>
+                        <RadzenDropDown Name="Vendor"
+                                        TValue="string"
+                                        AllowFiltering=true
+                                        AllowClear=true
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        Data="Model.AssetListContainer.Vendors"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                        @bind-Value="FilterData.VendorCode" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="2">
+                    <CustomField Text="Hire/Sub Contract" IsModern>
+                        <RadzenDropDown Name="HireOrSubContract"
+                                        TValue="string"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                                        AllowClear=true
+                                        Data="Model.AssetListContainer.HireSub"
+                        @bind-Value="FilterData.HireOrSubContract" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="1">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                        <CstButton 
+                                   ButtonType="EnumButtonType.Search"
+                                   IconOnly=true
+                                   Size="ButtonSize.Small"
+                                   ActionType="ButtonType.Submit" />
+
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+
+    <RadzenDataGrid Data=@AssetData
+                    TItem="ExternalListModel"
+                    AllowPaging="true"
+                    PageSize="10"
+                    AllowColumnReorder="true"
+                    AllowColumnResize="true"
+                    AllowFiltering=true
+                    AllowSorting="true"
+                    ColumnWidth="200px"
+                    Style="overflow-x:scroll"
+                    PageSizeOptions="@pageSizeOptions"
+                    ShowPagingSummary="true">
+        <Columns>
+            
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="AssetCode" Title="Asset Code" Width="160px" />
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="Description" Title="Description" />
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="PlateType" Title="Plate Type" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="PlateNum" Title="Plate No" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="HireUnder" Title="Hire Under" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="Vendor" Title="Vendor" />
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="HireOrSubContract" Title="Hire / Sub Contract" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="FuelTankCapacity" Title="Tank Capacity (Ltr.)" TextAlign="TextAlign.Center" FormatString="{0:###,##0}" />
+            <RadzenDataGridColumn TItem="ExternalListModel" Property="CreatedAt" Title="Created At" />
+            
+            @if (EditMode != "read") {
+                <RadzenDataGridColumn TItem="ExternalListModel" Context="asset" Width="50px"
+                                      TextAlign="TextAlign.Center"
+                                      Filterable=false
+                                      Sortable=false
+                                      Resizable=false
+                                      Visible=true>
+                    <Template Context="asset">
+                        <CstButton ButtonType="EnumButtonType.Edit" Size=ButtonSize.Small ButtonVariant="Variant.Text" IconOnly=true 
+                                Click="@(() => PageNavigation.NavigateTo("/asset/form/external",asset.AssetCode) )" />
+                    </Template>
+                </RadzenDataGridColumn>
+            }
+
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+
+@code {
+    [Parameter]
+    public string EditMode { get; set; } = "";
+
+    private FilterAssetParam FilterData => Model.FilterAsset;
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+    protected IEnumerable<ExternalListModel> AssetData => Model.AssetListContainer.ExternalData;
+
+    private async Task HandleSubmit()
+    {
+        FilterData.AssetType = "external";
+        await Model.Filter();
+    }
+
+}
+

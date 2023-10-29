@@ -1,0 +1,36 @@
+﻿@using WebApp.UILibrary.Providers;
+
+
+
+<CustomCard TitleHeader="Create/Manage Menu">
+    <RadzenRow Orientation="Orientation.Horizontal" Gap="50px">
+
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenRow AlignItems="AlignItems.Center" Gap="20px">
+                <RadzenColumn Size="2">
+                    <RadzenIcon Icon="@IconProvider.GetIconMenu("manage")" />
+                </RadzenColumn>
+                <RadzenColumn Size="10">
+                    <RadzenText Text="Manage Asset" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenRow AlignItems="AlignItems.Center" Gap="20px">
+                <RadzenColumn Size="2">
+                    <RadzenIcon Icon="@IconProvider.GetIconMenu("manage")" />
+                </RadzenColumn>
+                <RadzenColumn Size="10">
+                    <RadzenText Text="Manage Group" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+        <RadzenCard Variant="Variant.Outlined">
+
+        </RadzenCard>
+    </RadzenRow>
+</CustomCard>
+
+@code {
+
+}

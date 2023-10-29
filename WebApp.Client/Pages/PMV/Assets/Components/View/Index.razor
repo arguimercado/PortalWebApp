@@ -1,0 +1,108 @@
+﻿@page "/asset/manage/view/{id?}"
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@attribute [Authorize]
+@inherits ComponentViewModelBase<AssetReadViewModel>
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="View Asset" Icon="directions_bus">
+
+    </CustomLayoutHeader>
+    <RadzenStack Orientation="Orientation.Vertical" Gap="20px">
+        <CustomCard TitleHeader="Asset Info" Icon="directions_car">
+
+            <RadzenFieldset Text="Asset Detail" Style="position:relative">
+                <RadzenBadge Text="@(Model.Asset.Completed ? "" : "Incomplete Entry")" Style="position:absolute;top:0;right:10px" />
+                <RadzenRow>
+                    <RadzenColumn Size="4">
+                        <CustomFieldDisplay Label="Asset Code" Text=@Model.Asset.AssetCode Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay Label="Categories" Text=@Model.Asset.Category Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Register Under" Text=@Model.Asset.CompanyCode Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Color" Text=@Model.Asset.Color Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Chasis No" Text=@Model.Asset.ChasisNo Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Vendor" Text=@Model.Asset.VendorCode LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="PO No." Text=@Model.Asset.LpoNo LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Delivery Note." Text=@Model.Asset.DeliveryNote LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Account Category" Text=@Model.Asset.AccountCategory LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Operated By" Text="@Model.Asset.OperatedBy" LabelColumn="5" TextColumn="7" />
+                    </RadzenColumn>
+
+                    <RadzenColumn Size="4">
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Asset Description" Text=@Model.Asset.AssetDesc Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Sub Category" Text=@Model.Asset.SubCatName Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Condition Rank" Text=@Model.Asset.ConditionRank.ToString() Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="First Registration Date" Text=@(Model.Asset.FirstRegDate.HasValue ? Model.Asset.FirstRegDate.Value.ToString("dd-MMM-yyyy") : "") Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Year/Make/Model" Text=@Model.Asset.YearMakeModel Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Engine No" Text=@Model.Asset.EngineNo Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Plate No" Text=@Model.Asset.PlateNo Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Km/Hr" Text=@Model.Asset.KmHr.ToString("###,##0") Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Net Value" Text=@Model.Asset.NetValue.ToString("###,##0.00") Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Modified Asset" Text=@Model.Asset.ModifiedAssetString Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Tank Capacity" Text=@Model.Asset.TankCapacity.ToString() Gap="20px" LabelColumn="5" TextColumn="7" />
+                        
+                    </RadzenColumn>
+                    <RadzenColumn Size="4">
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Rate Of Depreciation" Text=@Model.Asset.RateOfDepreciation.ToString() Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Rent / Owned" Text=@Model.Asset.RentOwned Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Validation=true Label="Rate Type" Text=@Model.Asset.RateType Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Asset Rate" Text=@Model.Asset.Rate.ToString("###,##0.00") Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Owner" Text=@Model.Asset.Owner Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Status" Text=@Model.Asset.StatusDescription Gap="20px" LabelColumn="5" TextColumn="7" />
+
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Warranty Expiry Date"
+                                            Validation="@(Model.Asset.Warranty.HasValue && Model.Asset.Warranty.Value.Year.ToString() != "1900")"
+                                            Text=@(Model.Asset.Warranty.HasValue ? Model.Asset.Warranty.Value.ToString("dd-MMM-yyyy") : "")
+                                            Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Insurance Expiry Date" Text=@(Model.Asset.Insurance.HasValue ? Model.Asset.Insurance.Value.ToString("dd-MMM-yyyy") : "") Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Registration Expiry Date" Text=@(Model.Asset.RegistrationExpiry.HasValue ? Model.Asset.RegistrationExpiry.Value.ToString("dd-MMM-yyyy") : "") Gap="20px" LabelColumn="5" TextColumn="7" />
+                        <CustomFieldDisplay IsDisplayLine="true" Label="Created By" Text=@(Model.Asset.CreatedBy) Gap="20px" LabelColumn="5" TextColumn="7" />
+                        
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenFieldset>
+        </CustomCard>
+
+        <RadzenTabs>
+            <Tabs>
+                <RadzenTabsItem Text="Attachments">
+                    <AttachmentGrid />
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Fuel History">
+                    <FuelEffeciencyGrid />
+                </RadzenTabsItem>
+
+                <RadzenTabsItem Text="Assigned Person">
+                    <AssignedDriverList />
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Service Alert">
+                    <ServiceAlertGrid />
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Repair & Maintenance">
+                    <ServiceOrderGrid />
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+    </RadzenStack>
+
+</CustomPageLayout>
+
+@code {
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Model.Load(int.Parse(Id));
+        }
+    }
+
+    protected async Task HandleUpdate()
+    {
+        await Model.UpdateAssetRecord(Model.Asset.AssetCode);
+        PageNavigation.NavigateTo($"/asset/manage/view/{Id}");
+    }
+
+}

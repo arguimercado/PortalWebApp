@@ -1,0 +1,217 @@
+﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+
+@inherits ComponentViewModelBase<AssetListViewModel>
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+    <RadzenTemplateForm TItem="FilterAssetParam" Data="FilterData" Submit="HandleSubmit">
+        <RadzenFieldset Text="Search" class="w-100">
+            <RadzenRow Gap="5px" class="mb-2">
+                <RadzenColumn Size="2">
+                    <CustomField Text="Category" IsModern>
+                        <RadzenDropDown Name="Category"
+                                        Multiple="true"
+                                        AllowFiltering=true
+                                        AllowClear=true
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        Chips=true
+                                        Data="Model.AssetListContainer!.Categories"
+                                        TValue="string"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                                        Value="FilterData.SelectedCategories"
+                                        Change="@(args => HandleFilterChange(args))" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="2">
+                    <CustomField Text="Sub Category" IsModern>
+                        <RadzenDropDown Name="SubCategory"
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        AllowFiltering=true
+                                        AllowClear=true
+                                        Data="Model.AssetListContainer!.SubCategories"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                                        TValue="string"
+                        @bind-Value="FilterData.SubCategory" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="2">
+                    <CustomField  Text="Make" IsModern>
+                        <RadzenDropDown Name="Brands"
+                                        TValue="string"
+                                        AllowClear=true
+                                        Data="Model.AssetListContainer!.Brands"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                                        AllowFiltering=true
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        @bind-Value="FilterData.Brand" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="2">
+                    <CustomField Text="Registration Under" IsModern>
+                        <RadzenDropDown Name="CompanyCode"
+                                        TValue="string"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                                        AllowFiltering=true
+                                        AllowClear=true
+                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        Data="Model.AssetListContainer!.Companies"
+                        @bind-Value="FilterData.CompanyCode" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn Size="2">
+                    <CustomField  Text="Status" IsModern>
+                        <RadzenDropDown Name="Status"
+                                        TValue="string"
+                                        TextProperty="Text"
+                                        ValueProperty="Value"
+                                        AllowClear=true
+                                        Data="Model.AssetListContainer!.Statuses"
+                        @bind-Value="FilterData.Status" />
+                    </CustomField>
+                </RadzenColumn>
+                <RadzenColumn>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="5px">
+                        <RadzenText Text="OR" />
+                        <CustomField Text="Asset Code"  IsModern>
+                            <RadzenTextBox Name="AssetCode"
+                            @bind-Value="FilterData.AssetCode" />
+                        </CustomField>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow JustifyContent="JustifyContent.End">
+                <RadzenColumn Size="1">
+                    <CstButton ButtonType="EnumButtonType.Search"
+                               ActionType="ButtonType.Submit" />
+                </RadzenColumn>
+            </RadzenRow>
+            
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+
+
+    <RadzenDataGrid Data=@AssetData.ToList()
+                    TItem="AssetListModel"
+                    AllowPaging="true"
+                    PageSize="10"
+                    AllowColumnReorder="true"
+                    AllowColumnResize="true"
+                    AllowFiltering=true
+                    AllowSorting="true"
+                    Style="overflow-x:scroll"
+                    PageSizeOptions="@pageSizeOptions"
+                    ShowPagingSummary="true"
+                    AllowColumnPicking=true>
+        <Columns>
+            <RadzenDataGridColumn TItem="AssetListModel" Property="AssetCode" Title="Asset Code" Width="160px">
+                <Template Context="asset">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                        <span>@asset.AssetCode</span>&nbsp;
+                        <a href="@($"/asset/manage/view/{asset.Id}")" style="text-decoration:none">
+                            <RadzenIcon Icon="pageview" />
+                        </a>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="AssetListModel" Property="AssetDesc" Title="Description" />
+            <RadzenDataGridColumn TItem="AssetListModel" Property="MakeModelYear" Title="Make/Model/Year" />
+            <RadzenDataGridColumn TItem="AssetListModel" Property="PlateNo" Title="Plate No" TextAlign="TextAlign.Center" Width="140px" />
+            <RadzenDataGridColumn TItem="AssetListModel" Property="CompanyCode" Title="Reg. Under" TextAlign="TextAlign.Center" Width="180px" />
+            <RadzenDataGridColumn TItem="AssetListModel" Property="PurchaseDate" Title="Purchase Date" FormatString="{0:dd/MMM/yyyy}" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="AssetListModel" Property="VendorCode" Title="Vendor" />
+            <RadzenDataGridColumn TItem="AssetListModel" Property="LPONo" Title="PO No" />
+            <RadzenDataGridColumn TItem="AssetListModel" Property="TankCapacity" Title="Tank Capacity" />
+            <RadzenDataGridColumn TItem="AssetListModel" Property="KmPerHr" Title="SMU" TextAlign="TextAlign.Right" Width="120px" />
+            <RadzenDataGridColumn TItem="AssetListModel" Title="Operator/Driver">
+                <Template Context="data">
+                    @foreach (var item in data.Drivers) {
+                        <RadzenStack Orientation=Orientation.Horizontal Gap="5px">
+                            <RadzenIcon Icon="account_circle" />
+                            <RadzenText Text="@item.EmpCode" />
+
+                        </RadzenStack>
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            @if(EditMode != "read")
+            {
+                <RadzenDataGridColumn TItem="AssetListModel" Context="asset"
+                                      TextAlign="TextAlign.Center" Width="50px"
+                                      Filterable=false
+                                      Sortable=false
+                                      Resizable=false
+                                      Pickable=false
+                                      Visible=true>
+                    <Template Context="asset">
+                        <CstButton Size=ButtonSize.Small
+                                   ButtonType="EnumButtonType.Edit" IconOnly=true ButtonVariant="Variant.Text" Click="@(() => PageNavigation.NavigateTo("/asset/form/internal",asset.AssetCode) )" />
+                    </Template>
+                </RadzenDataGridColumn>
+            }
+        </Columns>
+    </RadzenDataGrid>
+
+</RadzenStack>
+@code {
+    [Parameter]
+    public string? Status { get; set; } = "";
+
+    [Parameter]
+    public string EditMode { get; set; } = "";
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            FilteredSubCategories = Model.AssetListContainer!.SubCategories;
+            StateHasChanged();
+        }
+
+    }
+
+
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+    protected FilterAssetParam FilterData => Model.FilterAsset;
+
+    protected IEnumerable<AssetListModel> AssetData
+                    => Model.AssetListContainer!.AssetData.ToList();
+
+    protected List<SelectItem> FilteredSubCategories { get; set; }
+
+    private void HandleFilterChange(object values)
+    {
+
+        string str = values is IEnumerable<object> ? string.Join(",", (IEnumerable<object>)values) : (string)values;
+
+        FilterData.Category = str;
+        if (values is IEnumerable<object> trueValue)
+        {
+            if (trueValue.Count() == 0)
+            {
+                FilteredSubCategories = Model.AssetListContainer!.GetAll();
+            }
+            else
+            {
+                FilteredSubCategories = Model.AssetListContainer!.GetSubCategoryByCat(trueValue.Select(x => x.ToString()).ToList());
+
+            }
+        };
+
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleSubmit()
+    {
+        FilterData.AssetType = "internal";
+        await Model.Filter();
+    }
+
+
+
+}

@@ -1,0 +1,122 @@
+﻿@using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Models;
+    
+
+@inherits ComponentViewModelBase<FuelTrackingViewModel>
+@inject DialogService DialogService
+
+<RadzenTemplateForm TItem="FuelTransactionModel" Data="Model.FuelEntry" Submit="HandleSubmit">
+    <RadzenStack Gap="0.5rem">
+        <CustomField Text="Log Type" IsModern=true>
+            <ChildContent>
+                <RadzenDropDown Name="LogType"
+                                TValue="string"
+                                Data="@Model.Container.LogTypes"
+                                TextProperty="Text"
+                                ValueProperty="Value"
+                                AllowVirtualization=true
+                                FilterOperator="StringFilterOperator.StartsWith"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                AllowFiltering="true" 
+                                @bind-Value="@Model.FuelEntry.LogType"/>
+            </ChildContent>
+            <Error>
+                <RadzenRequiredValidator Component="LogType" Text="Log Type is required" />
+            </Error>
+        </CustomField>
+        <CustomField Text="Asset" IsModern=true>
+            <ChildContent>
+                <RadzenDropDown Name="AssetCode"
+                                TValue="string"
+                                AllowVirtualization=true
+                                TextProperty="Text"
+                                ValueProperty="Value"
+                                Data="@Model.Container.GetAssetList(Model.FuelEntry.LogType)"
+                                FilterOperator="StringFilterOperator.StartsWith"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                @bind-Value="@Model.FuelEntry.AssetCode"
+                                AllowFiltering="true"/>
+            </ChildContent>
+            <Error>
+                <RadzenRequiredValidator Component="AssetCode" Text="Asset Code is required" />
+            </Error>
+        </CustomField>
+        <CustomField Text="Project Code" IsModern=true>
+            <ChildContent>
+                <RadzenDropDown Name="ProjectCode"
+                                TValue="String"
+                                AllowVirtualization=true
+                                AllowClear=true
+                                AllowFiltering=true
+                                Data="@Model.Container.ProjectCodes"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                FilterOperator="StringFilterOperator.StartsWith"
+                                @bind-Value="@Model.FuelEntry.ProjectCode"
+                                TextProperty="Text"
+                                ValueProperty="Value"/>
+            </ChildContent>
+            <Error>
+                <RadzenRequiredValidator Component="ProjectCode" Text="Project Code is required" />
+            </Error>
+        </CustomField>
+        <CustomField Text="DateTime">
+            <RadzenDatePicker TValue="DateTime" DateFormat="dd-MMM-yyyy hh:mm tt" 
+                @bind-Value="@Model.FuelEntry.FuelDateTime" ShowTime=true HourFormat="12">
+                <FooterTemplate>
+                    <RadzenButton Text="Today" 
+                        Size="ButtonSize.Small" Icon="calendar_today" 
+                        ButtonStyle="ButtonStyle.Danger" Click="@(() => Model.FuelEntry.FuelDateTime = DateTime.Now)" />
+                </FooterTemplate>
+            </RadzenDatePicker>
+        </CustomField>
+        <CustomField Text="SMU (Km or Hr)" IsModern>
+            <ChildContent>
+                <RadzenNumeric Name="KmHr" TValue="int" @bind-Value="@Model.FuelEntry.Reading" />
+            </ChildContent>
+        </CustomField>
+        <CustomField Text="Quantity (Liter)" IsModern>
+            <ChildContent>
+                <RadzenNumeric Name="Quantity" TValue="float" @bind-Value="@Model.FuelEntry.Quantity" />
+            </ChildContent>
+            
+        </CustomField>
+        <CustomField Text="Operator/Driver (QID)" IsModern>
+            <ChildContent>
+                <RadzenTextBox Name="OperatorDriver" @bind-Value="@Model.FuelEntry.OperatorDriver" />
+            </ChildContent>
+        </CustomField>
+        <CustomField Text="Remarks" IsModern>
+            <ChildContent>
+                <RadzenTextArea Name="Remarks"  @bind-Value="Model.FuelEntry.Remarks" />
+            </ChildContent>
+        </CustomField>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="10px">
+            <CstButton ButtonType="EnumButtonType.Add" ActionType="ButtonType.Submit" IsBusy=@Model.IsLoading />
+            <CstButton ButtonType="EnumButtonType.Cancel" ActionType="ButtonType.Reset" Click="@(() => DialogService.CloseSide())" />
+        </RadzenStack>
+    </RadzenStack>
+    
+</RadzenTemplateForm>
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await Model.ReInitialize();
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if(Model.FuelEntry.MarkVoid) {
+            await Model.Void();
+        }
+        else {
+            await Model.AddTransaction();
+        }
+        
+        DialogService.CloseSide();
+    }
+}

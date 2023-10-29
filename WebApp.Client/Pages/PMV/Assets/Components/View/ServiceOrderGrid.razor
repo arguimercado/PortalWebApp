@@ -1,0 +1,20 @@
+@using WebApp.Client.Pages.PMV.Assets.Models;
+@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+
+@inherits ComponentViewModelBase<AssetReadViewModel>
+
+<RadzenDataGrid TItem="AssetServiceOrder" Data="Model.Asset.ServiceOrders">
+    <Columns>
+        <RadzenDataGridColumn TItem="AssetServiceOrder" Property="DocumentNo" Title="Document No" />
+        <RadzenDataGridColumn TItem="AssetServiceOrder" Property="OrderDate" Title="Date" FormatString="{0:dd-MMM-yyyy}" />
+        <RadzenDataGridColumn TItem="AssetServiceOrder" Property="Remarks" Title="Remarks" />
+        <RadzenDataGridColumn TItem="AssetServiceOrder" Property="ScheduleDate" Title="Schedule Date" FormatString="{0:dd-MMM-yyyy}" />
+        <RadzenDataGridColumn TItem="AssetServiceOrder" Property="ExpectedCompletion" Title="Expected Completion Date" FormatString="{0:dd-MMM-yyyy}" />
+        <RadzenDataGridColumn TItem="AssetServiceOrder" Property="ClosedDate" Title="Date Completed" FormatString="{0:dd-MMM-yyyy}" />
+        <RadzenDataGridColumn TItem="AssetServiceOrder" Property="Stage" Title="Stage" />
+        <RadzenDataGridColumn TItem="AssetServiceOrder" Property="Status" Title="Status" />
+    </Columns>
+</RadzenDataGrid>
+@code {
+
+}

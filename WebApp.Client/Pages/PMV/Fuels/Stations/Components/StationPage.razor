@@ -1,0 +1,158 @@
+﻿@page "/fuel/station"
+@using WebApp.Client.Pages.PMV.Fuels.Stations.Models;
+@using WebApp.Client.Pages.PMV.Fuels.Stations.ViewModels;
+
+
+
+
+@attribute [Authorize]
+@inherits ComponentViewModelBase<StationPageViewModel>
+
+<CustomPageLayout>
+    <CustomLayoutHeader Title="Tank Station" Icon="group_work">
+        
+    </CustomLayoutHeader>
+    <RadzenRow>
+        <RadzenColumn Size="3">
+            <CustomCard TitleHeader="Entry">
+                <RadzenTemplateForm TItem="FuelStationModel" Data="Model.Station" Submit="@Model.Add">
+                    <RadzenStack>
+                        <CustomField Text="Tanker Code">
+                                <RadzenTextBox @bind-Value="Model.Station.Code" Name="Code"/>
+                        </CustomField>
+                        <CustomField Text="Tanker Code">
+                            <RadzenDropDown 
+                                TValue="string"
+                                @bind-Value="Model.Station.StationType"
+                                Data="@(new string[] { "Main","Tanker" })"
+                                Name="StationType" />
+                        </CustomField>
+
+                        <CustomField Text="Description">
+                            <RadzenTextBox @bind-Value="Model.Station.Description" Name="Description" />
+                        </CustomField>
+                        <CustomField Text="Opening Fuel Meter">
+                            <RadzenNumeric TValue="float" @bind-Value="Model.Station.OpeningMeter" Name="OpeningMeter" />
+                        </CustomField>
+                        <CustomField Text="Opening Fuel Balance">
+                            <RadzenNumeric TValue="float" @bind-Value="Model.Station.OpeningBalance" Name="OpeningBalance" />
+                        </CustomField>
+                        <CustomField Text="Capacity">
+                            <RadzenNumeric TValue="float" @bind-Value="Model.Station.TankCapacity" Name="Capacity" />
+                        </CustomField>
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                            <CstButton ButtonType="EnumButtonType.Add" ActionType="ButtonType.Submit"  />
+                            <CstButton ButtonType="EnumButtonType.Cancel" Text="Clear" Click="@Model.Clear" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenTemplateForm>
+            </CustomCard>
+        </RadzenColumn>
+        <RadzenColumn>
+            <RadzenDataGrid @ref="tGrid"
+                            AllowColumnResize=true
+                            AllowFiltering=true
+                            TItem="FuelStationModel"
+                            EditMode="DataGridEditMode.Single"
+                            Data="Model.Container.FuelStationList"
+                            RowUpdate="@OnUpdateRow"
+                            RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset">
+                <Columns>
+                    <RadzenDataGridColumn TItem="FuelStationModel" Title="SNo" Width="80px" Resizable=false Filterable=false>
+                        <Template Context="data">
+                            <span>@(Model.Container.FuelStationList.ToList().IndexOf(data) + 1)</span>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FuelStationModel" Property="Code" Title="Code" />
+                    <RadzenDataGridColumn TItem="FuelStationModel" Property="Description" Title="Description">
+                        <EditTemplate>
+                            <RadzenTextBox @bind-Value="context.Description" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FuelStationModel" Property="OpeningMeter" Title="Opening Meter" FormatString="{0: ###,##0.00}">
+                        <EditTemplate>
+                            <RadzenNumeric @bind-Value="context.OpeningMeter" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FuelStationModel" Property="OpeningBalance" Title="Opening Balance" FormatString="{0: ###,##0.00}">
+                        <EditTemplate>
+                            <RadzenNumeric @bind-Value="context.OpeningBalance" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FuelStationModel" Property="TankCapacity" Title="Capacity" FormatString="{0: ###,##0.00}">
+                        <EditTemplate>
+                            <RadzenNumeric @bind-Value="context.TankCapacity" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="FuelStationModel" Width="100px" TextAlign="TextAlign.Center" Resizable=false Filterable=false>
+                        <Template>
+                            <CstButton ButtonType="EnumButtonType.Edit" IconOnly=true
+                                       Click="@(args => EditRow(context))" ButtonVariant="Variant.Text" Size="ButtonSize.Small" />
+                        </Template>
+                        <EditTemplate>
+                            <CstButton ButtonType="EnumButtonType.Save" IconOnly=true
+                                       Click="@(args => SaveRow(context))" Size="ButtonSize.Small" ButtonVariant="Variant.Text" />
+                            <CstButton ButtonType="EnumButtonType.Cancel" IconOnly=true
+                                       Click="@(args => CancelEdit(context))" Size="ButtonSize.Small" ButtonVariant="Variant.Text" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</CustomPageLayout>
+
+
+@code {
+
+    public RadzenDataGrid<FuelStationModel> tGrid { get; set; }
+    public FuelStationModel FuelStation { get; set; } = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Model.Load();
+        }
+    }
+
+    protected async Task Reset()
+    {
+        FuelStation = new();
+        await tGrid.Reload();
+    }
+
+    protected void OnUpdateRow(FuelStationModel station)
+    {
+        Model.CreateUpdate(station);
+    }
+
+    protected void OnCreateRow(FuelStationModel detail)
+    {
+
+    }
+
+    protected async Task InsertRow()
+    {
+
+        await tGrid.InsertRow(FuelStation);
+
+    }
+
+    protected async Task EditRow(FuelStationModel detail)
+    {   
+        await tGrid.EditRow(detail);
+    }
+
+    protected void CancelEdit(FuelStationModel detail)
+    {
+        tGrid.CancelEditRow(detail);
+    }
+
+    protected async Task SaveRow(FuelStationModel detail)
+    {
+        await tGrid.UpdateRow(detail);
+        await tGrid.Reload();
+    }
+}

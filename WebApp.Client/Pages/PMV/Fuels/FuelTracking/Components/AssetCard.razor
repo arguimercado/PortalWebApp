@@ -1,0 +1,35 @@
+﻿@using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
+@using WebApp.Client.Pages.PMV.Fuels.FuelTracking.Models;
+    
+
+@inherits ComponentViewModelBase<FuelTrackingViewModel>
+
+<RadzenStack Gap="5px">
+    <CustomFieldDisplay LabelColumn="4" Label="Asset Code">
+        <RadzenText Text="@Model.AssetInformation.AssetCode" />
+    </CustomFieldDisplay>
+    <CustomFieldDisplay LabelColumn="4" Label="Asset Description">
+        <RadzenText Text="@Model.AssetInformation.AssetDesc" />
+    </CustomFieldDisplay>
+    <RadzenDataGrid TItem="AssignedOperatorModel" Data="@Model.AssetInformation.Operators">
+        <Columns>
+            <RadzenDataGridColumn TItem="AssignedOperatorModel" Property="EmpCode" Title="Employee Code"/>
+            <RadzenDataGridColumn TItem="AssignedOperatorModel" Property="EmpName" Title="Employee Name" />
+            <RadzenDataGridColumn TItem="AssignedOperatorModel" Property="RPNo" Title="RP No" />
+            <RadzenDataGridColumn TItem="AssignedOperatorModel" Property="MobileNo" Title="Mobile No" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public string AssetCode { get; set; } = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await Model.GetAssetDetail(AssetCode);
+        }
+    }
+}
