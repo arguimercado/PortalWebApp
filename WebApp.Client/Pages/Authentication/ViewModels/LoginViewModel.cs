@@ -32,8 +32,6 @@ namespace Portal.WebClient.Pages.Accounts.ViewModels
                 var customAuthStateProvider = (CustomAuthStateProvider)_authStateProvider;
                 await customAuthStateProvider.UpdateAuthenticationState(userSession);
 
-                Notify("updatelogin");
-
                 return Result<UserSession>.Success(userSession!);
             }
             catch (Exception ex) {

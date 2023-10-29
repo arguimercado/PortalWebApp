@@ -3,8 +3,6 @@
 @using Portal.WebClient.Pages.Accounts.ViewModels;
 @using WebApp.Client.Pages.Authentication.Models;
 
-
-
 @layout LoginLayout
 
 @attribute [AllowAnonymous]
@@ -26,6 +24,7 @@
     <RadzenAlert Variant="Variant.Flat" Size="AlertSize.Medium" Shade="Shade.Lighter" AlertStyle="AlertStyle.Info">
         Verifying your account. Please wait...
     </RadzenAlert>
+
 @code {
 
     private string _message = "";
@@ -41,39 +40,37 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; }
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthState;
-        if (authState.User.Identity.IsAuthenticated) {
-            var stringKey = "/";
-            if(!string.IsNullOrEmpty(Key)) {
-                stringKey = Key.Replace('-', '/');
-            }
-            PageNavigation.DirectNavigate(stringKey);
-        }
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            
-            
-            if (!string.IsNullOrEmpty(Username))
-            {
-                var result = await ViewModel.Validate(new LoginModel { EmpCode = Username });
-                if (result.IsSuccess) {
-                    var stringKey = Key.Replace('-', '/');
-
-                    PageNavigation.DirectNavigate(stringKey);
-                }
-                else
+        if (firstRender) {
+            var authState = await AuthState;
+            if (authState.User.Identity!.IsAuthenticated) {
+                var stringKey = "/";
+                if (!string.IsNullOrEmpty(Key))
                 {
-                    _message = result.Error;
-                    StateHasChanged();
+                    stringKey = Key.Replace('-', '/');
+                }
+                PageNavigation.DirectNavigate(stringKey);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(Username))
+                {
+                    var result = await ViewModel.Validate(new LoginModel { EmpCode = Username });
+                    if (result.IsSuccess)
+                    {
+                        var stringKey = Key.Replace('-', '/');
+                        PageNavigation.DirectNavigate(stringKey);
+                    }
+                    else
+                    {
+                        _message = result.Error;
+                        StateHasChanged();
+                    }
                 }
             }
+
+           
         }
     }
 

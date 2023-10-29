@@ -22,7 +22,7 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<UserSession?> AuthenticateUser(LoginModel login)
     {
-        var url = "account/auth";
+        var url = "auth/login";
         var response = await _httpService.PostAsync<object,UserSession>(url, new { login.EmpCode });
 
         return response;
@@ -30,7 +30,7 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<UserSession?> ValidateUser(LoginModel login)
     {
-        var url = $"account/verify?EmpCode={login.EmpCode}&Password={login.Password}";
+        var url = $"auth/validate?EmpCode={login.EmpCode}";
         var response = await _httpService.GetAsync<UserSession>(url);
         return response;
 

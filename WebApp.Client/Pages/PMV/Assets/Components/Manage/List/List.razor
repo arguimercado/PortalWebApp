@@ -2,10 +2,7 @@
 @using WebApp.Client.Pages.PMV.Assets.ViewModels;
 @using WebApp.UILibrary;
 
-
 @inherits ComponentViewModelBase<AssetListViewModel>
-@inject DialogService DialogService
-
 
 @attribute [Authorize()]
 
@@ -13,11 +10,17 @@
     <CustomLayoutHeader Title="Manage Asset" Icon="directions_bus">
         
         @if(View != "read") {
-            <RadzenButton Text="Add Internal" Icon="front_loader" Click="@(() => HandleAction("/asset/form/internal"))" />
-            <RadzenButton Text="Add External" Icon="directions_car" Click="@(() => HandleAction("/asset/form/external"))" />
+            <RadzenSplitButton Text="Create Asset" Icon="front_loader" Click="HandleAction" Variant="Variant.Outlined">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Internal Asset" Value="/asset/form/internal" />
+                    <RadzenSplitButtonItem Text="External Asset" Value="/asset/form/external" />
+                </ChildContent>
+            </RadzenSplitButton>
         }
-
-        <RadzenButton Text="Export to Excel" Icon="excel" ButtonStyle="ButtonStyle.Dark" Click="@(() => HandleExportClick())" />
+        <RadzenButton 
+            Text="Export to Excel" 
+            Icon="excel" 
+            ButtonStyle="ButtonStyle.Dark" Click="@(() => HandleExportClick())" Variant="Variant.Text" />
         
     </CustomLayoutHeader>
 
@@ -36,74 +39,6 @@
 
 </CustomPageLayout>
 
-@code {
-
-    [Parameter]
-    public string? Status { get; set; } = "";
-
-    [Parameter]
-    public string? Category { get; set; } = "";
-
-    [Parameter]
-    public string? Type { get; set; } = "";
-
-    [Parameter]
-    public string View { get; set; } = "";
-
-    public int SelectedIndex { get; set; } = 0;
-
-    [CascadingParameter]
-    public required Task<AuthenticationState> AuthState { get; set; }
-
-
-    protected override async Task  OnAfterRenderAsync(bool firstRender)
-    {
-        if(firstRender) {
-
-            if (!string.IsNullOrEmpty(Status))
-            {
-                if(Type == "external")
-                {
-                    Model.FilterAsset.PlateType = Category;
-                }
-                else
-                {
-                    Model.FilterAsset.Status = Status;
-                    Model.FilterAsset.Category = Category;
-                }
-
-                Model.FilterAsset.AssetType = Type ?? "internal";
-                Model.FilterAsset.IsRefresh = true;
-                Model.FilterAsset.IsPostBack = true;
-                SelectedIndex = Type == "external" ? 1 : 0;
-                
-                await Model.Filter();
-            }
-            else
-            {
-                //initialize when first render
-                if (Model.AssetListContainer.Categories.Count <= 0)
-                {
-                    await Model.Initialize();
-                }
-            }
-        }
-    }
-
-    private void HandleAction(string navigate) {
-        PageNavigation.NavigateTo(navigate);
-    }
-
-    private async Task HandleExportClick()
-    {
-        var result = await DialogService.OpenAsync<AssetExportDialog>("Export Excel",
-            new Dictionary<string, object>() {{ "Filter", Model.FilterAsset }});
-
-        //Model.ExportToExcel();
-    }
-
-   
-}
 
 
 

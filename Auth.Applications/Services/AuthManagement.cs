@@ -28,67 +28,48 @@ public class AuthManagement : IAuthManagement
     }
 
 
-    public async Task<AuthResult?> ValidateThruPortal(string username)
-    {
-
-        try
-        {
-            User user = await _management.GetUserInPortal(username);
+    public async Task<AuthResult> ValidateThruPortal(string username)
+    {   
+        User user = await _management.GetUserInPortal(username);
         
-            return new AuthResult {
-                EmpCode = user.UserName,
-                EmpName = user.FullName,
-                Menus =  await GetFreeUserMenus(),
-                Token = _jwt.GenerateToken(user),
-            };
-        }catch(Exception ex)
-        {
-
-        }
+        return new AuthResult {
+            EmpCode = user.UserName,
+            EmpName = user.FullName,
+            Menus =  await GetFreeUserMenus(),
+            Token = _jwt.GenerateToken(user),
+        };
+        
     }
 
-    public async Task<AuthResult?> ExportLogin(string username, int valid)
+    public async Task<AuthResult> ExportLogin(string username, int valid)
     {
         var user = await _management.GetUserInPortal(username);
-        if (user is not null && valid == 1)
+        var authResult = new AuthResult
         {
-            var authResult = new AuthResult
-            {
-                EmpCode = user.UserName,
-                EmpName = user.FullName,
-                Token = _jwt.GenerateToken(user),
-            };
+            EmpCode = user.UserName,
+            EmpName = user.FullName,
+            Token = _jwt.GenerateToken(user),
+        };
 
-            return authResult;
-        }
-
-        return null;
+        return authResult;
     }
 
-    public async Task<AuthResult?> Login(string username, string password)
+    public async Task<AuthResult> Login(string username, string password)
     {
 
         var user = await _management.GetUserInPortal(username);
+        if (user.Password != SimpleEncode.EncodePassword(password))
+            throw new Exception("Password does not match");
 
-        if (user is not null)
+        var authResult = new AuthResult
         {
+            EmpCode = user.UserName,
+            EmpName = user.FullName,
+            Token = _jwt.GenerateToken(user),
+            PermissionLevel = user.PermissionLevel
+        };
+        return authResult;
 
-            if (user.Password == SimpleEncode.EncodePassword(password))
-            {
-                var authResult = new AuthResult
-                {
-                    EmpCode = user.UserName,
-                    EmpName = user.FullName,
-                    Token = _jwt.GenerateToken(user),
-                    PermissionLevel = user.PermissionLevel
-                };
-                return authResult;
-            }
-        }
-
-
-
-        return null;
 
     }
 

@@ -8,6 +8,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.12" />
+	  <ProjectReference Include="..\Auth.Applications\Auth.Applications.csproj" />
     <ProjectReference Include="..\WebApp.Service\WebApp.Service.csproj" />
     <ProjectReference Include="..\WebApp.UILibrary\WebApp.UILibrary.csproj" />
   </ItemGroup>

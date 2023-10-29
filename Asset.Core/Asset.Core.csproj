@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Queries\" />
+    <Folder Include="Infrastructures\Commons\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BaseEntityPack.Core" Version="2.2.0" />
+    <PackageReference Include="Dapper" Version="2.1.15" />
+    <PackageReference Include="FluentResults" Version="3.15.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebApp.SharedServer\WebApp.SharedServer.csproj" />
+  </ItemGroup>
+
+</Project>

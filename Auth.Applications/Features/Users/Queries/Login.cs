@@ -5,7 +5,7 @@ namespace Auth.Applications.Features.Users.Queries;
 
 public class Login
 {
-    public record Query(string EmpCode, string Password, string? Module = "") : IRequest<Result<AuthResult>>;
+    public record Query(string EmpCode, string Password) : IRequest<Result<AuthResult>>;
 
     public class QueryHandler : IRequestHandler<Query, Result<AuthResult>>
     {
@@ -20,10 +20,8 @@ public class Login
         {
             try
             {
-                var authResult = await _authManagement.Login(request.EmpCode, request.Password,request.Module ?? "pmv");
-                if (authResult is null) {
-                    throw new Exception("Password is incorrect or user not found");
-                }
+                var authResult = await _authManagement.Login(request.EmpCode, request.Password);
+                
                 return Result.Ok(authResult);
             }
             catch (Exception ex)
