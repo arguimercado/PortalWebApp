@@ -2,47 +2,124 @@ using BaseEntityPack.Core;
 using Core.PMV.Assets.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 using Asset.Core.Models.Assets.Entities;
+using Asset.Core.Notifications.Assets;
 
 namespace Asset.Core.Models.Assets;
 
 public class InternalAsset : AggregateRoot<int>
 {
 
+    public static InternalAsset Update(
+                                    int id,
+                                    int cid,
+                                    string subCatCode,
+                                    string description,
+                                    string brandCode,
+                                    string model,
+                                    int year,
+                                    string color,
+                                    string plateNo,
+                                    string engineNo,
+                                    string chasisNo,
+                                    DateTime? firstRegDate,
+                                    DateTime? purchaseDate,
+                                    float netValue,
+                                    string vendorCode,
+                                    string companyCode,
+                                    string managedBy,
+                                    string lpoNo,
+                                    int kmPerHr,
+                                    int conditionRank,
+                                    int status,
+                                    string rentOwned,
+                                    string rateType,
+                                    float rate,
+                                    bool? modifiedAsset,
+                                    string remarks,
+                                    string? accountCategory,
+                                    float rateOfDepreciation,
+                                    string? itemCode,
+                                    float purchaseAmount,
+                                    DateTime? dateOfSelling,
+                                    float soldAmount,
+                                    float parkingArea,
+                                    string employeeCode)
+    {
 
-    public static InternalAsset Create(int cid,
-                                string subCatCode,
-                                 int assetNo,
-                                 string description,
-                                 string brandCode,
-                                 string model,
-                                 int year,
-                                 string color,
-                                 string plateNo,
-                                 string engineNo,
-                                 string chasisNo,
-                                 DateTime? firstRegDate,
-                                 DateTime? purchaseDate,
-                                 float netValue,
-                                 string vendorCode,
-                                 string companyCode,
-                                 string managedBy,
-                                 string lpoNo,
-                                 int kmPerHr,
-                                 int conditionRank,
-                                 int status,
-                                 string rentOwned,
-                                 string rateType,
-                                 float rate,
-                                 bool? modifiedAsset,
-                                 string remarks,
-                                 string? accountCategory,
-                                 float rateOfDepreciation,
-                                 string? itemCode,
-                                 float purchaseAmount,
-                                 DateTime? dateOfSelling,
-                                 float soldAmount,
-                                 float parkingArea,
-                                 string employeeCode)
+        return new InternalAsset {
+            SlNo = id,
+            Cid = cid,
+            SubCatCode = subCatCode,
+            AssetDesc = description,
+            BrandCode = brandCode,
+            Model = model,
+            Year = year,
+            Color = color,
+            PlateNo = plateNo,
+            EngineNo = engineNo,
+            ChasisNo = chasisNo,
+            FirstRegDate = firstRegDate,
+            PurchaseDate = purchaseDate,
+            NetValue = netValue,
+            VendorCode = vendorCode,
+            CompanyCode = companyCode,
+            ManagedBy = managedBy,
+            LPONo = lpoNo,
+            KmPerHr = kmPerHr,
+            ConditionRank = conditionRank,
+            Status = status,
+            RentOrOwned = rentOwned,
+            RateType = rateType,
+            Rate = rate,
+            ModifiedAsset = modifiedAsset ?? false,
+            Remarks = remarks,
+            AccountCategory = accountCategory,
+            RateOfDepreciation = rateOfDepreciation,
+            ItemCode = itemCode,
+            PurchaseAmount = purchaseAmount,
+            DateOfSelling = dateOfSelling,
+            SoldAmount = soldAmount,
+            ParkingArea = parkingArea,
+            UpdatedAt = DateTime.Now,
+            UpdatedBy = employeeCode
+        };
+    }
+
+    public static InternalAsset Create(
+                                    int cid,
+                                    string subCatCode,
+                                    int assetNo,
+                                    string description,
+                                    string brandCode,
+                                    string model,
+                                    int year,
+                                    string color,
+                                    string plateNo,
+                                    string engineNo,
+                                    string chasisNo,
+                                    DateTime? firstRegDate,
+                                    DateTime? purchaseDate,
+                                    float netValue,
+                                    string vendorCode,
+                                    string companyCode,
+                                    string managedBy,
+                                    string lpoNo,
+                                    int kmPerHr,
+                                    int conditionRank,
+                                    int status,
+                                    string rentOwned,
+                                    string rateType,
+                                    float rate,
+                                    bool? modifiedAsset,
+                                    string remarks,
+                                    string? accountCategory,
+                                    float rateOfDepreciation,
+                                    string? itemCode,
+                                    float purchaseAmount,
+                                    DateTime? dateOfSelling,
+                                    float soldAmount,
+                                    float parkingArea,
+                                    string employeeCode)
     {
 
         var assetNumber = assetNo + 1;
@@ -50,6 +127,7 @@ public class InternalAsset : AggregateRoot<int>
 
         return new InternalAsset
         {
+            SlNo = 0,
             Cid = cid,
             AssetCode = assetCode,
             SubCatCode = subCatCode,
@@ -87,48 +165,7 @@ public class InternalAsset : AggregateRoot<int>
             CreatedAt = DateTime.Now,
             CreatedBy = employeeCode
         };
-
     }
-
-    public static InternalAsset Instance(int cid,
-                                 string assetCode,
-                                 string subCatCode,
-                                 int assetNo,
-                                 string description,
-                                 string brandCode,
-                                 string model,
-                                 int year,
-                                 string color,
-                                 string plateNo,
-                                 string engineNo,
-                                 string chasisNo,
-                                 DateTime? firstRegDate,
-                                 DateTime? purchaseDate,
-                                 float netValue,
-                                 string vendorCode,
-                                 string companyCode,
-                                 string managedBy,
-                                 string lpoNo,
-                                 int kmPerHr,
-                                 int conditionRank,
-                                 int status,
-                                 string rentOwned,
-                                 string rateType,
-                                 float rate,
-                                 bool? modifiedAsset,
-                                 string remarks,
-                                 string? accountCategory,
-                                 float rateOfDepreciation,
-                                 string? itemCode,
-                                 float purchaseAmount,
-                                 DateTime? dateOfSelling,
-                                 float soldAmount,
-                                 float parkingArea,
-                                 string employeeCode,
-                                 int assetId = 0) =>
-        new(0, cid, assetCode, subCatCode, assetNo, description, brandCode, model, year, color, plateNo, engineNo, chasisNo, firstRegDate,
-            purchaseDate, netValue, vendorCode, companyCode, managedBy, lpoNo, kmPerHr, conditionRank, status, rentOwned, rateType, rate, modifiedAsset, remarks, accountCategory, rateOfDepreciation, itemCode, purchaseAmount
-            , dateOfSelling, soldAmount, parkingArea, employeeCode, assetId);
 
 
     public InternalAsset() : base(0)
@@ -136,98 +173,7 @@ public class InternalAsset : AggregateRoot<int>
 
     }
 
-    private InternalAsset(
-        int id,
-        int cid,
-        string assetCode,
-        string subCatCode,
-        int assetNo,
-        string description,
-        string brandCode,
-        string model,
-        int year,
-        string color,
-        string plateNo,
-        string engineNo,
-        string chasisNo,
-        DateTime? firstRegDate,
-        DateTime? purchaseDate,
-        float netValue,
-        string vendorCode,
-        string companyCode,
-        string managedBy,
-        string lpoNo,
-        int kmPerHr,
-        int conditionRank,
-        int status,
-        string rentOwned,
-        string rateType,
-        float rate,
-        bool? modifiedAsset,
-        string remarks,
-        string? accountCategory,
-        float rateOfDepreciation,
-        string? itemCode,
-        float purchaseAmount,
-        DateTime? dateOfSelling,
-        float soldAmount,
-        float parkingArea,
-        string employeeCode,
-        int assetId = 0) : base(0)
-    {
-
-        SlNo = assetId;
-        Cid = cid;
-        SubCatCode = subCatCode;
-
-        if (SlNo == 0)
-        {
-            AssetNo = assetNo + 1; //increase by one
-        }
-
-        AssetDesc = description;
-
-        if (string.IsNullOrEmpty(assetCode))
-        {
-            AssetCode = $"{subCatCode}{AssetNo.ToString("000")}";
-        }
-        else
-        {
-            AssetCode = assetCode;
-        }
-
-        BrandCode = brandCode;
-        Model = model;
-        Year = year;
-        Color = color;
-        PlateNo = plateNo;
-        EngineNo = engineNo;
-        ChasisNo = chasisNo;
-        FirstRegDate = firstRegDate;
-        PurchaseDate = purchaseDate;
-        NetValue = netValue;
-        VendorCode = vendorCode;
-        CompanyCode = companyCode;
-        ManagedBy = managedBy;
-        LPONo = lpoNo;
-        KmPerHr = kmPerHr;
-        ConditionRank = conditionRank;
-        Status = status;
-        RentOrOwned = rentOwned;
-        RateType = rateType;
-        Rate = rate;
-        ModifiedAsset = modifiedAsset ?? false;
-        Remarks = remarks;
-        AccountCategory = accountCategory;
-        RateOfDepreciation = rateOfDepreciation;
-        ItemCode = itemCode;
-        PurchaseAmount = purchaseAmount;
-        DateOfSelling = dateOfSelling;
-        SoldAmount = soldAmount;
-        ParkingArea = parkingArea;
-        CreatedAt = DateTime.Now;
-        CreatedBy = employeeCode;
-    }
+    
 
 
     public void InsertAdditional(string owner,
@@ -340,6 +286,81 @@ public class InternalAsset : AggregateRoot<int>
 
     private List<AssetDocument> _documents = new();
     public IEnumerable<AssetDocument> Documents => _documents.ToList();
+
+    public void Update(int cid,
+                        string subCatCode,
+                        string description,
+                        string brandCode,
+                        string model,
+                        int year,
+                        string color,
+                        string plateNo,
+                        string engineNo,
+                        string chasisNo,
+                        DateTime? firstRegDate,
+                        DateTime? purchaseDate,
+                        float netValue,
+                        string vendorCode,
+                        string companyCode,
+                        string managedBy,
+                        string lpoNo,
+                        int kmPerHr,
+                        int conditionRank,
+                        int status,
+                        string rentOwned,
+                        string rateType,
+                        float rate,
+                        bool? modifiedAsset,
+                        string remarks,
+                        string? accountCategory,
+                        float rateOfDepreciation,
+                        string? itemCode,
+                        float purchaseAmount,
+                        DateTime? dateOfSelling,
+                        float soldAmount,
+                        float parkingArea,
+                        string employeeCode)
+    {
+        var oldKmPerHr = this.KmPerHr;
+
+        Cid = cid;
+        SubCatCode = subCatCode;
+        AssetDesc = description;
+        BrandCode = brandCode;
+        Model = model;
+        Year = year;
+        Color = color;
+        PlateNo = plateNo;
+        EngineNo = engineNo;
+        ChasisNo = chasisNo;
+        FirstRegDate = firstRegDate;
+        PurchaseDate = purchaseDate;
+        NetValue = netValue;
+        VendorCode = vendorCode;
+        CompanyCode = companyCode;
+        ManagedBy = managedBy;
+        LPONo = lpoNo;
+        KmPerHr = kmPerHr;
+        ConditionRank = conditionRank;
+        Status = status;
+        RentOrOwned = rentOwned;
+        RateType = rateType;
+        Rate = rate;
+        ModifiedAsset = modifiedAsset ?? false;
+        Remarks = remarks;
+        AccountCategory = accountCategory;
+        RateOfDepreciation = rateOfDepreciation;
+        ItemCode = itemCode;
+        PurchaseAmount = purchaseAmount;
+        DateOfSelling = dateOfSelling;
+        SoldAmount = soldAmount;
+        ParkingArea = parkingArea;
+        UpdatedBy = employeeCode;
+
+        AddDomainEvent(new OnAssetUpdateNotification(this, oldKmPerHr, kmPerHr));
+    }
+
+   
 
     public void AddDocuments(AssetDocument document)
     {

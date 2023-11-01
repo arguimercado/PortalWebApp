@@ -87,20 +87,76 @@ public class AssetDataService : IAssetDataService
 
     public async Task<InternalAsset> GetInternal(object value)
     {
+        var strSQL = @"SELECT 
+					pmv.slno SlNo,
+					pmv.cid Cid,
+					pmv.SubCatCode SubCatCode,
+					pmv.AssetCode,
+					pmv.AssetNo,
+					pmv.AssetDesc,
+					pmv.BrandCode,
+					pmv.Model,
+					pmv.Year,
+					pmv.Color,
+					pmv.PlateNo,
+					pmv.EngineNo,
+					pmv.ChasisNo, 
+					pmv.FirstRegDate,
+					pmv.PurchaseDate,
+					pmv.NetValue,
+					pmv.VendorCode,
+					pmv.CompanyCode,
+					pmv.managedBy ManagedBy,
+					pmv.LpoNo LPONo,
+					pmv.KmHR KmPerHr,
+					pmv.CondtionRank ConditionRank,
+					pmv.status Status,
+					pmv.statusDesc StatusDesc,
+					pmv.createdBy CreatedBy,
+					pmv.createdAt CreatedAt,
+					pmv.rentOwned RentOrOwned,
+					pmv.Rate_Type RateType,
+					pmv.Rate,
+					pmv.modifiedAsset ModifiedAsset,
+					pmv.remarks Remarks,
+					pmv.accountcategory AccountCategory,
+					pmv.rateofdepreciation RateOfDepreciation,
+					pmv.accountdepreciation AccountDepreciation,
+					pmv.ParkingFieldArea ParkingArea,
+					pmv.DeliveryNote,
+					pmv.Completed,
+					pmv.TankCapacity,
+					ad.assetCode AssetCode2,
+					ad.hiremethod HireMethod,
+					ad.assetType AssetType,
+					ad.warantee Warranty,
+					ad.registrationExpiry RegistrationExpiry,
+					ad.insurance Insurance,
+					ad.Owner Owner,
+					ad.operatedby OperatedBy,
+					doc.Id,
+					doc.AssetId,
+					doc.DocumentType,
+					doc.FileName,
+					doc.DocumentReferenceNo,
+					doc.DocumentPath,
+					doc.Title,
+					doc.Description
+				FROM PMV pmv
+				LEFT JOIN PMV_AssetAdditional ad ON ad.assetCode = pmv.AssetCode
+				LEFT JOIN HLMPMV.AssetDocument doc ON doc.AssetId = pmv.slno
+				WHERE (pmv.slno = @id)";
 
-        var results = await _sqlQuery.DynamicQuery<InternalAsset, AssetAdditional, AssetDocument, InternalAsset>("sp_EditAsset",
+        var results = await _sqlQuery.DynamicQuery<InternalAsset, AssetAdditional, AssetDocument, InternalAsset>(strSQL,
         new { id = value },
-        (asset, additional, document) =>
-        {
+        (asset, additional, document) => {
             asset.AddAdditional(additional);
-            if (document is not null)
-            {
+            if (document is not null) {
                 asset.AddDocument(document);
             }
             return asset;
         },
-        splitOn: "AssetCode2,Id",
-        commandType: System.Data.CommandType.StoredProcedure);
+        splitOn: "AssetCode2,Id");
 
         var asset = results.FirstOrDefault();
         if (asset is not null)
@@ -350,10 +406,24 @@ public class AssetDataService : IAssetDataService
 
     public async Task<ExternalAsset> GetExternalAsset(string assetCode)
     {
-        var results = await _sqlQuery.DynamicQuery<ExternalAsset>("sp_EditAsset",
-               new { assetType = "external", assetCode = assetCode }, commandType: System.Data.CommandType.StoredProcedure);
+        var strSQL = @"SELECT 
+					        AssetCode,
+					        AssetDesc,
+					        plateType PlateType, 
+					        plateNum PlateNum, 
+					        VendorCode,
+					        CompanyCode,
+					        hireSub HireSub,
+					        FuelTankCapacity,
+                            createdBy CreatedBy,
+                            createdAt CreatedAt
+				        FROM  PMV_ExternalAssets
+                        WHERE AssetCode = @assetCode";
 
-        return results.First();
+        var results = await _sqlQuery.DynamicQuery<ExternalAsset>(strSQL,
+               new { assetType = "external", assetCode = assetCode });
+
+        return results.FirstOrDefault() ?? new ExternalAsset();
     }
 
     public async Task<IEnumerable<ExternalAsset>> GetExternalAssets(string plateType = "", string plateNum = "", string hiredUnder = "", string vendor = "", string hireSubContract = "")

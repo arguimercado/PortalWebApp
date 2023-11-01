@@ -88,25 +88,7 @@ public class DocFileManager
         return stream;
     }
 
-    public async Task<FileResult> UploadFile(Stream content, string fileName, string directoryName)
-    {
-
-        //write file from stream 
-        var path = Path.Combine(Directory.GetCurrentDirectory(), directoryName, fileName);
-
-        using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
-        {
-            await content.CopyToAsync(fileStream);
-        }
-
-        return new FileResult
-        {
-            FilePath = $"{fileName}",
-            FileName = fileName,
-            Type = "jpg/png"
-        };
-
-    }
+   
 
     public async Task<FileDownloadResult> ViewImage(string fileName)
     {
@@ -123,8 +105,26 @@ public class DocFileManager
 
     }
 
+    public async Task<FileResult> UploadDocument(Stream content, string fileName, string filePath)
+    {
+        //write file from stream 
+        var path = Path.Combine(Directory.GetCurrentDirectory(), _docOption.Document, filePath, fileName);
 
-    public async Task<FileResult> UploadFile(IFormFile formFile)
+        using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write)) {
+            await content.CopyToAsync(fileStream);
+        }
+
+        return new FileResult
+        {
+            FilePath = $"{fileName}",
+            FileName = fileName,
+            Type = "jpg/png"
+        };
+
+    }
+
+
+    public async Task<FileResult> UploadDocument(IFormFile formFile,string filePath)
     {
         try
         {
@@ -135,8 +135,7 @@ public class DocFileManager
 
             string fileName = formFile.FileName;
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), _docOption.Document, fileName);
-
+            var path = Path.Combine(Directory.GetCurrentDirectory(), _docOption.Document,filePath, fileName);
             await CopyStream(formFile, path);
 
             return new FileResult

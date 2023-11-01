@@ -124,8 +124,7 @@ public class AssetDocumentResponse
     public string? FileName { get; set; } = string.Empty;
     public string? DocumentPath { get; set; }
     public string? DocumentReferenceNo { get; set; } = string.Empty;
-    public IFormFile? Content { get; set; } = null!;
-    public string? Tracker { get; set; } = "";
+    
 }
 
 public class ServiceDueResponse

@@ -19,9 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PMV", "PMV", "{E249AE69-647
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{7EE96E74-3635-41A5-8BEB-8059EC5E0DA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Asset.Core", "Asset.Core\Asset.Core.csproj", "{1BB7F879-1CF4-4DC5-AD07-D54FFDDDCF19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Asset.Core", "Asset.Core\Asset.Core.csproj", "{1BB7F879-1CF4-4DC5-AD07-D54FFDDDCF19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.SharedServer", "WebApp.SharedServer\WebApp.SharedServer.csproj", "{D4B7EAB2-4B18-4DC7-8F82-8A136A19B63B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp.SharedServer", "WebApp.SharedServer\WebApp.SharedServer.csproj", "{D4B7EAB2-4B18-4DC7-8F82-8A136A19B63B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

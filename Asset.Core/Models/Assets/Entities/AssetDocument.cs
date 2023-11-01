@@ -39,5 +39,10 @@ public class AssetDocument : Entity<Guid>
     public string? DocumentReferenceNo { get; set; }
     public string DocumentPath { get; set; } = "";
 
+    public void Update(string title, string description, string documentType, string documentReferenceNo, string documentPath, string fileName)
+    {
+
+    }
+
 
 }

@@ -23,21 +23,20 @@ public static class AssetCreate {
         {
             try
             {
-                if (request.AssetType.ToLower() == "external")
-                {
+                if (request.AssetType.ToLower() == "external") {
+                    
                     var externalData = request.Request.External;
+                    
                     //transfer data from dto to entity
-                    var external = new ExternalAsset(
-                        externalData.AssetCode,
-                        externalData.AssetDesc,
+                    var external = ExternalAsset.Create(
+                        externalData!.AssetDesc ?? "",
                         externalData.PlateType,
                         externalData.PlateNum,
                         externalData.VendorCode,
                         externalData.CompanyCode,
                         externalData.HireSub,
+                        externalData.FuelTankCapacity,
                         request.UserId);
-
-                    external.FuelTankCapacity = externalData.FuelTankCapacity;
 
                     await _dataService.CreateUpdateExternalAssets(external);
                 }
@@ -118,13 +117,11 @@ public static class AssetCreate {
             returnAsset.DeliveryNote = string.IsNullOrEmpty(asset.DeliveryNote) ? "N/A" : asset.DeliveryNote;
             returnAsset.TankCapacity = asset.TankCapacity;
 
-            if (assetStatus != null)
-            {
+            if (assetStatus is not null) {
                 returnAsset.StatusDescription = assetStatus.Text;
             }
 
             return returnAsset;
-
         }
     }
 }
