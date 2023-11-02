@@ -1,6 +1,6 @@
 ﻿using Asset.Core.Contracts.Assets;
 
-namespace Asset.Core.Features.Commands;
+namespace Asset.Core.Features.Commands.Assets;
 
 public static class DeleteDocument
 {

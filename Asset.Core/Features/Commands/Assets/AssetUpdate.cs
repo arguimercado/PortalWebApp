@@ -4,11 +4,11 @@ using Asset.Core.DTOs.Assets;
 using Asset.Core.Models.Assets;
 using WebApp.SharedServer.Notifications;
 
-namespace Asset.Core.Features.Commands;
+namespace Asset.Core.Features.Commands.Assets;
 
 public static class AssetUpdate
 {
-    public record Command(AssetContainerRequest Request,string Key, string AssetType, string UserId) : IRequest<Result<Unit>>;
+    public record Command(AssetContainerRequest Request, string Key, string AssetType, string UserId) : IRequest<Result<Unit>>;
 
     public class CommandHandler : IRequestHandler<Command, Result<Unit>>
     {
@@ -17,7 +17,7 @@ public static class AssetUpdate
         private readonly IAppNotificationPublisher _notification;
 
         public CommandHandler(
-            IAssetDataService dataService, 
+            IAssetDataService dataService,
             ICommonDataService commonService,
             IAppNotificationPublisher notification
             )
@@ -65,7 +65,7 @@ public static class AssetUpdate
         }
 
         private async Task UpdateAsset(InternalAsset internalAsset, InternalAssetRequest request, string userId)
-        { 
+        {
 
             var selections = await _commonService.GetSelections("statuses");
 

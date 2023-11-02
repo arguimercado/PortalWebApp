@@ -177,6 +177,99 @@ public class AssetDataService : IAssetDataService
         return asset ?? new();
     }
 
+    public Task<InternalAsset> GetInternalByAssetCode(string assetCode)
+    {
+        var strSQL = @"SELECT 
+					pmv.slno SlNo,
+					pmv.cid Cid,
+					pmv.SubCatCode SubCatCode,
+					pmv.AssetCode,
+					pmv.AssetNo,
+					pmv.AssetDesc,
+					pmv.BrandCode,
+					pmv.Model,
+					pmv.Year,
+					pmv.Color,
+					pmv.PlateNo,
+					pmv.EngineNo,
+					pmv.ChasisNo, 
+					pmv.FirstRegDate,
+					pmv.PurchaseDate,
+					pmv.NetValue,
+					pmv.VendorCode,
+					pmv.CompanyCode,
+					pmv.managedBy ManagedBy,
+					pmv.LpoNo LPONo,
+					pmv.KmHR KmPerHr,
+					pmv.CondtionRank ConditionRank,
+					pmv.status Status,
+					pmv.statusDesc StatusDesc,
+					pmv.createdBy CreatedBy,
+					pmv.createdAt CreatedAt,
+					pmv.rentOwned RentOrOwned,
+					pmv.Rate_Type RateType,
+					pmv.Rate,
+					pmv.modifiedAsset ModifiedAsset,
+					pmv.remarks Remarks,
+					pmv.accountcategory AccountCategory,
+					pmv.rateofdepreciation RateOfDepreciation,
+					pmv.accountdepreciation AccountDepreciation,
+					pmv.ParkingFieldArea ParkingArea,
+					pmv.DeliveryNote,
+					pmv.Completed,
+					pmv.TankCapacity,
+					ad.assetCode AssetCode2,
+					ad.hiremethod HireMethod,
+					ad.assetType AssetType,
+					ad.warantee Warranty,
+					ad.registrationExpiry RegistrationExpiry,
+					ad.insurance Insurance,
+					ad.Owner Owner,
+					ad.operatedby OperatedBy,
+					doc.Id,
+					doc.AssetId,
+					doc.DocumentType,
+					doc.FileName,
+					doc.DocumentReferenceNo,
+					doc.DocumentPath,
+					doc.Title,
+					doc.Description
+				FROM PMV pmv
+				LEFT JOIN PMV_AssetAdditional ad ON ad.assetCode = pmv.AssetCode
+				LEFT JOIN HLMPMV.AssetDocument doc ON doc.AssetId = pmv.slno
+				WHERE (pmv.slno = @id)";
+
+        var results = await _sqlQuery.DynamicQuery<InternalAsset, AssetAdditional, AssetDocument, InternalAsset>(strSQL,
+        new { id = value },
+        (asset, additional, document) => {
+            asset.AddAdditional(additional);
+            if (document is not null)
+            {
+                asset.AddDocument(document);
+            }
+            return asset;
+        },
+        splitOn: "AssetCode2,Id");
+
+        var asset = results.FirstOrDefault();
+        if (asset is not null)
+        {
+            foreach (var currentAsset in results)
+            {
+                var document = currentAsset.Documents.FirstOrDefault();
+                if (document is not null)
+                {
+                    if (!asset.Documents.Any(d => d.Id == currentAsset.Documents.FirstOrDefault().Id))
+                    {
+                        asset.AddDocuments(currentAsset.Documents.FirstOrDefault());
+                    }
+                }
+            }
+        }
+
+        return asset ?? new();
+    }
+
     public async Task<object> GetInternalDynamics(string assetCode = "", string categoryIds = "", string subCategory = "", string brand = "", string companyCode = "", string status = "", string fields = "")
     {
         Dictionary<string, string> fieldOrigins = new Dictionary<string, string>();
@@ -441,5 +534,5 @@ public class AssetDataService : IAssetDataService
         return results;
     }
 
-
+    
 }

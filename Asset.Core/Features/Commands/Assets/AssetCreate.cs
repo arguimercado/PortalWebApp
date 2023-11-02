@@ -4,17 +4,18 @@ using Asset.Core.DTOs.Assets;
 using Asset.Core.Models.Assets;
 
 
-namespace Asset.Core.Features.Commands;
+namespace Asset.Core.Features.Commands.Assets;
 
-public static class AssetCreate {
-    public record Command(AssetContainerRequest Request,string AssetType,string UserId) : IRequest<Result<Unit>>;
+public static class AssetCreate
+{
+    public record Command(AssetContainerRequest Request, string AssetType, string UserId) : IRequest<Result<Unit>>;
 
     public class CommandHandler : IRequestHandler<Command, Result<Unit>>
     {
         private readonly IAssetDataService _dataService;
         private readonly ICommonDataService _commonService;
 
-        public CommandHandler(IAssetDataService dataService,ICommonDataService commonService)
+        public CommandHandler(IAssetDataService dataService, ICommonDataService commonService)
         {
             _dataService = dataService;
             _commonService = commonService;
@@ -23,10 +24,11 @@ public static class AssetCreate {
         {
             try
             {
-                if (request.AssetType.ToLower() == "external") {
-                    
+                if (request.AssetType.ToLower() == "external")
+                {
+
                     var externalData = request.Request.External;
-                    
+
                     //transfer data from dto to entity
                     var external = ExternalAsset.Create(
                         externalData!.AssetDesc ?? "",
@@ -42,23 +44,23 @@ public static class AssetCreate {
                 }
                 else
                 {
-                    var asset = await GetInstance(request.Request.Internal!,request.UserId);
+                    var asset = await GetInstance(request.Request.Internal!, request.UserId);
                     await _dataService.CreateUpdateInternal(asset);
                 }
 
                 return Result.Ok(Unit.Value);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Result.Fail(ex.Message);
             }
         }
 
-        private async Task<InternalAsset> GetInstance(InternalAssetRequest asset,string userId)
+        private async Task<InternalAsset> GetInstance(InternalAssetRequest asset, string userId)
         {
             //generate asset no
             var assetNo = await _dataService.CreateInternalAssetNo(asset.SubCatCode);
-            
+
             var selections = await _commonService.GetSelections("statuses");
 
             var returnAsset = InternalAsset.Create(
@@ -117,7 +119,8 @@ public static class AssetCreate {
             returnAsset.DeliveryNote = string.IsNullOrEmpty(asset.DeliveryNote) ? "N/A" : asset.DeliveryNote;
             returnAsset.TankCapacity = asset.TankCapacity;
 
-            if (assetStatus is not null) {
+            if (assetStatus is not null)
+            {
                 returnAsset.StatusDescription = assetStatus.Text;
             }
 

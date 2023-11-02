@@ -1,7 +1,7 @@
 ﻿using Asset.Core.Contracts.Assets;
 using WebApp.SharedServer.Utilities.Uploads;
 
-namespace Asset.Core.Features.Commands;
+namespace Asset.Core.Features.Commands.Assets;
 
 public static class GetDocument
 {

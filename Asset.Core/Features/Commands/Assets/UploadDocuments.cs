@@ -3,7 +3,7 @@ using Asset.Core.DTOs.Assets;
 using Asset.Core.Models.Assets.Entities;
 using WebApp.SharedServer.Utilities.Uploads;
 
-namespace Asset.Core.Features.Commands;
+namespace Asset.Core.Features.Commands.Assets;
 
 public static class UploadDocuments
 {
@@ -27,9 +27,10 @@ public static class UploadDocuments
             {
                 FileResult docFileResult = new();
 
-                if (request.AssetDocument.Content != null) {
+                if (request.AssetDocument.Content != null)
+                {
                     //upload documents in the server
-                    docFileResult = await _documentUpload.UploadDocument(request.AssetDocument.Content,"Documents");
+                    docFileResult = await _documentUpload.UploadDocument(request.AssetDocument.Content, "Documents");
                 }
 
                 var guid = string.IsNullOrEmpty(request.AssetDocument.Id) ? Guid.NewGuid() : Guid.Parse(request.AssetDocument.Id);
@@ -41,12 +42,12 @@ public static class UploadDocuments
                         request.AssetDocument.DocumentReferenceNo ?? "",
                         docFileResult.FilePath,
                         docFileResult.FileName);
-                
+
                 await _service.CreateDocument(assetDoc);
 
                 return Result.Ok(new AssetDocumentResponse
                 {
-                    
+
                     DocumentId = assetDoc.Id,
                     AssetId = assetDoc.AssetId,
                     Title = assetDoc.Title,
@@ -57,7 +58,8 @@ public static class UploadDocuments
                     DocumentReferenceNo = assetDoc.DocumentReferenceNo
                 });
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return Result.Fail(ex.Message);
             }
         }

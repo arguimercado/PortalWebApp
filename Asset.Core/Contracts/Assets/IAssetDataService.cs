@@ -10,6 +10,7 @@ public interface IAssetDataService {
     Task CreateUpdateInternal(InternalAsset asset, bool onlyDetail = false);
     Task UpdateInternalFields(Dictionary<string, object> values, string assetCode,string assetType);
     Task<InternalAsset> GetInternal(object value);
+    Task<InternalAsset> GetInternalByAssetCode(string assetCode);
     Task<int> CreateInternalAssetNo(string subCatCode);
     Task<object> GetInternalDynamics(string assetCode = "",
             string categoryIds = "",
