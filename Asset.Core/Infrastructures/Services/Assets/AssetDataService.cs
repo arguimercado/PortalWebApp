@@ -338,7 +338,7 @@ public class AssetDataService : IAssetDataService
 
     public async Task<InternalAssetResponse> GetInternalForViewing(int assetId)
     {
-        var results = await _sqlQuery.DynamicQuery<InternalAssetResponse, ServiceDueResponse, AssetDocumentResponse, InternalAssetResponse>("sp_ViewAsset",
+        var results = await _sqlQuery.DynamicQuery<InternalAssetResponse, ServiceAlertResponse, AssetDocumentResponse, InternalAssetResponse>("sp_ViewAsset",
         new { AssetId = assetId },
         (asset, service, document) =>
         {
@@ -348,7 +348,7 @@ public class AssetDataService : IAssetDataService
 
                 var currentSMUReading = asset.KmHr;
 
-                ServiceAlert serviceDue = new ServiceAlert(service.Id, asset.SlNo, service.GroupId,
+                ServiceAlert serviceDue = new ServiceAlert(Guid.Parse(service.Id), asset.SlNo, service.GroupId,
                     service.Code, service.Name, service.LastSMUReading, currentSMUReading,
                     service.KmAlert, service.KmInterval, "");
 

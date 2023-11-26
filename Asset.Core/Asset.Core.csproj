@@ -7,14 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Queries\" />
-    <Folder Include="Infrastructures\Commons\" />
+    <Compile Remove="Infrastructures\Commons\**" />
+    <EmbeddedResource Remove="Infrastructures\Commons\**" />
+    <None Remove="Infrastructures\Commons\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BaseEntityPack.Core" Version="2.2.0" />
     <PackageReference Include="Dapper" Version="2.1.15" />
     <PackageReference Include="FluentResults" Version="3.15.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 

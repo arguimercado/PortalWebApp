@@ -22,6 +22,7 @@ namespace WebApp.UILibrary
         public async ValueTask<string> Prompt(string message)
         {
             var module = await moduleTask.Value;
+            
             return await module.InvokeAsync<string>("showPrompt", message);
         }
 

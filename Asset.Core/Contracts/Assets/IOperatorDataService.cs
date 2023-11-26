@@ -5,7 +5,9 @@ namespace Asset.Core.Contracts.Assets
     public interface IOperatorDataService
     {   
         Task SaveOperator(OperatorDriver driver);
-        Task<IEnumerable<OperatorDriver>> GetOperator(string assetCode);
-        
+        Task<IEnumerable<OperatorDriver>> GetOperators(string assetCode);
+
+        Task<OperatorDriver?> FindOperatorAsync(int id);
+
     }
 }

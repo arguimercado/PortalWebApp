@@ -1,33 +1,36 @@
 ﻿
 using Asset.Core.Contracts.Assets;
-using Asset.Core.Models.Assets.Entities;
+using WebApp.SharedServer.Errors;
 
 namespace Asset.Core.Features.Commands.Assets;
 
-public static class  CreateOperator
+public static class UpdateOperator
 {
     public record Command : IRequest<Result<Unit>>
     {
-        public Command(string assetCode,
-                              string? assetTypeCode,
-                              string? division,
-                              string? brandCode,
-                              string empCode,
-                              string empType,
-                              string? rPNo,
-                              string? name,
-                              string? company,
-                              string? mobileNo,
-                              string? department,
-                              string? assetLocation,
-                              string? vendorCode,
-                              int internalExternal,
-                              DateTime? assignedAt,
-                              DateTime? returnedAt,
-                              int? dcsSlNo,
-                              string? createdBy,
-                              DateTime? createdAt)
+        public Command(
+                int id,
+                string assetCode,
+                            string? assetTypeCode,
+                            string? division,
+                            string? brandCode,
+                            string empCode,
+                            string empType,
+                            string? rPNo,
+                            string? name,
+                            string? company,
+                            string? mobileNo,
+                            string? department,
+                            string? assetLocation,
+                            string? vendorCode,
+                            int internalExternal,
+                            DateTime? assignedAt,
+                            DateTime? returnedAt,
+                            int? dcsSlNo,
+                            string? createdBy,
+                            DateTime? createdAt)
         {
+            Id = id;
             AssetCode = assetCode;
             AssetTypeCode = assetTypeCode;
             Division = division;
@@ -48,14 +51,14 @@ public static class  CreateOperator
             CreatedBy = createdBy;
             CreatedAt = createdAt;
         }
-
+        public int Id { get;  }
         public string AssetCode { get; }
         public string? AssetTypeCode { get; }
         public string? Division { get; }
         public string? BrandCode { get; }
         public string EmpCode { get; }
         public string EmpType { get; }
-        public string Name { get; }
+        public string? Name { get; }
         public string? RPNo { get; }
         public string? Company { get; }
         public string? MobileNo { get; }
@@ -80,18 +83,20 @@ public static class  CreateOperator
             _dataService = dataService;
             _assetDataService = assetDataService;
         }
-
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
             try
             {
-                var assetTypeCode = "";
-                var vendorCode = "";
-                var brandCode = "";
+                var operatorDriver = await _dataService.FindOperatorAsync(request.Id);
+                if (operatorDriver is null)
+                {
+                    throw new NotFoundException("Operator or driver");
+                }
+                string vendorCode = "";
+                string brandCode = "";
                 if(request.InternalExternal == 1)
                 {
-                    var asset = await _assetDataService.GetInternal(request.AssetCode);
-                    assetTypeCode = asset.SubCatCode;
+                    var asset = await _assetDataService.GetInternalByAssetCode(request.AssetCode);
                     vendorCode = asset.VendorCode;
                     brandCode = asset.BrandCode;
                     
@@ -99,31 +104,36 @@ public static class  CreateOperator
                 else
                 {
                     var asset = await _assetDataService.GetExternalAsset(request.AssetCode);
-                    assetTypeCode = asset.PlateType;
                     vendorCode = asset.VendorCode;
-                    brandCode = "N/A";
-
+                    brandCode = "";
                 }
 
-                var operatorDriver = OperatorDriver.Create(request.AssetCode, assetTypeCode,
-                    request.Division, brandCode, request.EmpCode, request.EmpType, request.Name, request.RPNo,
-                    request.Company, request.MobileNo, request.AssetLocation,
-                    request.VendorCode, request.InternalExternal,
-                    request.AssignedAt, request.ReturnedAt,
-                    request.DcsSlNo,
-                    request.CreatedBy);
-                
+                operatorDriver.Update(request.AssetCode,
+                        request.AssetTypeCode,
+                        request.Division,
+                        brandCode,
+                        request.EmpCode,
+                        request.EmpType,
+                        request.Name ?? "",
+                        request.RPNo,
+                        request.Name,
+                        request.Company,
+                        request.MobileNo,
+                        request.Department,
+                        request.AssetLocation,
+                        vendorCode,
+                        request.InternalExternal,
+                        request.AssignedAt,
+                        request.ReturnedAt,
+                        request.DcsSlNo);
+
                 await _dataService.SaveOperator(operatorDriver);
-                return Result.Ok(Unit.Value);
-               
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return Result.Fail(ex.Message);
+                Result.Fail(ex.Message);
             }
         }
     }
 }
-
-
-

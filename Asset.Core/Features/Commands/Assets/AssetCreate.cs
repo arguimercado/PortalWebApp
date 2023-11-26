@@ -15,7 +15,8 @@ public static class AssetCreate
         private readonly IAssetDataService _dataService;
         private readonly ICommonDataService _commonService;
 
-        public CommandHandler(IAssetDataService dataService, ICommonDataService commonService)
+        public CommandHandler(IAssetDataService dataService, 
+            ICommonDataService commonService)
         {
             _dataService = dataService;
             _commonService = commonService;

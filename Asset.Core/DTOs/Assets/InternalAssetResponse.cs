@@ -86,7 +86,7 @@ public class InternalAssetResponse
 
     public bool Completed { get; set; }
     public IEnumerable<AssignedDriverResponse> Drivers { get; set; } = new List<AssignedDriverResponse>();
-    public List<ServiceDueResponse> ServiceDues { get; set; } = new();
+    public List<ServiceAlertResponse> ServiceDues { get; set; } = new();
     public List<AssetDocumentResponse> Documents { get; set; } = new();
 }
 
@@ -125,21 +125,4 @@ public class AssetDocumentResponse
     public string? DocumentPath { get; set; }
     public string? DocumentReferenceNo { get; set; } = string.Empty;
     
-}
-
-public class ServiceDueResponse
-{
-    public string GroupId { get; set; } = string.Empty;
-    public Guid Id { get; set; } = Guid.Empty;
-    public string Code { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public DateTime? LastServiceDate { get; set; }
-    public int LastSMUReading { get; set; }
-    public int CurrentSMUReading { get; set; }
-    public int KmAlert { get; set; }
-    public int AlertDue { get; set; }
-    public int KmInterval { get; set; }
-    public string SMU { get; set; }
-    public int IntervalDue { get; set; }
-    public string Status { get; set; } = string.Empty;
 }

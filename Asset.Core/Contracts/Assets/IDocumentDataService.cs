@@ -7,5 +7,5 @@ public interface IDocumentDataService
     Task CreateDocument(AssetDocument document);
     Task DeleteDocument(string Id);
     Task UpdateDocument(AssetDocument document);
-    Task<AssetDocument> GetAssetDocument(string documentId);
+    Task<AssetDocument?> GetAssetDocument(string documentId);
 }

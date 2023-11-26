@@ -105,4 +105,23 @@ internal sealed class SqlQuery : ISqlQuery
             throw;
         }
     }
+
+    public async Task<TResult?> DynamicExecute<TResult>(string sql, object parameters, CommandType commandType = CommandType.Text) where TResult : struct
+    {
+        try
+        {
+            Open();
+            var results = await _sqlConnection.ExecuteScalarAsync<TResult>(sql, 
+                parameters, commandType: commandType);
+            Close();
+
+            return results;
+
+        }
+        catch (Exception ex)
+        {
+            Close();
+            throw;
+        }
+    }
 }
