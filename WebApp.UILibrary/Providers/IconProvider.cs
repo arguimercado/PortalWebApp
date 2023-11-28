@@ -37,6 +37,22 @@ public static class IconProvider
                 return "send";
             case "print":
                 return "print";
+            case "search":
+                return "filter_alt";
+            case "addnew":
+                return "add_circle_outline";
+            case "save":
+                return "save";
+            case "delete":
+                return "delete";
+            case "cancel":
+                return "close";
+            case "pdf":
+                return "picture_as_pdf";
+            case "export_excel":
+                return "pivot_table_chart";
+            case "upload":
+                return "upload_file";
             default:
                 return "home";
 

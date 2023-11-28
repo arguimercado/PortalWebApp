@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Radzen;
 using Radzen.Blazor;
-using WebApp.Client.Pages.PMV.Assets.ViewModels;
-using WebApp.UILibrary.Commons;
 
 namespace WebApp.Client.Pages.PMV.Assets.Components.Manage.List;
 

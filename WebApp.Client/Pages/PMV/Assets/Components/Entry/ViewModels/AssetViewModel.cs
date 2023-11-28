@@ -30,7 +30,7 @@ public class AssetViewModel : ViewModelBase
     public InternalAssetModel Asset => AssetContainer.InternalAsset;
 
 
-    public IEnumerable<AssignedDriver> GetDrivers()
+    public IEnumerable<OperatorDriverModel> GetDrivers()
     {
         return AssetContainer.InternalAsset.Drivers;
     }
@@ -76,14 +76,8 @@ public class AssetViewModel : ViewModelBase
             {
                 var result = await _service.CreateNew(type, isPostback);
                 AssetContainer = result!;
-                if (type == "internal")
-                {
-                    AssetContainer.InternalAsset = new();
-                }
-                else
-                {
-                    AssetContainer.ExternalAsset = new();
-                }
+                AssetContainer.InternalAsset = new();
+                AssetContainer.ExternalAsset = new();
             }
 
             Notify("NewEdit");
@@ -150,16 +144,16 @@ public class AssetViewModel : ViewModelBase
         return false;
     }
 
-    public AssetDocument CreateNew(int assetId)
+    public AssetDocumentModel CreateNew(int assetId)
     {
-        return new AssetDocument
+        return new AssetDocumentModel
         {
             Id = Guid.NewGuid().ToString(),
             AssetId = assetId,
         };
     }
 
-    public async Task UpdateDocument(AssetDocument newDoc)
+    public async Task UpdateDocument(AssetDocumentModel newDoc)
     {
         try
         {
@@ -188,7 +182,7 @@ public class AssetViewModel : ViewModelBase
         }
     }
 
-    public async Task DeleteDocument(AssetDocument newDoc)
+    public async Task DeleteDocument(AssetDocumentModel newDoc)
     {
 
         try

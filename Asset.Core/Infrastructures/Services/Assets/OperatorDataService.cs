@@ -1,4 +1,5 @@
-﻿using Asset.Core.Contracts.Assets;
+﻿using Applications.Interfaces;
+using Asset.Core.Contracts.Assets;
 using Asset.Core.Models.Assets.Entities;
 using System.Data;
 

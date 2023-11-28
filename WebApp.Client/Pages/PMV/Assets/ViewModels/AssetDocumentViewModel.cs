@@ -23,18 +23,18 @@ public class AssetDocumentViewModel : ViewModelBase
     }
 
     public InternalAssetModel Asset { get; set; } = new();
-    public List<AssetDocument> Documents => Asset.Documents;
+    public List<AssetDocumentModel> Documents => Asset.Documents;
 
-    public AssetDocument CreateNew(int assetId)
+    public AssetDocumentModel CreateNew(int assetId)
     {
-        return new AssetDocument
+        return new AssetDocumentModel
         {
             Id = Guid.NewGuid().ToString(),
             AssetId = assetId,
         };
     }
 
-    public async Task Update(AssetDocument newDoc)
+    public async Task Update(AssetDocumentModel newDoc)
     {
         try
         {
@@ -64,7 +64,7 @@ public class AssetDocumentViewModel : ViewModelBase
         }
     }
 
-    public async Task Delete(AssetDocument newDoc)
+    public async Task Delete(AssetDocumentModel newDoc)
     {
         var result = await _dialogService.Confirm(message: "Are you sure you want to delete this record?");
         if (result.Value)

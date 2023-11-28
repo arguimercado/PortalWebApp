@@ -2,6 +2,7 @@ using Auth.Applications;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using WebApp.Client.Extensions;
 using WebApp.Service;
+using Module.PMV.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,10 @@ builder.Services.AddService(baseAddress);
 builder.Services
     .AddAuthApplication(builder.Configuration)
     .AddJwtValidation(builder.Configuration);
+
+builder.Services.AddPMVCore(builder.Configuration)
+    .AddAssetService();
+
 
 builder.Services.AddAppExtension()
     .AddServiceExtension()

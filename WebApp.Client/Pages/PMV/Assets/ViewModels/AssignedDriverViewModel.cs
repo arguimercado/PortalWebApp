@@ -21,12 +21,12 @@ namespace WebApp.Client.Pages.PMV.Assets.ViewModels
 
         }
 
-        public IEnumerable<AssignedDriver> Drivers { get; set; } = new List<AssignedDriver>();
+        public IEnumerable<OperatorDriverModel> Drivers { get; set; } = new List<OperatorDriverModel>();
 
-        public AssignedDriver Driver { get; set; } = new();
+        public OperatorDriverModel Driver { get; set; } = new();
 
 
-        public void EditDriver(AssignedDriver assignedDriver)
+        public void EditDriver(OperatorDriverModel assignedDriver)
         {
             Clear();
             Driver = assignedDriver;
@@ -63,7 +63,7 @@ namespace WebApp.Client.Pages.PMV.Assets.ViewModels
             }
         }
 
-        public async Task DeleteDriver(AssignedDriver assignedDriver)
+        public async Task DeleteDriver(OperatorDriverModel assignedDriver)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace WebApp.Client.Pages.PMV.Assets.ViewModels
             }
         }
 
-        public async Task<IEnumerable<AssignedDriver>> GetDrivers(string assetCode)
+        public async Task<IEnumerable<OperatorDriverModel>> GetDrivers(string assetCode)
         {
             return await assetService.GetAllAssignedDrivers(assetCode);
         }

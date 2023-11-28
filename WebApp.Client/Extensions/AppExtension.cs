@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
+using OfficeOpenXml;
 using Portal.WebClient.Pages.Accounts.ViewModels;
 using Portal.WebClient.Pages.Fuels.Finance.Data;
 using Portal.WebClient.Pages.Fuels.Finance.ViewModels;
@@ -8,6 +9,7 @@ using Portal.WebClient.Pages.Fuels.FuelTracking.Data;
 using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
 using Radzen;
 using WebApp.Client.Pages.Authentication.Data;
+using WebApp.Client.Pages.PMV.Assets.Components.Manage.ViewModels;
 using WebApp.Client.Pages.PMV.Assets.Data;
 using WebApp.Client.Pages.PMV.Assets.ViewModels;
 using WebApp.Client.Pages.PMV.Fuels.Dashboard.Data;
@@ -22,7 +24,7 @@ using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Components.Entry.ViewModels;
 using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Components.Manage.ViewModels;
 using WebApp.Client.Pages.PMV.PMS.GroupAlerts.Data;
 using WebApp.Client.Providers;
-using WebApp.UILibrary;
+using WebApp.Client.Providers.Exports;
 using WebApp.UILibrary.Components.Common.Spinners;
 using WebApp.UILibrary.Components.Navigation;
 using WebApp.UILibrary.Providers;
@@ -61,8 +63,6 @@ namespace WebApp.Client.Extensions
             services.AddScoped<CostReportViewModel>();
             services.AddScoped<AssignedDriverViewModel>();
 
-
-
             services.AddScoped<GroupAlertListViewModel>();
             services.AddScoped<GroupAlertViewModel>();
             services.AddScoped<ServiceAlertViewModel>();
@@ -81,6 +81,7 @@ namespace WebApp.Client.Extensions
             
             services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             services.AddScoped<JSInterOpProvider>();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             return services;
         }
 
@@ -96,8 +97,10 @@ namespace WebApp.Client.Extensions
             services.AddScoped<IEffeciencyService, EffeciencyService>();
             services.AddScoped<IFuelLedgerService, FuelLedgerService>();
             services.AddScoped<IFuelLogDashboardService,FuelLogDashboardService>();
-            services.AddScoped<IAssetService, AssetService>();
+            services.AddScoped<IAssetService, AssetDataService>();
 
+            services.AddScoped<IGeneralExport, GeneralExport>();
+            services.AddScoped<IExportObjectManager, ExportObjectManager>();
 
             return services;
         }

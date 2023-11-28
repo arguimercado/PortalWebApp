@@ -98,11 +98,4 @@
             await Model.Load(int.Parse(Id));
         }
     }
-
-    protected async Task HandleUpdate()
-    {
-        await Model.UpdateAssetRecord(Model.Asset.AssetCode);
-        PageNavigation.NavigateTo($"/asset/manage/view/{Id}");
-    }
-
 }

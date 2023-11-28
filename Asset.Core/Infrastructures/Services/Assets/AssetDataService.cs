@@ -177,7 +177,7 @@ public class AssetDataService : IAssetDataService
         return asset ?? new();
     }
 
-    public Task<InternalAsset> GetInternalByAssetCode(string assetCode)
+    public async Task<InternalAsset> GetInternalByAssetCode(string assetCode)
     {
         var strSQL = @"SELECT 
 					pmv.slno SlNo,
@@ -240,7 +240,7 @@ public class AssetDataService : IAssetDataService
 				WHERE (pmv.slno = @id)";
 
         var results = await _sqlQuery.DynamicQuery<InternalAsset, AssetAdditional, AssetDocument, InternalAsset>(strSQL,
-        new { id = value },
+        new { id = assetCode },
         (asset, additional, document) => {
             asset.AddAdditional(additional);
             if (document is not null)
@@ -424,7 +424,7 @@ public class AssetDataService : IAssetDataService
             asset.Category = new AssetCategory { Cid = category.Cid, CatName = category.CatName };
             if (assigned is not null)
             {
-                asset.Drivers.Add(new OperatorDriver { EmpCode = assigned.EmpCode, Name = assigned.Name, AssignedAt = assigned.AssignedAt });
+                asset.Drivers.Add(new OperatorDriver { EmpCode = assigned.EmpCode, EmpName = assigned.EmpName, AssignedAt = assigned.AssignedAt });
             }
 
             return asset;

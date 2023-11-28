@@ -8,29 +8,29 @@
     <RadzenStack Orientation="Orientation.Vertical">
 
         <RadzenDataGrid 
-                        TItem="AssignedDriver"
+                        TItem="OperatorDriverModel"
                         Data="@Model.Asset.Drivers"
                         AllowColumnResize=true
                         Style="font-size: 10px"
                         ColumnWidth="250px">
 
             <Columns>
-                <RadzenDataGridColumn TItem="AssignedDriver" Title="SNo" TextAlign="TextAlign.Center" Width="40px" Resizable=false>
+                <RadzenDataGridColumn TItem="OperatorDriverModel" Title="SNo" TextAlign="TextAlign.Center" Width="40px" Resizable=false>
                     <Template Context="driver">
                         <span> @(Model.Asset.Drivers.ToList().IndexOf(driver) + 1)</span>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="AssignedDriver" Title="Employee Code" Property="EmpCode" />
+                <RadzenDataGridColumn TItem="OperatorDriverModel" Title="Employee Code" Property="EmpCode" />
                 
-                <RadzenDataGridColumn TItem="AssignedDriver" Title="Assigned Person" Width="320px">
+                <RadzenDataGridColumn TItem="OperatorDriverModel" Title="Assigned Person" Width="320px">
                     <Template Context="driver">
                         <span>@($"{driver.EmpName} ({driver.Company})")</span>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="AssignedDriver" Property="AssetLocation" Title="Location" />
-                <RadzenDataGridColumn TItem="AssignedDriver" Property="AssignedAt" Title="Assigned Date" FormatString="{0:dd-MMM-yyyy}" Width="200px" />
-                <RadzenDataGridColumn TItem="AssignedDriver" Property="ReturnedAt" Title="Returned Date" FormatString="{0:dd-MMM-yyyy}" Width="200px" />
-                <RadzenDataGridColumn TItem="AssignedDriver" Property="DcsSlNo" Title="DCS No" />
+                <RadzenDataGridColumn TItem="OperatorDriverModel" Property="AssetLocation" Title="Location" />
+                <RadzenDataGridColumn TItem="OperatorDriverModel" Property="AssignedAt" Title="Assigned Date" FormatString="{0:dd-MMM-yyyy}" Width="200px" />
+                <RadzenDataGridColumn TItem="OperatorDriverModel" Property="ReturnedAt" Title="Returned Date" FormatString="{0:dd-MMM-yyyy}" Width="200px" />
+                <RadzenDataGridColumn TItem="OperatorDriverModel" Property="DcsSlNo" Title="DCS No" />
             </Columns>
         </RadzenDataGrid>
     </RadzenStack>

@@ -8,7 +8,7 @@
         public string? Type { get; set; }
         public int HoldingValueInt { get; set; }
         public string? HoldingValueStr { get; set; }
-
+        
         public bool IsSelected { get; set; } = false;
     }
 

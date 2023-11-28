@@ -45,8 +45,8 @@ public sealed class AssetReadModel
     public IList<AssetFuelEfficiencyModel> EfficiencyList { get; set; } = new List<AssetFuelEfficiencyModel>();
     public IEnumerable<AssetServiceOrder> ServiceOrders { get; set; } = new List<AssetServiceOrder>();
     public IEnumerable<ServiceDueReadModel> ServiceDues { get; set; } = new List<ServiceDueReadModel>();
-    public IEnumerable<AssignedDriver> Drivers { get; set; } = new List<AssignedDriver>();
-    public IEnumerable<AssetDocument> Documents { get; set; } = new List<AssetDocument>();
+    public IEnumerable<OperatorDriverModel> Drivers { get; set; } = new List<OperatorDriverModel>();
+    public IEnumerable<AssetDocumentModel> Documents { get; set; } = new List<AssetDocumentModel>();
 
 }
 

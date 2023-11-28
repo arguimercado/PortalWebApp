@@ -1,4 +1,4 @@
-﻿
+﻿@using WebApp.UILibrary.Providers
 
 <RadzenButton 
     Icon=@GetStyle().Icon
@@ -12,6 +12,8 @@
     IsBusy=@IsBusy />
 
 @code {
+
+
 
     [Parameter]
     public EnumButtonType ButtonType { get; set; }
@@ -49,23 +51,26 @@
     public bool IsBusy { get; set; } = false;
 
 
+
     protected ButtonCustStyle GetStyle()
     {
 
         if (ButtonType == EnumButtonType.Search)
         {
+
             return new ButtonCustStyle
                 {
-                    Icon = "filter_alt",
+                    Icon = IconProvider.GetIconMenu("search"),
                     Title = IconOnly ? "" : string.IsNullOrEmpty(Text) ?  "Search" : Text,
                     Style = ButtonStyle.Warning
+
                 };
         }
         else if (ButtonType == EnumButtonType.Add)
         {
             return new ButtonCustStyle
                 {
-                    Icon = "add_circle_outline",
+                    Icon = IconProvider.GetIconMenu("addnew"),
                     Title = IconOnly ? "" : string.IsNullOrEmpty(Text) ? "Add New" : Text,
                     Style = ButtonStyle.Success
                 };
@@ -83,7 +88,7 @@
         {
             return new ButtonCustStyle
                 {
-                    Icon = "save",
+                    Icon = IconProvider.GetIconMenu("save"),
                     Title = IconOnly ? "" : "Save",
                     Style = ButtonStyle.Success
                 };
@@ -92,7 +97,7 @@
         {
             return new ButtonCustStyle
                 {
-                    Icon = "save",
+                    Icon = IconProvider.GetIconMenu("save"),
                     Title = IconOnly ? "" : "Save As Draft",
                     Style = ButtonStyle.Warning
                 };
@@ -101,7 +106,7 @@
         {
             return new ButtonCustStyle
                 {
-                    Icon = "save",
+                    Icon = IconProvider.GetIconMenu("save"),
                     Title = IconOnly ? "" : "Post",
                     Style = ButtonStyle.Success
                 };
@@ -110,7 +115,7 @@
         {
             return new ButtonCustStyle
                 {
-                    Icon = "delete",
+                    Icon = IconProvider.GetIconMenu("delete"),
                     Title = IconOnly ? "" : "Remove",
                     Style = ButtonStyle.Danger
                 };
@@ -128,7 +133,7 @@
         {
             return new ButtonCustStyle
                 {
-                    Icon = "close",
+                    Icon = IconProvider.GetIconMenu("cancel"),
                     Title = IconOnly ? "" : "Cancel",
                     Style = ButtonStyle.Warning
                 };
@@ -137,7 +142,7 @@
         {
             return new ButtonCustStyle
                 {
-                    Icon = "picture_as_pdf",
+                    Icon = IconProvider.GetIconMenu("pdf"),
                     Title = "Save as PDF",
                     Style = ButtonStyle.Light
                 };
@@ -146,7 +151,7 @@
         {
             return new ButtonCustStyle
                 {
-                    Icon = "pivot_table_chart",
+                    Icon = IconProvider.GetIconMenu("export_excel"),
                     Title = "Export to Excel",
                     Style = ButtonStyle.Dark
                 };
@@ -155,7 +160,7 @@
         {
             return new ButtonCustStyle
                 {
-                    Icon = "upload_file",
+                    Icon = IconProvider.GetIconMenu("upload"),
                     Title = IconOnly ? "Upload File" : "",
                     Style = ButtonStyle.Dark
                 };

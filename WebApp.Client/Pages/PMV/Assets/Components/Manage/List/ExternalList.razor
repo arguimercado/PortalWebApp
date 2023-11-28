@@ -1,10 +1,13 @@
-﻿@using WebApp.Client.Pages.PMV.Assets.Models;
-@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+﻿@    using Module.PMV.Core.Assets.Features.Queries.Assets.DTOs
+@    using Module.PMV.Core.Assets.Features.Queries.Assets.Filters
+@    using WebApp.Client.Pages.PMV.Assets.Models;
+@    using WebApp.Client.Pages.PMV.Assets.ViewModels;
+@    using WebApp.UILibrary.Components.Grid
 
 @inherits ComponentViewModelBase<AssetListViewModel>
 
 <RadzenStack Orientation="Orientation.Vertical" Gap="10px">
-    <RadzenTemplateForm TItem="FilterAssetParam" Data="FilterData" Submit="HandleSubmit">
+    <RadzenTemplateForm TItem="FilterAssetRequest" Data="FilterData" Submit="HandleSubmit">
         <RadzenFieldset Text="Search" class="w-100">
             <RadzenRow AlignItems="AlignItems.Center">
                 <RadzenColumn Size="2">
@@ -76,7 +79,7 @@
     </RadzenTemplateForm>
 
     <RadzenDataGrid Data=@AssetData
-                    TItem="ExternalListModel"
+                    TItem="ExternalAssetsResponse"
                     AllowPaging="true"
                     PageSize="10"
                     AllowColumnReorder="true"
@@ -85,22 +88,22 @@
                     AllowSorting="true"
                     ColumnWidth="200px"
                     Style="overflow-x:scroll"
-                    PageSizeOptions="@pageSizeOptions"
+                    PageSizeOptions="@PageSizeOption.Option"
                     ShowPagingSummary="true">
         <Columns>
             
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="AssetCode" Title="Asset Code" Width="160px" />
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="Description" Title="Description" />
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="PlateType" Title="Plate Type" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="PlateNum" Title="Plate No" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="HireUnder" Title="Hire Under" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="Vendor" Title="Vendor" />
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="HireOrSubContract" Title="Hire / Sub Contract" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="FuelTankCapacity" Title="Tank Capacity (Ltr.)" TextAlign="TextAlign.Center" FormatString="{0:###,##0}" />
-            <RadzenDataGridColumn TItem="ExternalListModel" Property="CreatedAt" Title="Created At" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="AssetCode" Title="Asset Code" Width="160px" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="Description" Title="Description" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="PlateType" Title="Plate Type" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="PlateNum" Title="Plate No" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="HireUnder" Title="Hire Under" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="Vendor" Title="Vendor" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="HireOrSubContract" Title="Hire / Sub Contract" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="FuelTankCapacity" Title="Tank Capacity (Ltr.)" TextAlign="TextAlign.Center" FormatString="{0:###,##0}" />
+            <RadzenDataGridColumn TItem="ExternalAssetsResponse" Property="CreatedAt" Title="Created At" />
             
             @if (EditMode != "read") {
-                <RadzenDataGridColumn TItem="ExternalListModel" Context="asset" Width="50px"
+                <RadzenDataGridColumn TItem="ExternalAssetsResponse" Context="asset" Width="50px"
                                       TextAlign="TextAlign.Center"
                                       Filterable=false
                                       Sortable=false
@@ -119,12 +122,13 @@
 
 
 @code {
+
     [Parameter]
     public string EditMode { get; set; } = "";
 
-    private FilterAssetParam FilterData => Model.FilterAsset;
-    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
-    protected IEnumerable<ExternalListModel> AssetData => Model.AssetListContainer.ExternalData;
+    private FilterAssetRequest FilterData => Model.FilterAsset;
+    
+    protected IEnumerable<ExternalAssetsResponse> AssetData => Model.AssetListContainer.ExternalAssets;
 
     private async Task HandleSubmit()
     {

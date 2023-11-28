@@ -18,8 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+	  <PackageReference Include="EPPlus" Version="7.0.2" />
 	  <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.12" />
 	  <ProjectReference Include="..\Auth.Applications\Auth.Applications.csproj" />
+	  <ProjectReference Include="..\Module.PMV.Core\Module.PMV.Core.csproj" />
     <ProjectReference Include="..\WebApp.Service\WebApp.Service.csproj" />
     <ProjectReference Include="..\WebApp.UILibrary\WebApp.UILibrary.csproj" />
   </ItemGroup>

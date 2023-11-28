@@ -106,7 +106,7 @@ internal sealed class SqlQuery : ISqlQuery
         }
     }
 
-    public async Task<TResult?> DynamicExecute<TResult>(string sql, object parameters, CommandType commandType = CommandType.Text) where TResult : struct
+    public async Task<TResult> DynamicExecute<TResult>(string sql, object parameters, CommandType commandType = CommandType.Text) where TResult : struct
     {
         try
         {

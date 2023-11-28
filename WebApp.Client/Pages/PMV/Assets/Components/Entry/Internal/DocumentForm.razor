@@ -46,39 +46,39 @@
             </RadzenFieldset>
         </RadzenColumn>
         <RadzenColumn>
-            <RadzenDataGrid TItem="AssetDocument"
+            <RadzenDataGrid TItem="AssetDocumentModel"
                             Data="Model.Asset.Documents"
                             @ref="tGrid"
                             AllowMultiColumnSorting=true
                             AllowColumnResize=true>
                 <Columns>
-                    <RadzenDataGridColumn TItem="AssetDocument" Title="SNo" TextAlign="TextAlign.Center" Width="5%">
+                    <RadzenDataGridColumn TItem="AssetDocumentModel" Title="SNo" TextAlign="TextAlign.Center" Width="5%">
                         <Template Context="document">
                             <span> @(Model.Asset.Documents.IndexOf(document) + 1)</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AssetDocument" Property="Id" Width="0" />
-                    <RadzenDataGridColumn TItem="AssetDocument" Property="Title" Title="Title">
+                    <RadzenDataGridColumn TItem="AssetDocumentModel" Property="Id" Width="0" />
+                    <RadzenDataGridColumn TItem="AssetDocumentModel" Property="Title" Title="Title">
                         <EditTemplate Context="document">
                             <RadzenTextBox @bind-Value="document.Title" />
                         </EditTemplate>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AssetDocument" Property="Description" Title="Description">
+                    <RadzenDataGridColumn TItem="AssetDocumentModel" Property="Description" Title="Description">
                         <EditTemplate Context="document">
                             <RadzenTextBox @bind-Value="document.Description" />
                         </EditTemplate>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AssetDocument" Property="DocumentReferenceNo" Title="Reference No">
+                    <RadzenDataGridColumn TItem="AssetDocumentModel" Property="DocumentReferenceNo" Title="Reference No">
                         <EditTemplate Context="document">
                             <RadzenTextBox @bind-Value="document.DocumentReferenceNo" />
                         </EditTemplate>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AssetDocument" Property="DocumentType" Title="Document Type">
+                    <RadzenDataGridColumn TItem="AssetDocumentModel" Property="DocumentType" Title="Document Type">
                         <EditTemplate Context="document">
                             <RadzenTextBox @bind-Value="document.DocumentType" />
                         </EditTemplate>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AssetDocument" Property="Attachment" Title="Attachment" TextAlign="TextAlign.Center" Width="8%">
+                    <RadzenDataGridColumn TItem="AssetDocumentModel" Property="Attachment" Title="Attachment" TextAlign="TextAlign.Center" Width="8%">
                         <Template Context="document">
                             @if (!document.IsContentEmpty()) {
                                 <NavLink href="@($"{Configuration.GetValue<string>("Report:DownloadUrl")}/asset/document?documentId={document.Id}")" target="_blank">
@@ -90,7 +90,7 @@
                             <InputFile OnChange="HandleFileChange" />
                         </EditTemplate>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AssetDocument" Context="document"
+                    <RadzenDataGridColumn TItem="AssetDocumentModel" Context="document"
                                           TextAlign="TextAlign.Center" Width="10%">
                         <Template Context="document">
                             <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat"
@@ -109,9 +109,9 @@
 @code {
 
 
-    private RadzenDataGrid<AssetDocument> tGrid;
-    private AssetDocument? _assetDocument = null;
-    private AssetDocument Document = new();
+    private RadzenDataGrid<AssetDocumentModel> tGrid;
+    private AssetDocumentModel? _assetDocument = null;
+    private AssetDocumentModel Document = new();
     private int _counter = 0;
 
     [Parameter]
@@ -130,19 +130,19 @@
 
  
 
-    protected async Task DeleteRow(AssetDocument docs) {
+    protected async Task DeleteRow(AssetDocumentModel docs) {
         _assetDocument = new();
         await Model.DeleteDocument(docs);
         await tGrid.Reload();
     }
 
    
-    protected async Task OnUpdateRow(AssetDocument docs) {
+    protected async Task OnUpdateRow(AssetDocumentModel docs) {
         await Model.UpdateDocument(docs);
         await tGrid.Reload();
     }
 
-    protected async Task OnCreateRow(AssetDocument docs) {
+    protected async Task OnCreateRow(AssetDocumentModel docs) {
         _counter = tGrid.Count;
         await Model.UpdateDocument(docs);
         await tGrid.Reload();

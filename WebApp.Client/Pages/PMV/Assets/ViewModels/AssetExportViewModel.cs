@@ -1,4 +1,4 @@
-﻿using Microsoft.JSInterop;
+﻿using Module.PMV.Core.Assets.Features.DTOs.Assets.Request;
 using Radzen;
 using WebApp.Client.Pages.PMV.Assets.Data;
 using WebApp.Client.Pages.PMV.Assets.Models;
@@ -68,30 +68,5 @@ public class AssetExportViewModel : ViewModelBase
 
     }
 
-
-    public async Task ExportToExcel(FilterAssetParam filter)
-    {
-        var prms = filter.GetType()
-                           .GetProperties();
-
-        string urlParam = "";
-
-        foreach (var prop in prms)
-        {
-
-            string name = prop.Name;
-            object? value = prop.GetValue(filter);
-            if (value is not null)
-            {
-                urlParam += $"{prop.Name}={value}&";
-            }
-        }
-
-        var baseUrl = $"{_configuration["Report:ExportUrl"]}/assetexport?{urlParam.Substring(0, urlParam.Length - 1)}";
-
-        await _jSRuntime.Show(baseUrl);
-
-        Notify("update");
-
-    }
+   
 }

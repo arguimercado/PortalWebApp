@@ -116,7 +116,6 @@ public static class UpdateOperator
                         request.EmpType,
                         request.Name ?? "",
                         request.RPNo,
-                        request.Name,
                         request.Company,
                         request.MobileNo,
                         request.Department,
@@ -129,10 +128,12 @@ public static class UpdateOperator
 
                 await _dataService.SaveOperator(operatorDriver);
 
+                return Result.Ok(Unit.Value);
+
             }
             catch (Exception ex)
             {
-                Result.Fail(ex.Message);
+                return Result.Fail(ex.Message);
             }
         }
     }

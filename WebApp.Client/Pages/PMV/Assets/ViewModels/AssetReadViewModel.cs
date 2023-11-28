@@ -30,7 +30,7 @@ public class AssetReadViewModel : ViewModelBase
             Asset = await _service.ViewAsset(id) ?? new AssetReadModel();
             if(Asset!.Documents == null)
             {
-                Asset.Documents = new List<AssetDocument>();
+                Asset.Documents = new List<AssetDocumentModel>();
             }
             Notify("Load");
 
@@ -43,19 +43,5 @@ public class AssetReadViewModel : ViewModelBase
         }
     }
 
-    public async Task UpdateAssetRecord(string assetCode)
-    {
-        try
-        {
-            _spinner.Loading = true;
-            var response = await _service.UpdateAssetRecord(assetCode);
-            Asset.CurrentSMUReading = response.CurrentSMU;
-            _spinner.Loading = false;
-        }
-        catch (Exception ex)
-        {
-            await _dialogService.Alert(ex.Message);
-            _spinner.Loading = false;
-        }
-    }
+   
 }

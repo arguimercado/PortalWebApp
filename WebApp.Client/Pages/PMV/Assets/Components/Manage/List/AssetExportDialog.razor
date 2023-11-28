@@ -1,7 +1,9 @@
-﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+﻿@using WebApp.Client.Pages.PMV.Assets.Components.Manage.ViewModels
+@using WebApp.Client.Pages.PMV.Assets.Models;
 @using WebApp.Client.Pages.PMV.Assets.ViewModels;
+    
 
-@inherits ComponentViewModelBase<AssetExportViewModel>
+@inherits ComponentViewModelBase<AssetListViewModel>
 
 <RadzenStack Orientation="Orientation.Vertical">
     <div class="rz-p-12">
@@ -60,10 +62,10 @@
         "chasisNo","engineNo","registrationUnder", "purchaseDate", "conditionRank", "vendor", "onHireTo","location","netValue","kmhr","parkingField","status","plateNo" };
 
     [Parameter]
-    public FilterAssetParam Filter { get; set; } = new();
+    public FilterAssetModel Filter { get; set; } = new();
 
-    protected async Task Export()
-    {
+    private async Task Export() {
+
         List<string> selectedFieldName = new();
 
         for(var i = 0; i < Fields.Count(); i++) {
@@ -73,7 +75,7 @@
         }
         
         if (selectedFieldName.Count > 0) {
-            Filter.Fields = string.Join(",", selectedFieldName.ToArray());
+             Filter.Fields = string.Join(",", selectedFieldName.ToArray());
         }
 
         await Model.ExportToExcel(Filter);

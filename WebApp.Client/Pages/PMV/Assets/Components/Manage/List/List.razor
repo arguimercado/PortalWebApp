@@ -1,6 +1,7 @@
 @page "/asset/manage/{view}/{type?}/{category?}/{status?}"
-@using WebApp.Client.Pages.PMV.Assets.ViewModels;
+@using WebApp.Client.Pages.PMV.Assets.Components.Manage.ViewModels
 @using WebApp.UILibrary;
+@using WebApp.UILibrary.Providers
 
 @inherits ComponentViewModelBase<AssetListViewModel>
 
@@ -8,20 +9,21 @@
 
 <CustomPageLayout>
     <CustomLayoutHeader Title="Manage Asset" Icon="directions_bus">
-        
-        @if(View != "read") {
-            <RadzenSplitButton Text="Create Asset" Icon="front_loader" Click="HandleAction" Variant="Variant.Outlined">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Internal Asset" Value="/asset/form/internal" />
-                    <RadzenSplitButtonItem Text="External Asset" Value="/asset/form/external" />
-                </ChildContent>
-            </RadzenSplitButton>
-        }
-        <RadzenButton 
-            Text="Export to Excel" 
-            Icon="excel" 
-            ButtonStyle="ButtonStyle.Dark" Click="@(() => HandleExportClick())" Variant="Variant.Text" />
-        
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10px">
+            @if(View != "read") {
+                <RadzenSplitButton Text="Create Asset" Icon="front_loader" Click="HandleAction" Variant="Variant.Outlined">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Internal Asset" Value="/asset/form/internal" />
+                        <RadzenSplitButtonItem Text="External Asset" Value="/asset/form/external" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            }
+            <RadzenButton 
+                Text="Export to Excel" 
+                Icon=@IconProvider.GetIconMenu("export_excel")
+                ButtonStyle="ButtonStyle.Dark" Click="@(() => HandleExportClick())" 
+                Variant="Variant.Outlined" />
+        </RadzenStack>
     </CustomLayoutHeader>
 
     <RadzenStack Style="padding-top: 15px">

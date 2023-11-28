@@ -9,7 +9,7 @@
 <RadzenStack>
     <RadzenRow Gap="10px">
         <RadzenColumn Size="3">
-            <RadzenTemplateForm TItem="AssignedDriver" Data="Model.Driver" Submit="HandleSubmit">
+            <RadzenTemplateForm TItem="OperatorDriverModel" Data="Model.Driver" Submit="HandleSubmit">
                 <RadzenFieldset>
                     <CustomField Text="Employee/Non Employee" IsModern>
                         <ChildContent>
@@ -87,28 +87,28 @@
         </RadzenColumn>
         <RadzenColumn Size="9">
             <RadzenDataGrid @ref="driversGrid"
-                            TItem="AssignedDriver"
+                            TItem="OperatorDriverModel"
                             Data="@AssignedDrivers"
                             AllowColumnResize=true
                             Style="font-size: 10px"
                             ColumnWidth="280px">
 
                 <Columns>
-                    <RadzenDataGridColumn TItem="AssignedDriver" Title="SNo" TextAlign="TextAlign.Center" Width="40px" Resizable=false>
+                    <RadzenDataGridColumn TItem="OperatorDriverModel" Title="SNo" TextAlign="TextAlign.Center" Width="40px" Resizable=false>
                         <Template Context="driver">
                             <span> @(AssignedDrivers.ToList().IndexOf(driver) + 1)</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AssignedDriver" Title="Assigned Person" Width="320px">
+                    <RadzenDataGridColumn TItem="OperatorDriverModel" Title="Assigned Person" Width="320px">
                         <Template Context="driver">
                             <span>@($"{driver.EmpCode} - {driver.EmpName} ({driver.Company})")</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AssignedDriver" Property="AssetLocation" Title="Location" Width="120px"/>
-                    <RadzenDataGridColumn TItem="AssignedDriver" Property="AssignedAt" Title="Assigned Date" FormatString="{0:dd-MMM-yyyy}" Width="200px" />
-                    <RadzenDataGridColumn TItem="AssignedDriver" Property="ReturnedAt" Title="Returned Date" FormatString="{0:dd-MMM-yyyy}" />
-                    <RadzenDataGridColumn TItem="AssignedDriver" Property="DcsSlNo" Title="DCS No" Width="140px" />
-                    <RadzenDataGridColumn TItem="AssignedDriver"
+                    <RadzenDataGridColumn TItem="OperatorDriverModel" Property="AssetLocation" Title="Location" Width="120px"/>
+                    <RadzenDataGridColumn TItem="OperatorDriverModel" Property="AssignedAt" Title="Assigned Date" FormatString="{0:dd-MMM-yyyy}" Width="200px" />
+                    <RadzenDataGridColumn TItem="OperatorDriverModel" Property="ReturnedAt" Title="Returned Date" FormatString="{0:dd-MMM-yyyy}" />
+                    <RadzenDataGridColumn TItem="OperatorDriverModel" Property="DcsSlNo" Title="DCS No" Width="140px" />
+                    <RadzenDataGridColumn TItem="OperatorDriverModel"
                                           TextAlign="TextAlign.Center"
                                           Resizable=false
                                           Width="80px">
@@ -140,7 +140,7 @@
     [Parameter]
     public string AssetType { get; set; } = "";
     [Parameter]    
-    public IEnumerable<AssignedDriver> AssignedDrivers { get; set; } = new List<AssignedDriver>();
+    public IEnumerable<OperatorDriverModel> AssignedDrivers { get; set; } = new List<OperatorDriverModel>();
     [Parameter]
     public EventCallback<EventArgs> OnRefresh { get; set; }
 
@@ -151,9 +151,9 @@
         new SelectItem { Text = "Non Employee", Value = "nonemployee" }
     };
 
-    private RadzenDataGrid<AssignedDriver>? driversGrid;
+    private RadzenDataGrid<OperatorDriverModel>? driversGrid;
 
-    private void HandleEdit(AssignedDriver driver)
+    private void HandleEdit(OperatorDriverModel driver)
     {
         Model.EditDriver(driver);
     }
@@ -178,7 +178,7 @@
 
     }
 
-    protected async Task DeleteRow(AssignedDriver driver)
+    protected async Task DeleteRow(OperatorDriverModel driver)
     {
         var confirmation = await DialogService.Confirm("Are you sure you want to delete?", "Delete");
         if (!confirmation.HasValue || !confirmation.Value)

@@ -1,4 +1,4 @@
-﻿using Microsoft.JSInterop;
+﻿using Module.PMV.Core.Assets.Features.DTOs.Assets.Response;
 using Radzen;
 using WebApp.Client.Pages.PMV.Assets.Data;
 using WebApp.Client.Pages.PMV.Assets.Models;
@@ -7,7 +7,7 @@ using WebApp.UILibrary.Components.Common.Spinners;
 using WebApp.UILibrary.Providers;
 
 
-namespace WebApp.Client.Pages.PMV.Assets.ViewModels;
+namespace WebApp.Client.Pages.PMV.Assets.Components.Manage.ViewModels;
 
 public class AssetListViewModel : ViewModelBase
 {
@@ -29,11 +29,14 @@ public class AssetListViewModel : ViewModelBase
         _notificationService = notificationService;
         _configuration = configuration;
         _jSRuntime = jSRuntime;
-
     }
 
-    public AssetListContainerModel AssetListContainer { get; set; } = new();
-    public FilterAssetParam FilterAsset { get; set; } = new();
+
+
+    public AssetContainerResponse AssetListContainer { get; set; } = new();
+
+    public FilterAssetModel FilterAsset { get; set; } = new();
+
 
     public string BaseUrl { get; set; } = "";
 
@@ -70,12 +73,12 @@ public class AssetListViewModel : ViewModelBase
             var response = await _assetService.GetAssets(FilterAsset);
 
 
-            if (FilterAsset.IsPostBack)
+            if (AssetListContainer.Categories.Count > 0)
             {
                 if (FilterAsset.AssetType.ToLower() == "internal")
-                    AssetListContainer.AssetData = response.AssetData;
+                    AssetListContainer.InternalAssets = response.InternalAssets;
                 else
-                    AssetListContainer.ExternalData = response.ExternalData;
+                    AssetListContainer.ExternalAssets = response.ExternalAssets;
             }
 
             if (FilterAsset.IsRefresh)
@@ -117,12 +120,35 @@ public class AssetListViewModel : ViewModelBase
             }
         }
 
-        var baseUrl = $"{_configuration["Report:ExportUrl"]}/assetexport?{urlParam.Substring(0, urlParam.Length - 1)}";
+        var baseUrl = $"{_configuration["BaseUrl"]}/asset/export?{urlParam.Substring(0, urlParam.Length - 1)}";
         await _jSRuntime.Show(baseUrl);
 
         Notify("update");
 
     }
 
+    public async Task ExportToExcel(FilterAssetModel filter)
+    {
+        var prms = filter.GetType()
+                           .GetProperties();
+
+        string urlParam = "";
+
+        foreach (var prop in prms)
+        {
+            string name = prop.Name;
+            object? value = prop.GetValue(filter);
+            if (value is not null)
+            {
+                urlParam += $"{prop.Name}={value}&";
+            }
+        }
+
+        var baseUrl = $"{_configuration["BaseUrl"]}asset/export?{urlParam.Substring(0, urlParam.Length - 1)}";
+        await _jSRuntime.Show(baseUrl);
+
+        Notify("update");
+
+    }
 
 }

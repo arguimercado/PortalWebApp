@@ -199,8 +199,7 @@ public class InternalAsset : AggregateRoot<int>
     public AssetCategory Category { get; set; }
 
     public AssetAdditional AssetAdditional { get; private set; }
-
-    public AssetRecord AssetRecord { get; set; } = new();
+   
 
     public List<OperatorDriver> Drivers { get; set; } = new();
 

@@ -40,7 +40,13 @@ public class OperatorDriver
         };
     }
     public void Update(string assetCode, 
-        string? assetTypeCode, string? division, string? brandCode, string empCode, string empType, string empName, string? rPNo, string? company, string? mobileNo, string? department, string? assetLocation, string? vendorCode, int internalExternal, DateTime? assignedAt, DateTime? returnedAt, int? dcsSlNo)
+        string? assetTypeCode, 
+        string? division, 
+        string? brandCode, 
+        string empCode, 
+        string empType, 
+        string empName, 
+        string? rPNo, string? company, string? mobileNo, string? department, string? assetLocation, string? vendorCode, int internalExternal, DateTime? assignedAt, DateTime? returnedAt, int? dcsSlNo)
     {
        
         AssetCode = assetCode;

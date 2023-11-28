@@ -1,11 +1,16 @@
-﻿@using WebApp.Client.Pages.PMV.Assets.Models;
+﻿@using Module.PMV.Core.Assets.Features.DTOs.Assets.Response
+@using Module.PMV.Core.Assets.Models.Assets
+
+@using WebApp.Client.Pages.PMV.Assets.Components.Manage.ViewModels
+@using WebApp.Client.Pages.PMV.Assets.Models;
 @using WebApp.Client.Pages.PMV.Assets.ViewModels;
+@using WebApp.UILibrary.Components.Grid
 
 
 @inherits ComponentViewModelBase<AssetListViewModel>
 
 <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
-    <RadzenTemplateForm TItem="FilterAssetParam" Data="FilterData" Submit="HandleSubmit">
+    <RadzenTemplateForm TItem="FilterAssetModel" Data="FilterData" Submit="HandleSubmit">
         <RadzenFieldset Text="Search" class="w-100">
             <RadzenRow Gap="5px" class="mb-2">
                 <RadzenColumn Size="2">
@@ -74,12 +79,11 @@
                         @bind-Value="FilterData.Status" />
                     </CustomField>
                 </RadzenColumn>
-                <RadzenColumn>
+                <RadzenColumn Size="2">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="5px">
-                        <RadzenText Text="OR" />
                         <CustomField Text="Asset Code"  IsModern>
                             <RadzenTextBox Name="AssetCode"
-                            @bind-Value="FilterData.AssetCode" />
+                            @bind-Value="FilterData.AssetCode" Style="width:100%" />
                         </CustomField>
                     </RadzenStack>
                 </RadzenColumn>
@@ -87,7 +91,7 @@
             <RadzenRow JustifyContent="JustifyContent.End">
                 <RadzenColumn Size="1">
                     <CstButton ButtonType="EnumButtonType.Search"
-                               ActionType="ButtonType.Submit" />
+                               ActionType="ButtonType.Submit" ButtonClass="w-100"/>
                 </RadzenColumn>
             </RadzenRow>
             
@@ -96,7 +100,7 @@
 
 
     <RadzenDataGrid Data=@AssetData.ToList()
-                    TItem="AssetListModel"
+                    TItem="InternalAssetResponse"
                     AllowPaging="true"
                     PageSize="10"
                     AllowColumnReorder="true"
@@ -104,11 +108,11 @@
                     AllowFiltering=true
                     AllowSorting="true"
                     Style="overflow-x:scroll"
-                    PageSizeOptions="@pageSizeOptions"
+                    PageSizeOptions="@PageSizeOption.Option"
                     ShowPagingSummary="true"
                     AllowColumnPicking=true>
         <Columns>
-            <RadzenDataGridColumn TItem="AssetListModel" Property="AssetCode" Title="Asset Code" Width="160px">
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="AssetCode" Title="Asset Code" Width="160px">
                 <Template Context="asset">
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
                         <span>@asset.AssetCode</span>&nbsp;
@@ -118,16 +122,20 @@
                     </RadzenStack>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="AssetListModel" Property="AssetDesc" Title="Description" />
-            <RadzenDataGridColumn TItem="AssetListModel" Property="MakeModelYear" Title="Make/Model/Year" />
-            <RadzenDataGridColumn TItem="AssetListModel" Property="PlateNo" Title="Plate No" TextAlign="TextAlign.Center" Width="140px" />
-            <RadzenDataGridColumn TItem="AssetListModel" Property="CompanyCode" Title="Reg. Under" TextAlign="TextAlign.Center" Width="180px" />
-            <RadzenDataGridColumn TItem="AssetListModel" Property="PurchaseDate" Title="Purchase Date" FormatString="{0:dd/MMM/yyyy}" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="AssetListModel" Property="VendorCode" Title="Vendor" />
-            <RadzenDataGridColumn TItem="AssetListModel" Property="LPONo" Title="PO No" />
-            <RadzenDataGridColumn TItem="AssetListModel" Property="TankCapacity" Title="Tank Capacity" />
-            <RadzenDataGridColumn TItem="AssetListModel" Property="KmPerHr" Title="SMU" TextAlign="TextAlign.Right" Width="120px" />
-            <RadzenDataGridColumn TItem="AssetListModel" Title="Operator/Driver">
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="AssetDesc" Title="Description" />
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="MakeModelYear" Title="Make/Model/Year">
+                <Template Context="data">
+                    <span>@($"{data.YearMakeModel}")</span>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="PlateNo" Title="Plate No" TextAlign="TextAlign.Center" Width="140px" />
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="CompanyCode" Title="Reg. Under" TextAlign="TextAlign.Center" Width="180px" />
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="PurchaseDate" Title="Purchase Date" FormatString="{0:dd/MMM/yyyy}" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="VendorCode" Title="Vendor" />
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="LPONo" Title="PO No" />
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="TankCapacity" Title="Tank Capacity" />
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="KmPerHr" Title="SMU" TextAlign="TextAlign.Right" Width="120px" />
+            <RadzenDataGridColumn TItem="InternalAssetResponse" Title="Operator/Driver">
                 <Template Context="data">
                     @foreach (var item in data.Drivers) {
                         <RadzenStack Orientation=Orientation.Horizontal Gap="5px">
@@ -140,7 +148,7 @@
             </RadzenDataGridColumn>
             @if(EditMode != "read")
             {
-                <RadzenDataGridColumn TItem="AssetListModel" Context="asset"
+                <RadzenDataGridColumn TItem="InternalAssetsResponse" Context="asset"
                                       TextAlign="TextAlign.Center" Width="50px"
                                       Filterable=false
                                       Sortable=false
@@ -157,31 +165,30 @@
     </RadzenDataGrid>
 
 </RadzenStack>
+
+
+
 @code {
+
     [Parameter]
     public string? Status { get; set; } = "";
 
     [Parameter]
     public string EditMode { get; set; } = "";
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
+    protected override void OnAfterRender(bool firstRender) {
+        if (firstRender) {
             FilteredSubCategories = Model.AssetListContainer!.SubCategories;
             StateHasChanged();
         }
-
     }
+    
+    protected FilterAssetModel FilterData => Model.FilterAsset;
 
+    protected IEnumerable<InternalAssetResponse> AssetData
+                    => Model.AssetListContainer!.InternalAssets.ToList();
 
-    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
-    protected FilterAssetParam FilterData => Model.FilterAsset;
-
-    protected IEnumerable<AssetListModel> AssetData
-                    => Model.AssetListContainer!.AssetData.ToList();
-
-    protected List<SelectItem> FilteredSubCategories { get; set; }
+    protected List<SharedServer.Commons.SelectItem> FilteredSubCategories { get; set; } = new();
 
     private void HandleFilterChange(object values)
     {
@@ -191,17 +198,14 @@
         FilterData.Category = str;
         if (values is IEnumerable<object> trueValue)
         {
-            if (trueValue.Count() == 0)
-            {
+            if (trueValue.Count() == 0) {
                 FilteredSubCategories = Model.AssetListContainer!.GetAll();
             }
-            else
-            {
-                FilteredSubCategories = Model.AssetListContainer!.GetSubCategoryByCat(trueValue.Select(x => x.ToString()).ToList());
-
+            else {
+                var stringValues = trueValue.Select(x => x.ToString()).ToList();
+                FilteredSubCategories = Model.AssetListContainer!.GetSubCategoryByCat(stringValues);
             }
         };
-
 
         InvokeAsync(StateHasChanged);
     }
