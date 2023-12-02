@@ -58,6 +58,7 @@ public class AssetDataService : IAssetService
             Brands = result.Value.Brands?.ToList() ?? new(),
             AssetTypes = result.Value.AssetTypes?.ToList() ?? new(),
             Categories = result.Value.Categories?.ToList() ?? new(),
+            SubCategories = result.Value.SubCategories.ToList() ?? new(),
             Companies = result.Value.Companies?.ToList() ?? new(),
             HireMethods = result.Value.HireMethods?.ToList() ?? new(),
             RentOwnes = result.Value.RentOwnes?.ToList() ?? new(),
@@ -68,9 +69,30 @@ public class AssetDataService : IAssetService
         };
     }
 
-    public Task<AssetContainerModel?> GetAsset(string searchValue, string searchType, string assetType, bool IsPostBack)
+    public async Task<AssetContainerModel?> GetAsset(string searchValue, string searchType, string assetType, bool IsPostBack)
     {
-        throw new NotImplementedException();
+        var result = await _mediator.Send(new EditAsset.Query(searchValue,searchType,assetType,IsPostBack));
+
+        if (!result.IsSuccess) {
+            throw new Exception(result.Errors[0].Message);
+        }
+
+        return new AssetContainerModel {
+            InternalAsset = assetType.ToLower() == "internal" ? InternalAssetModel.ToModel(result.Value.InternalAsset) : new(),
+            ExternalAsset = assetType.ToLower() == "external" ? ExternalAssetModel.ToModel(result.Value.ExternalAsset) : new(),
+            Accounts = result.Value.Accounts?.ToList() ?? new(),
+            Brands = result.Value.Brands?.ToList() ?? new(),
+            AssetTypes = result.Value.AssetTypes?.ToList() ?? new(),
+            Categories = result.Value.Categories?.ToList() ?? new(),
+            SubCategories = result.Value.SubCategories.ToList() ?? new(),
+            Companies = result.Value.Companies?.ToList() ?? new(),
+            HireMethods = result.Value.HireMethods?.ToList() ?? new(),
+            RentOwnes = result.Value.RentOwnes?.ToList() ?? new(),
+            PlateTypes = result.Value.PlateTypes?.ToList() ?? new(),
+            Statuses = result.Value.Statuses?.ToList() ?? new(),
+            Vendors = result.Value.Vendors?.ToList() ?? new(),
+            ServiceGroups = result.Value.ServiceGroups?.ToList() ?? new(),
+        };
     }
 
     public Task<AssignedAssetModel> GetAssetDetailExpress(string assetCode)
@@ -88,18 +110,27 @@ public class AssetDataService : IAssetService
 
         return result.Value;
     }
-
-    public async Task<AssetContainerResponse> GetAssets(FilterAssetModel filterAssetParam) {
-
-        var results = await _mediator.Send(new FilterAssets.Query(filterAssetParam.ToRequest(), 
-            filterAssetParam.AssetType,filterAssetParam.IsPostBack,filterAssetParam.IsRefresh));
-        
-        return results.Value;
-    }
-
     public Task<AssetDashboardContainer> GetCategoryCount()
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<AssetContainerModel> GetAssets(FilterAssetModel filterAssetParam) {
+
+        var results = await _mediator.Send(new FilterAssets.Query(filterAssetParam.ToRequest(), 
+            filterAssetParam.AssetType,filterAssetParam.IsPostBack,filterAssetParam.IsRefresh));
+
+        var value = results.Value;
+
+        return new AssetContainerModel {
+            ExternalAssets = value.ExternalAssets.Count() > 0 ? value.ExternalAssets.Select(m => ExternalAssetModel.ToModel(m)) : new List<ExternalAssetModel>(),
+            InternalAssets = value.InternalAssets.Count() > 0 ? value.InternalAssets.Select(m => InternalAssetModel.ToModel(m)) : new List<InternalAssetModel>(),
+            Categories = value.Categories,
+            SubCategories = value.SubCategories,
+            Brands = value.Brands,
+            Companies = value.Companies,
+            Statuses = value.Statuses
+        };
     }
 
     public Task<CostReportModel> GetMaintenanceCost(MCRequest request)
@@ -109,7 +140,9 @@ public class AssetDataService : IAssetService
 
     public async Task SaveInternal(InternalAssetModel model,string userId)
     {
-        var result = await _mediator.Send(new AssetCreate.Command(model.ToRequest(), null, userId));
+        var data = model.ToRequest();
+        
+        var result = await _mediator.Send(new AssetCreate.Command(data, null, userId));
         if (!result.IsSuccess)
         {
             throw new Exception(result.Errors[0].Message);
@@ -123,6 +156,11 @@ public class AssetDataService : IAssetService
         {
             throw new Exception(result.Errors[0].Message);
         }
+    }
+
+    public Task<AssetReadModel?> ViewAsset(int id)
+    {
+        throw new NotImplementedException();
     }
 
     public Task UpdateAssignedDriver(OperatorDriverModel assignedDriver, string assetType)
@@ -140,8 +178,5 @@ public class AssetDataService : IAssetService
         throw new NotImplementedException();
     }
 
-    public Task<AssetReadModel?> ViewAsset(int id)
-    {
-        throw new NotImplementedException();
-    }
+  
 }

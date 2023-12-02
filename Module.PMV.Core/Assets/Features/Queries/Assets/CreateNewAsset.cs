@@ -27,6 +27,7 @@ public static class CreateNewAsset
                 {
                     response.Companies = (await _commonDataService.GetSelections("companies")).ToList();
                     response.Categories = (await _commonDataService.GetSelections("categories")).ToList();
+                    response.SubCategories = (await _commonDataService.GetSelections("subcategories")).ToList();
                     response.Companies = (await _commonDataService.GetSelections("companies")).ToList();
                     response.Brands = (await _commonDataService.GetSelections("brands")).ToList();
                     response.RentOwnes = (await _commonDataService.GetSelections("rentownes")).ToList();

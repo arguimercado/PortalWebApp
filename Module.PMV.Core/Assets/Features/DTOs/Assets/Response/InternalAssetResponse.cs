@@ -1,9 +1,67 @@
-﻿using Module.PMV.Core.Assets.Models.Assets.Entities;
+﻿using Module.PMV.Core.Assets.Models.Assets;
+using Module.PMV.Core.Assets.Models.Assets.Entities;
 
 namespace Module.PMV.Core.Assets.Features.DTOs.Assets.Response;
 
 public class InternalAssetResponse
 {
+    public static InternalAssetResponse MapToResponse(InternalAsset model) {
+        
+        var response = new InternalAssetResponse
+        {
+            SlNo = model.SlNo,
+            Cid = model.Cid,
+            SubCatCode = model.SubCatCode,
+            AssetCode = model.AssetCode,
+            AssetDesc = model.AssetDesc,
+            BrandCode = model.BrandCode,
+            Model = model.Model,
+            Year = model.Year,
+            PlateNo = model.PlateNo,
+            EngineNo = model.EngineNo,
+            ChasisNo = model.ChasisNo,
+            Color = model.Color,
+            FirstRegDate = model.FirstRegDate,
+            PurchaseDate = model.PurchaseDate,
+            DispositionDate = model.DispositionDate,
+            NetValue = model.NetValue,
+            OriginalPurchasePrice = model.OriginalPurchasePrice,
+            VendorCode = model.VendorCode,
+            CompanyCode = model.CompanyCode,
+            LPONo = model.LPONo,
+            ManagedBy = model.ManagedBy,
+            DeliveryNote = model.DeliveryNote,
+            KmHr = model.KmPerHr,
+            ConditionRank = model.ConditionRank,
+            Status = model.Status,
+            RentOrOwned = model.RentOrOwned,
+            RateType = model.RateType,
+            Rate = model.Rate,
+            RateOfDepreciation = model.RateOfDepreciation,
+            ModifiedAsset = model.ModifiedAsset,
+            Remarks = model.Remarks,
+            AccountCategory = model.AccountCategory,
+            AccountDepreciation = model.AccountDepreciation,
+            Completed = model.Completed,
+            TankCapacity = model.TankCapacity,
+            ParkingArea = model.ParkingArea,
+        };
+
+        if(model.AssetAdditional is not null) {
+
+            response.Additional = new AssetAdditionalResponse {
+                AssetType = model.AssetAdditional.AssetType,
+                Dimension = model.AssetAdditional.Dimension,
+                HireMethod = model.AssetAdditional?.HireMethod,
+                RegName = model.AssetAdditional?.RegName,
+                RegistrationExpiry = model.AssetAdditional?.RegistrationExpiry ?? null,
+                Owner = model.AssetAdditional?.Owner,
+                OperatedBy = model.AssetAdditional?.OperatedBy,
+            };
+        }
+
+        return response;
+    }
     public int SlNo { get; set; }
     public int Cid { get; set; }
     public string CategoryName { get; set; } = string.Empty;
@@ -21,6 +79,7 @@ public class InternalAssetResponse
     public DateTime? FirstRegDate { get; set; }
     public DateTime? PurchaseDate { get; set; }
     public float NetValue { get; set; }
+    public float OriginalPurchasePrice { get; set; }
     public string? VendorCode { get; set; }
     public string? CompanyCode { get; set; }
     public string? ManagedBy { get; set; }
@@ -40,7 +99,6 @@ public class InternalAssetResponse
     public float AccountDepreciation { get; set; }
     public string? ItemCode { get; set; }
     public float PurchaseAmount { get; set; }
-    public float OriginalPurchasePrice { get; set; }
     public DateTime? DateOfSelling { get; set; }
     public float SoldAmount { get; set; }
     public bool Completed { get; set; }
@@ -48,6 +106,8 @@ public class InternalAssetResponse
     public float ParkingArea { get; set; }
     public DateTime? DispositionDate { get; set; }
     public int TankCapacity { get; set; } = 0;
+    public string? CreatedBy { get; set; }
+    public DateTime? CreatedDate { get; set; }
 
     public class AssetAdditionalResponse
     {

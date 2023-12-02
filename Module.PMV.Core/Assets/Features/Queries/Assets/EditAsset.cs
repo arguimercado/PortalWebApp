@@ -19,7 +19,6 @@ public static class EditAsset
             _commonDataService = commonDataService;
         }
 
-
         public async Task<Result<AssetContainerResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
             try
@@ -30,6 +29,7 @@ public static class EditAsset
                 {
                     response.Companies = (await _commonDataService.GetSelections("companies")).ToList();
                     response.Categories = (await _commonDataService.GetSelections("categories")).ToList();
+                    response.SubCategories = (await _commonDataService.GetSelections("subcategories")).ToList();
                     response.Companies = (await _commonDataService.GetSelections("companies")).ToList();
                     response.Brands = (await _commonDataService.GetSelections("brands")).ToList();
                     response.RentOwnes = (await _commonDataService.GetSelections("rentownes")).ToList();
@@ -50,12 +50,31 @@ public static class EditAsset
                 if (request.AssetType.ToLower() == "internal") {
 
                     var internalAsset = await _assetDataService.GetInternal(request.SearchValue, request.SearchType);
-
+                    response.InternalAsset = InternalAssetResponse.MapToResponse(internalAsset);
                 }
+                else
+                {
+                    var externalAsset = await _assetDataService.GetExternalAsset(request.SearchValue);
+                    response.ExternalAsset = new ExternalAssetResponse
+                    {
+                        AssetCode = externalAsset.AssetCode,
+                        Description = externalAsset.AssetDesc,
+                        CreatedAt = externalAsset.CreatedAt,
+                        CreateBy = externalAsset.CreatedBy,
+                        FuelTankCapacity = externalAsset.FuelTankCapacity,
+                        HireOrSubContract = externalAsset.HireSub,
+                        HireUnder = externalAsset.CompanyCode,
+                        Vendor = externalAsset.VendorCode,
+                        PlateNum = externalAsset.PlateNum,
+                        PlateType = externalAsset.PlateType
+                    };
+                }
+
+                return Result.Ok(response);
             }
             catch(Exception ex)
             {
-
+                return Result.Fail(ex.Message);
             }
         }
     }

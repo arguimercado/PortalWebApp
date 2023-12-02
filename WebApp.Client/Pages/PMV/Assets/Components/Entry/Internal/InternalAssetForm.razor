@@ -1,6 +1,4 @@
 ﻿@page "/asset/form/internal/{assetCode?}"
-
-@using WebApp.Client.Pages.PMV.Assets.Components.Entry.Components
 @using WebApp.Client.Pages.PMV.Assets.Models;
 @using WebApp.Client.Pages.PMV.Assets.ViewModels;
 @using WebApp.UILibrary.Providers;
@@ -14,8 +12,8 @@
 <CustomPageLayout>
     <RadzenTemplateForm TItem="InternalAssetModel"
                         Data="Asset" Submit="HandleSubmit">
-        <CustomLayoutHeader Title="PMV - Internal Asset Form"
-                            Icon=@IconProvider.GetIconMenu("intern-asset")>
+        
+            <CustomLayoutHeader Title="PMV - Internal Asset Form" Icon=@IconProvider.GetIconMenu("intern-asset")>
             <RadzenSplitButton Text="Action" Click="HandleAction">
                 <ChildContent>
                     <RadzenSplitButtonItem Text="Create New" Value="new" Icon="add" />
@@ -528,8 +526,7 @@
                 <RadzenTabs TabPosition="TabPosition.Top" class="mt-3" Style="min-height:400px">
                     <Tabs>
                         <RadzenTabsItem Text="Maintenance Setup">
-                            <DueServiceForm Data="@Model.AssetContainer.InternalAsset.Dues"
-                                            ServiceGroups="@Model.AssetContainer.ServiceGroups"
+                            <DueServiceForm ServiceGroups="@Model.AssetContainer.ServiceGroups"
                                             AssetId="@Model.Asset.SlNo" />
                         </RadzenTabsItem>
                         <RadzenTabsItem Text="Attachments">
@@ -559,6 +556,7 @@
     */
     [Parameter]
     public string? AssetCode { get; set; }
+
     private readonly string _assetType = "internal";
 
     private bool IsReadOnly = false;
@@ -611,6 +609,7 @@
     }
 
     protected async Task HandleSubmit() {
+
         if (await Model.SaveAsync(_assetType)) {
             if (string.IsNullOrEmpty(AssetCode)) {
                 PageNavigation.NavigateTo("asset/manage/edit");
@@ -619,8 +618,10 @@
     }
 
     protected async Task HandleAction(RadzenSplitButtonItem item) {
+
         if (item.Value == "new") {
-            var confirm = await DialogService.Confirm("Do you to create new", "New Entry", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+            var confirm = await DialogService.Confirm("Do you to create new", "New Entry", 
+                                    new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
             if (confirm.Value) {
                 await Model.NewEditAsync("", _assetType);
                 PageNavigation.NavigateTo("/asset/form/internal","","",true);
@@ -629,8 +630,7 @@
         else if(item.Value == "search")
         {
             var result = await DialogService.OpenAsync<InternalSearch>("Search");
-            if(result != null)
-            {
+            if(result != null) {
                 PageNavigation.NavigateTo("/asset/form/internal", result.AssetCode,"",true,true);
             }
         }

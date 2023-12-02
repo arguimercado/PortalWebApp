@@ -132,6 +132,9 @@ public class InternalAsset : AggregateRoot<int>
     public DateTime? FirstRegDate { get; set; }
     public DateTime? PurchaseDate { get; set; }
     public float NetValue { get; set; }
+
+    public float OriginalPurchasePrice { get; set; }
+    public DateTime? DispositionDate { get; set; }
     public string VendorCode { get; set; } = string.Empty;
     public string CompanyCode { get; set; } = string.Empty;
     public string ManagedBy { get; set; } = string.Empty;

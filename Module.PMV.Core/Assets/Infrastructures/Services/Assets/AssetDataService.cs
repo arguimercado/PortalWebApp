@@ -9,13 +9,12 @@ public class AssetDataService : IAssetDataService
 {
     private readonly ISqlQuery _sqlQuery;
 
-    public AssetDataService(ISqlQuery sqlQuery)
-    {
+    public AssetDataService(ISqlQuery sqlQuery) {
         _sqlQuery = sqlQuery;
     }
-    public async Task<int> GetInternalAssetNo(string subCatCode)
-    {
-
+    
+    public async Task<int> GetInternalAssetNo(string subCatCode) {
+        
         string query = "SELECT AssetNo FROM PMV WHERE SubCatCode = @subCatCode ORDER BY AssetNo DESC";
         var results = await _sqlQuery.DynamicQueryScalar<int>(query, new { subCatCode });
         return results;
@@ -180,7 +179,7 @@ public class AssetDataService : IAssetDataService
     public async Task<InternalAsset> GetInternal(object value, string searchType = "")
     {
         object filterParam = searchType == "code" ? new { assetCode = value } : new { id = value };
-
+        var condition = searchType == "code" ? "pmv.AssetCode = @assetCode" : "pmv.slno = @id";
         var strSQL = @"SELECT 
 					pmv.slno SlNo,
 					pmv.cid Cid,
@@ -239,12 +238,10 @@ public class AssetDataService : IAssetDataService
 				FROM PMV pmv
 				LEFT JOIN PMV_AssetAdditional ad ON ad.assetCode = pmv.AssetCode
 				LEFT JOIN HLMPMV.AssetDocument doc ON doc.AssetId = pmv.slno
-				WHERE ";
-        
-        strSQL = strSQL + searchType == "code" ? "(pmv.AssetCode = @assetCode)" : "(pmv.slno = @id)";
+				WHERE " + condition;
 
         var results = await _sqlQuery.DynamicQuery<InternalAsset, AssetAdditional, AssetDocument, InternalAsset>(strSQL,
-       new { id = value },
+       filterParam,
        (asset, additional, document) =>
        {
            asset.AddAdditional(additional);

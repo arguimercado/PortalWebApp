@@ -9,6 +9,7 @@ using Portal.WebClient.Pages.Fuels.FuelTracking.Data;
 using Portal.WebClient.Pages.Fuels.FuelTracking.ViewModels;
 using Radzen;
 using WebApp.Client.Pages.Authentication.Data;
+using WebApp.Client.Pages.PMV.Assets.Components.Entry.ViewModels;
 using WebApp.Client.Pages.PMV.Assets.Components.Manage.ViewModels;
 using WebApp.Client.Pages.PMV.Assets.Data;
 using WebApp.Client.Pages.PMV.Assets.ViewModels;
@@ -80,6 +81,7 @@ namespace WebApp.Client.Extensions
         {
             
             services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            services.AddScoped<UserAuthProvider>();
             services.AddScoped<JSInterOpProvider>();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             return services;

@@ -48,9 +48,12 @@ internal sealed class ServiceAlertDataService : IServiceAlertDataService
 
     }
 
-    public Task<IEnumerable<ServiceAlert>> GetServiceAlert(int assetId)
+    public async Task<IEnumerable<ServiceAlert>> GetServiceAlerts(int assetId)
     {
-        throw new NotImplementedException();
+        var sql = "SELECT * FROM HLMPMV.ServiceDue WHERE AssetId = @assetId";
+        var results = await _sqlQuery.DynamicQuery<ServiceAlert>(sql,new {assetId = assetId});
+
+        return results;
     }
 
     public async Task UpdateAlert(ServiceAlert due, bool kmOnly = false)

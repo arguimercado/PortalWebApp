@@ -4,7 +4,7 @@ using WebApp.Client.Pages.PMV.Assets.Models;
 using WebApp.UILibrary.Commons;
 using WebApp.UILibrary.Components.Common.Spinners;
 
-namespace WebApp.Client.Pages.PMV.Assets.ViewModels;
+namespace WebApp.Client.Pages.PMV.Assets.Components.Entry.ViewModels;
 
 public class AssetDocumentViewModel : ViewModelBase
 {

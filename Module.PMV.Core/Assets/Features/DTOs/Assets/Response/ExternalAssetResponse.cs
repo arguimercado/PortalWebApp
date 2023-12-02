@@ -12,4 +12,5 @@ public class ExternalAssetResponse
     public string HireOrSubContract { get; set; } = "";
     public float FuelTankCapacity { get; set; }
     public DateTime? CreatedAt { get; set; }
+    public string? CreateBy { get; set; }
 }

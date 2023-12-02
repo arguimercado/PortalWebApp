@@ -1,6 +1,7 @@
 ﻿using Radzen;
 using WebApp.Client.Pages.PMV.Assets.Data;
 using WebApp.Client.Pages.PMV.Assets.Models;
+using WebApp.Client.Providers;
 using WebApp.UILibrary.Commons;
 using WebApp.UILibrary.Components.Common.Spinners;
 
@@ -13,16 +14,19 @@ public class AssetViewModel : ViewModelBase
     private readonly DialogService _dialogService;
     private readonly NotificationService _notificationService;
     private readonly CustomSpinnerViewModel _spinner;
+    private readonly UserAuthProvider _userProvider;
 
-    public AssetViewModel(IAssetService service,
+    public AssetViewModel(
+        IAssetService service,
         DialogService dialogService,
         NotificationService notificationService,
-        CustomSpinnerViewModel spinner)
-    {
+        CustomSpinnerViewModel spinner,
+        UserAuthProvider userProvider) {
         _service = service;
         _dialogService = dialogService;
         _notificationService = notificationService;
         _spinner = spinner;
+        _userProvider = userProvider;
     }
 
     public AssetContainerModel AssetContainer { get; set; } = new();
@@ -111,22 +115,18 @@ public class AssetViewModel : ViewModelBase
             {
                 _spinner.Loading = true;
                 var newEntryContainer = AssetContainerModel.Create();
-
-                if (type == "internal")
-                {
-
+                await _userProvider.ExtractUser();
+                if (type == "internal") {
                     //validate
-
-
                     newEntryContainer.InternalAsset = AssetContainerModel
                                                         .CreateInternal(AssetContainer.InternalAsset);
+                    await _service.SaveInternal(newEntryContainer.InternalAsset,_userProvider.UserName);
                 }
                 else
                 {
                     newEntryContainer.ExternalAsset = AssetContainer.ExternalAsset;
+                    await _service.SaveExternal(newEntryContainer.ExternalAsset,_userProvider.UserName);
                 }
-
-                await _service.Save(newEntryContainer, type);
 
                 _spinner.Loading = false;
                 _notificationService.Notify(NotificationSeverity.Success, "Save successfully");

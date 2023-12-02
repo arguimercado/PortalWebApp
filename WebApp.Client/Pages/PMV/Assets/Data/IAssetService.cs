@@ -6,7 +6,7 @@ namespace WebApp.Client.Pages.PMV.Assets.Data;
 public interface IAssetService
 {
     Task<AssetContainerModel> CreateNew(string assetType, bool isPostBack = false);
-    Task<AssetContainerResponse> GetAssets(FilterAssetModel filterAssetParam);
+    Task<AssetContainerModel> GetAssets(FilterAssetModel filterAssetParam);
     Task<AssetContainerModel?> GetAsset(string searchValue, string searchType, string assetType, bool IsPostBack);
     Task<string> GetAssetNo(string subCategory);
     Task<AssetReadModel?> ViewAsset(int id);

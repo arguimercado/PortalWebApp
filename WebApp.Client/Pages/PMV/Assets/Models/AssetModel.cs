@@ -91,25 +91,27 @@ public class AssetContainerModel
 
 
     public InternalAssetModel InternalAsset { get; set; } = new();
+    public IEnumerable<InternalAssetModel> InternalAssets { get; set; } = new List<InternalAssetModel>();
     public ExternalAssetModel ExternalAsset { get; set; } = new();
-    public IEnumerable<SelectItem> Categories { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem> SubCategories { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem> Companies { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem> Brands { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem> Vendors { get; set; } = new List<SelectItem>();
+    public IEnumerable<ExternalAssetModel> ExternalAssets { get; set; } = new List<ExternalAssetModel>();
+    public List<SelectItem> Categories { get; set; } = new();
+    public List<SelectItem> SubCategories { get; set; } = new();
+    public List<SelectItem> Brands { get; set; } = new();
+    public List<SelectItem> Companies { get; set; } = new();
+    public List<SelectItem> Statuses { get; set; } = new();
+    public List<SelectItem> PlateTypes { get; set; } = new();
+    public List<SelectItem> HireSub { get; set; } = new();
+    public List<SelectItem> Vendors { get; set; } = new();
+    public IEnumerable<SelectItem> Accounts { get; set; } = new List<SelectItem>();
     public IEnumerable<SelectItem> RentOwnes { get; set; } = new List<SelectItem>();
     public IEnumerable<SelectItem> HireMethods { get; set; } = new List<SelectItem>();
     public IEnumerable<SelectItem> AssetTypes { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem> Statuses { get; set; } = new List<SelectItem>();
-
-    public IEnumerable<SelectItem> Accounts { get; set; } = new List<SelectItem>();
-
     public IEnumerable<SelectItem> ServiceGroups { get; set; } = new List<SelectItem>();
-
-    public IEnumerable<SelectItem> PlateTypes { get; set; } = new List<SelectItem>();
-
     public IEnumerable<OperatorDriverModel> Drivers { get; set; } = new List<OperatorDriverModel>();
-
+    
+    public List<SelectItem> GetSubCategoryByType(List<string?> catId) => 
+        SubCategories.Where(s => catId.Contains(s.Type)).ToList();
+    public List<SelectItem> GetAll() => SubCategories.ToList();
     public IEnumerable<SelectItem> GetSubCategoryByCat
     {
         get
@@ -269,6 +271,8 @@ public class InternalAssetModel
     public string BrandCode { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
     public int Year { get; set; }
+
+    public string MakeModelYear => $"{BrandCode}/{Model}/{Year}";
     public string? Color { get; set; }
     public string? PlateNo { get; set; }
     public string? EngineNo { get; set; }
@@ -532,7 +536,20 @@ public class OperatorDriverModel
 
 public class ExternalAssetModel
 {
-    
+    public static ExternalAssetModel ToModel(ExternalAssetResponse res)
+    {
+        return new ExternalAssetModel
+        {
+            AssetCode = res.AssetCode,
+            AssetDesc = res.Description,
+            PlateType = res.PlateType,
+            PlateNum = res.PlateNum,
+            VendorCode = res.Vendor,
+            CompanyCode = res.HireUnder,
+            HireSub = res.HireOrSubContract,
+            FuelTankCapacity = res.FuelTankCapacity
+        };
+    }
     public ExternalAssetRequest ToRequest()
     {
         return new ExternalAssetRequest

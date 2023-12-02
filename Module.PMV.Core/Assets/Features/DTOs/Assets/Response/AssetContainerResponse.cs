@@ -18,9 +18,7 @@ public class AssetContainerResponse
         public string? PresentEmail { get; set; }
     }
     public IEnumerable<InternalAssetResponse> InternalAssets { get; set; } = new List<InternalAssetResponse>();
-
     public InternalAssetResponse InternalAsset { get; set; } = new();
-
     public IEnumerable<ExternalAssetResponse> ExternalAssets { get; set; } = new List<ExternalAssetResponse>();
 
     public ExternalAssetResponse ExternalAsset { get; set; } = new();
@@ -33,12 +31,12 @@ public class AssetContainerResponse
     public List<SelectItem> PlateTypes { get; set; } = new();
     public List<SelectItem> HireSub { get; set; } = new();
     public List<SelectItem> Vendors { get; set; } = new();
+    public IEnumerable<SelectItem> Accounts { get; set; } = new List<SelectItem>();
+    public IEnumerable<SelectItem> RentOwnes { get; set; } = new List<SelectItem>();
+    public IEnumerable<SelectItem> HireMethods { get; set; } = new List<SelectItem>();
+    public IEnumerable<SelectItem> AssetTypes { get; set; } = new List<SelectItem>();
+    public IEnumerable<SelectItem> ServiceGroups { get; set; } = new List<SelectItem>();
     public IEnumerable<DriversOperator> Drivers { get; set; } = new List<DriversOperator>();
-    public IEnumerable<SelectItem>? Accounts { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem>? RentOwnes { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem>? HireMethods { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem>? AssetTypes { get; set; } = new List<SelectItem>();
-    public IEnumerable<SelectItem>? ServiceGroups { get; set; } = new List<SelectItem>();
     public List<SelectItem> GetSubCategoryByCat(List<string?>? catId) => SubCategories.Where(s => catId!.Contains(s.Type!)).ToList();
     public List<SelectItem> GetAll() => SubCategories.ToList();
 }

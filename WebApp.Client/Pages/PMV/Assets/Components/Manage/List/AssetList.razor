@@ -1,7 +1,4 @@
-﻿@using Module.PMV.Core.Assets.Features.DTOs.Assets.Response
-@using Module.PMV.Core.Assets.Models.Assets
-
-@using WebApp.Client.Pages.PMV.Assets.Components.Manage.ViewModels
+﻿@using WebApp.Client.Pages.PMV.Assets.Components.Manage.ViewModels
 @using WebApp.Client.Pages.PMV.Assets.Models;
 @using WebApp.Client.Pages.PMV.Assets.ViewModels;
 @using WebApp.UILibrary.Components.Grid
@@ -100,7 +97,7 @@
 
 
     <RadzenDataGrid Data=@AssetData.ToList()
-                    TItem="InternalAssetResponse"
+                    TItem="InternalAssetModel"
                     AllowPaging="true"
                     PageSize="10"
                     AllowColumnReorder="true"
@@ -112,30 +109,30 @@
                     ShowPagingSummary="true"
                     AllowColumnPicking=true>
         <Columns>
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="AssetCode" Title="Asset Code" Width="160px">
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="AssetCode" Title="Asset Code" Width="160px">
                 <Template Context="asset">
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
                         <span>@asset.AssetCode</span>&nbsp;
-                        <a href="@($"/asset/manage/view/{asset.Id}")" style="text-decoration:none">
+                        <a href="@($"/asset/manage/view/{asset.SlNo}")" style="text-decoration:none">
                             <RadzenIcon Icon="pageview" />
                         </a>
                     </RadzenStack>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="AssetDesc" Title="Description" />
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="MakeModelYear" Title="Make/Model/Year">
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="AssetDesc" Title="Description" />
+            <RadzenDataGridColumn TItem="InternalAssetModel"  Title="Make/Model/Year">
                 <Template Context="data">
-                    <span>@($"{data.YearMakeModel}")</span>
+                    <span>@($"{data.Year}/{data.BrandCode}/{data.Model}")</span>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="PlateNo" Title="Plate No" TextAlign="TextAlign.Center" Width="140px" />
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="CompanyCode" Title="Reg. Under" TextAlign="TextAlign.Center" Width="180px" />
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="PurchaseDate" Title="Purchase Date" FormatString="{0:dd/MMM/yyyy}" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="VendorCode" Title="Vendor" />
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="LPONo" Title="PO No" />
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="TankCapacity" Title="Tank Capacity" />
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Property="KmPerHr" Title="SMU" TextAlign="TextAlign.Right" Width="120px" />
-            <RadzenDataGridColumn TItem="InternalAssetResponse" Title="Operator/Driver">
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="PlateNo" Title="Plate No" TextAlign="TextAlign.Center" Width="140px" />
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="CompanyCode" Title="Reg. Under" TextAlign="TextAlign.Center" Width="180px" />
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="PurchaseDate" Title="Purchase Date" FormatString="{0:dd/MMM/yyyy}" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="VendorCode" Title="Vendor" />
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="LPONo" Title="PO No" />
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="TankCapacity" Title="Tank Capacity" />
+            <RadzenDataGridColumn TItem="InternalAssetModel" Property="KmPerHr" Title="SMU" TextAlign="TextAlign.Right" Width="120px" />
+            <RadzenDataGridColumn TItem="InternalAssetModel" Title="Operator/Driver">
                 <Template Context="data">
                     @foreach (var item in data.Drivers) {
                         <RadzenStack Orientation=Orientation.Horizontal Gap="5px">
@@ -148,7 +145,7 @@
             </RadzenDataGridColumn>
             @if(EditMode != "read")
             {
-                <RadzenDataGridColumn TItem="InternalAssetsResponse" Context="asset"
+                <RadzenDataGridColumn TItem="InternalAssetModel" Context="asset"
                                       TextAlign="TextAlign.Center" Width="50px"
                                       Filterable=false
                                       Sortable=false
@@ -182,13 +179,14 @@
             StateHasChanged();
         }
     }
-    
+
     protected FilterAssetModel FilterData => Model.FilterAsset;
 
-    protected IEnumerable<InternalAssetResponse> AssetData
+    protected IEnumerable<InternalAssetModel> AssetData
                     => Model.AssetListContainer!.InternalAssets.ToList();
 
-    protected List<SharedServer.Commons.SelectItem> FilteredSubCategories { get; set; } = new();
+    protected IEnumerable<SharedServer.Commons.SelectItem> FilteredSubCategories { get; set; } 
+        = new List<SharedServer.Commons.SelectItem>();
 
     private void HandleFilterChange(object values)
     {
@@ -203,7 +201,7 @@
             }
             else {
                 var stringValues = trueValue.Select(x => x.ToString()).ToList();
-                FilteredSubCategories = Model.AssetListContainer!.GetSubCategoryByCat(stringValues);
+                FilteredSubCategories = Model.AssetListContainer!.GetSubCategoryByType(stringValues);
             }
         };
 
@@ -215,7 +213,4 @@
         FilterData.AssetType = "internal";
         await Model.Filter();
     }
-
-
-
 }

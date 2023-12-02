@@ -1,5 +1,6 @@
 ﻿@using WebApp.Client.Pages.PMV.Assets.Models;
 @using WebApp.Client.Pages.PMV.Assets.ViewModels;
+@using WebApp.Client.Pages.PMV.Assets.Components.Entry.ViewModels;
 
 @inherits ComponentViewModelBase<AssetServiceViewModel>
 @inject DialogService DialogService
@@ -88,13 +89,15 @@
     private RadzenDataGrid<ServiceDueEntryModel>? Grid;
 
     [Parameter]
-    public IEnumerable<ServiceDueEntryModel> Data {
-        get => Model.ServiceDues.ToList();
-        set => Model.ServiceDues = value.ToList();
-    }
+    public IEnumerable<SharedServer.Commons.SelectItem> ServiceGroups { get; set; } = new List<SharedServer.Commons.SelectItem>();
 
     [Parameter]
-    public IEnumerable<SelectItem> ServiceGroups { get; set; } = new List<SelectItem>();
+    public IEnumerable<ServiceDueEntryModel> Data { get; set; } = new List<ServiceDueEntryModel>();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
 
     [Parameter]
     public int AssetId { get; set; }

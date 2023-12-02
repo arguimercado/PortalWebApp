@@ -1,5 +1,4 @@
-﻿using Module.PMV.Core.Assets.Features.DTOs.Assets.Response;
-using Radzen;
+﻿using Radzen;
 using WebApp.Client.Pages.PMV.Assets.Data;
 using WebApp.Client.Pages.PMV.Assets.Models;
 using WebApp.UILibrary.Commons;
@@ -33,10 +32,9 @@ public class AssetListViewModel : ViewModelBase
 
 
 
-    public AssetContainerResponse AssetListContainer { get; set; } = new();
+    public AssetContainerModel AssetListContainer { get; set; } = new();
 
     public FilterAssetModel FilterAsset { get; set; } = new();
-
 
     public string BaseUrl { get; set; } = "";
 

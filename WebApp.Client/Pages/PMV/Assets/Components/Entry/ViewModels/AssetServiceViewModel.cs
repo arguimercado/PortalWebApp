@@ -4,7 +4,7 @@ using WebApp.Client.Pages.PMV.Assets.Models;
 using WebApp.UILibrary.Commons;
 using WebApp.UILibrary.Components.Common.Spinners;
 
-namespace WebApp.Client.Pages.PMV.Assets.ViewModels
+namespace WebApp.Client.Pages.PMV.Assets.Components.Entry.ViewModels
 {
     public class AssetServiceViewModel : ViewModelBase
     {
@@ -33,7 +33,8 @@ namespace WebApp.Client.Pages.PMV.Assets.ViewModels
 
         public async Task CreateServiceDue(int slNo)
         {
-            try {
+            try
+            {
                 _spinner.Loading = true;
                 var result = await _service.CreateServiceDue(slNo, ServiceDueId);
                 ServiceDues = result.ToList();
@@ -48,22 +49,25 @@ namespace WebApp.Client.Pages.PMV.Assets.ViewModels
             }
         }
 
-        public async Task<bool> UpdateServiceDue(int assetId,ServiceDueEntryModel due)
+        public async Task<bool> UpdateServiceDue(int assetId, ServiceDueEntryModel due)
         {
             try
             {
                 var confirm = await _dialogService.Confirm("Do you want to update this service?", "Update Dialog");
-                if (confirm.Value) {
-                    
+                if (confirm.Value)
+                {
+
                     var selected = ServiceDues.FirstOrDefault(d => d.Id == due.Id);
-                    if (selected != null) {
+                    if (selected != null)
+                    {
                         _spinner.Loading = true;
                         selected.MarkDeleted = false;
-                        if (due.LastServiceDate.HasValue) {
+                        if (due.LastServiceDate.HasValue)
+                        {
                             selected.LastServiceDate = due.LastServiceDate;
                         }
                         selected.LastSMUReading = due.LastSMUReading;
-                        await _service.UpdateServiceDue(assetId,due);
+                        await _service.UpdateServiceDue(assetId, due);
                         selected.Recalculate();
                         _spinner.Loading = false;
 
