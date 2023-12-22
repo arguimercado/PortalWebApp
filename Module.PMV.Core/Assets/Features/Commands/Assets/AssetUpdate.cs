@@ -2,7 +2,6 @@
 using Module.PMV.Core.Assets.Contracts.Commons;
 using Module.PMV.Core.Assets.Features.DTOs.Assets.Request;
 using Module.PMV.Core.Assets.Models.Assets;
-using WebApp.SharedServer.Notifications;
 
 namespace Module.PMV.Core.Assets.Features.Commands.Assets;
 
